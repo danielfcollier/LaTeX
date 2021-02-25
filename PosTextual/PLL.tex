@@ -1,0 +1,750 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Malha de Captura de Fase} \label{apendice:pll}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O \textit{phase-locked loop} (PLL) é uma malha de captura de fase, isto é, um circuito de sincronismo em malha fechada capaz de detectar a fase e a frequência fundamental de um sinal periódico. Os PLLs são utilizados em diversas aplicações na engenharia elétrica e dentre as aplicações em eletrônica de potência, se destacam em conversores conectados à rede elétrica que requerem a sincronização entre as tensões da rede e as tensões ou correntes sintetizadas pelo conversor. Exemplos de aplicações são filtros ativos, inversores que injetam energia proveniente de fontes renováveis, entre outros \cite{Teses-08-01,Artigos-08-06,Artigos-08-08}. 
+
+Neste trabalho apresenta-se a descrição matemática do PLL baseado na teoria $pq$, cuja metodologia é apresentada em \cite{Artigos-08-06}. O projeto e sintonia do controlador do PLL é feita de acordo com as referências \cite{Livros-Best,Artigos-08-13,Artigos-08-08,Artigos-08-06,Teses-08-01}. São também apresentadas as modificações propostas para garantir a estabilidade do PLL durante a operação com sinais de entrada de amplitude variável, em que se projeta um PLL normalizado. Estas modificações são necessárias, pois o PLL é aplicado nas correntes de fase do GSIP para identificação do ângulo $\delta_i$ utilizado na modulação vetorial do VSR$_{\Delta}$ e utilizado na técnica de autocontrole de corrente com compensação para estimação da velocidade do GSIP. Como resultado, obteve-se um PLL robusto às grandes variações de amplitude das correntes e capaz de sincronizar rapidamente. O erro estático dos PLLs digitais é analisado devido à sua influência na técnica de modulação vetorial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Análise do PLL baseado na Teoria $pq$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sejam dois vetores do sistema trifásico, $\vec{x}_{abc}$ e $\vec{u}_{abc}$, de mesma frequência $\omega$, em que a amplitude dos sinais em $\vec{x}_{abc}$ é $X_{pk}$ e em $\vec{u}_{abc}$ é unitária. A transformada $\alpha \beta$ destes sinais são dadas por (\ref{eq:xpll}) e (\ref{eq:u}), respectivamente. Em regime permanente, estes sinais podem ser descritos na forma complexa por (\ref{eq:ex}) e (\ref{eq:eu}), em que $\theta_x=\omega t + \theta_x(t_0)$ e $\theta_u=\omega t + \theta_u(t_0)$.
+
+\begin{equation}
+\label{eq:xpll}
+\vec{x}_{\alpha\beta}=x_{\alpha}+jx_{\beta}
+\end{equation}
+
+\begin{equation}
+\label{eq:u}
+\vec{u}_{\alpha\beta}=u_{\alpha}+ju_{\beta}
+\end{equation}
+
+\begin{equation}
+\label{eq:ex}
+\vec{X}_{\alpha\beta}=X_{pk}e^{j\theta_x}=X_{pk}[\cos(\theta_x)+j\textrm{sen}(\theta_x)]
+\end{equation}
+
+\begin{equation}
+\label{eq:eu}
+\vec{U}_{\alpha\beta}=e^{j\theta_u}=\cos(\theta_u)+j\textrm{sen}(\theta_u)
+\end{equation}
+
+Segundo a teoria $pq$, a potência complexa instantânea pode ser descrita por\footnote{Despreza-se a parcela referente à sequência zero.} (\ref{eq:s}). Como a matriz de transformação $\alpha\beta$ utilizada em \cite{Livros-pq} é diferente da utilizada neste trabalho, há uma diferença em (\ref{eq:s}) que é o ganho de 3/2. No entanto, essa diferença não altera as conclusões obtidas a partir da teoria $pq$.
+
+\begin{equation}
+\label{eq:s}
+\dot{s}=p+jq=\left(\dfrac{3}{2}\right)\vec{v}_{\alpha\beta}\vec{i}_{\alpha\beta}^{c*}
+\end{equation}
+
+Aplicando os sinais $\vec{x}_{abc}$ e $\vec{u}_{abc}$ em (\ref{eq:s}) como, respectivamente, tensões e correntes (pode-se trocar a ordem sem consequências) obtêm-se como resultados (\ref{eq:sxu}) e (\ref{eq:sxu-reg}) para a condição em regime permanente. 
+
+\begin{equation}
+\label{eq:sxu}
+\dot{s}_{xu}=p_{xu}+jq_{xu}=\dfrac{3}{2}\left[(x_{\alpha}u_{\alpha}+x_{\beta}u_{\beta})+j(x_{\beta}u_{\alpha}-x_{\alpha}u_{\beta})\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:sxu-reg}
+\dot{S}_{xu}=\dfrac{3}{2}X_{pk}[\cos(\theta_x-\theta_u)+j\textrm{sen}(\theta_x-\theta_u)]
+\end{equation}
+
+Observa-se que, se $\vec{u}_{\alpha \beta}$ é uma estimativa normalizada de $\vec{x}_{\alpha \beta}$, isto é, $\theta_u=\hat{\theta}_x$, e se esta estimativa em regime permanente tende ao valor correto $\theta_x$ têm-se que as potências ativas e reativa, obtidas a partir de (\ref{eq:sxu}), tendem a $(3/2)X_{pk}$ e zero, respectivamente. Estes resultados são expressos por (\ref{eq:limites-p}) e (\ref{eq:limites-q}).
+
+\begin{equation}
+\label{eq:limites-p}
+\lim_{t\rightarrow\infty}\dfrac{3}{2}X_{pk}\cos(\theta_x-\hat{\theta}_x)=\dfrac{3}{2}X_{pk}
+\end{equation}
+
+\begin{equation}
+\label{eq:limites-q}
+\lim_{t\rightarrow\infty}\dfrac{3}{2}X_{pk}\textrm{sen}(\theta_x-\hat{\theta}_x)=0
+\end{equation}
+
+As estratégias de sincronismo baseadas na teoria $pq$ recebem o nome de p-PLL quando se utiliza o resultado (\ref{eq:limites-p}) e as respectivas equações para determinação da estratégia de operação em malha fechada do PLL. E, q-PLL quando se utiliza (\ref{eq:limites-q}). Neste trabalho será utilizado o q-PLL, pois enquanto o q-PLL captura a fase do sinal da fase $a$ do vetor $\vec{x}_{abc}$, o p-PLL captura uma fase adiantada em $90^\circ$ \cite{Artigos-08-06}. 
+
+%\pagebreak
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Projeto do q-PLL} \label{pll:qPLL}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Garantindo que $\Delta \theta$ é nulo em regime permanente, garante-se o rastreamento da fase do sinal $\vec{x}_{abc}$. 
+
+Seja a potência reativa de (\ref{eq:sxu}), reescrita como uma função da amplitude $x_{pk}$ e das variações de ângulo $\Delta \theta = \theta_x - \hat{\theta}_x$ (\ref{eq:q-generico}). Isto é, considera-se que a equação de regime permanente (\ref{eq:sxu-reg}) também é válida em transitórios.
+
+\begin{equation}
+\label{eq:q-generico}
+q_{xu}(x_{pk},\Delta \theta)=\dfrac{3}{2}x_{pk}\textrm{sen}(\Delta\theta)
+\end{equation}
+
+Linearizando (\ref{eq:q-generico}) em torno do ponto de equilíbrio, obtém-se como resultado (\ref{eq:q-equilibrio}).
+
+\begin{flalign}
+\label{eq:q-equilibrio}
+q_{xu}(x_{pk},\Delta \theta) &\approx \bar{q}_{xu} + \tilde{q}_{xu} = \\
+ &=\dfrac{3}{2}\left[\bar{x}_{pk}\textrm{sen}(\Delta\bar{\theta}) + \bar{x}_{pk} \cos(\Delta\bar{\theta})\Delta\tilde{\theta} + \textrm{sen}(\Delta\bar{\theta}) \tilde{x}_{pk}\right] \nonumber
+\end{flalign}
+
+Reescrevendo a parcela de pequenos sinais em (\ref{eq:q-small}), observa-se que, variações da amplitude do sinal de entrada não irão afetar a fase estimada, pois $\Delta\bar{\theta}=0$. Deve-se notar que, como a parcela no ponto de operação é nula, a parcela de pequenos sinais pode ser calculada a partir de $q_{xu}=(3/2)(x_{\beta} u_{\alpha}-x_{\alpha} u_{\beta})$.
+
+\begin{equation}
+\label{eq:q-small}
+\tilde{q}_{xu} =\dfrac{3}{2} \left[ \bar{x}_{pk}\cos(\Delta\bar{\theta})\Delta\tilde{\theta} + \textrm{sen}(\Delta\bar{\theta}) \tilde{x}_{pk}\right]=\dfrac{3}{2}\bar{x}_{pk} \Delta\tilde{\theta}
+\end{equation}
+
+O diagrama de blocos do sistema em malha aberta está ilustrado na Fig.~\ref{ap02:ftma}. Observa-se que foi inserido um integrador para representar a relação de transferência entre velocidade angular e ângulo.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/ftma.eps}
+	\caption{Diagrama de blocos do sistema em malha aberta.}
+	\label{ap02:ftma}
+\end{figure}
+
+O valor de $\Delta\tilde{\omega}$ pode ser obtido a partir da derivação de (\ref{eq:Deltatheta}), cujo resultado é expresso pela variação de velocidade angular $\Delta\omega$, pela velocidade angular do sinal de entrada $\omega$ e pela velocidade angular do sinal estimado $\hat{\omega}$.
+
+\begin{equation}
+\label{eq:Deltatheta}
+\Delta\theta=\theta_x-\hat{\theta}_x \Rightarrow \dfrac{d\Delta\theta}{dt}=\dfrac{d\theta_x}{dt}-\dfrac{d\hat{\theta}_x}{dt} \Rightarrow\ \Delta\omega = \omega - \hat{\omega} 
+\end{equation} 
+
+A velocidade angular do sinal de entrada pode ser escrita como a soma de um valor inicial $\bar{\omega}_0$, conhecido  como \textit{frequência central}, e de uma perturbação $\omega_q$, conforme (\ref{eq:omega0q}). 
+
+\begin{equation}
+\label{eq:omega0q}
+\omega=\bar{\omega}_0 + \omega_q
+\end{equation} 
+
+Assim, linearizando (\ref{eq:Deltatheta}) em torno do ponto de equilíbrio obtém-se (\ref{eq:Deltaomega-lin}). 
+
+\begin{equation}
+\label{eq:Deltaomega-lin}
+\Delta\omega\approx\Delta\bar{\omega}+\Delta\tilde{\omega}=\bar{\omega}_0+\bar{\omega}_q+\tilde{\omega}_q-\bar{\hat{\omega}}-\tilde{\hat{\omega}}
+\end{equation} 
+
+Portanto, conclui-se que, no equilíbrio ($\Delta\bar{\omega}=0$) a velocidade angular estimada é igual ao valor da frequência central  somado à perturbação, isto é, $\bar{\omega}=\bar{\omega}_0+\bar{\omega}_q$. A variação de velocidade angular em torno do ponto de equilíbrio é dada por (\ref{eq:Deltaomegatilde}).
+
+\begin{equation}
+\label{eq:Deltaomegatilde}
+\Delta\tilde{\omega}=\tilde{\omega}_q-\tilde{\hat{\omega}}
+\end{equation}
+
+Aplicando (\ref{eq:Deltaomegatilde}) no diagrama de blocos de malha aberta e observando que é possível utilizar $\tilde{\hat{\omega}}$ como sinal de controle, é possível obter duas estruturas de controle conforme ilustrado na Fig.~\ref{ap02:ftmfs}. 
+
+\begin{figure}[!htb]
+	\centering
+	
+	\subfigure[]{
+	\label{ap02:ftmf}
+	\includegraphics[scale=\escalafig]{Figuras/ap02/ftmfN.eps}}
+	
+	\subfigure[]{
+	\label{ap02:ftmfN}
+	\includegraphics[scale=\escalafig]{Figuras/ap02/ftmf.eps}}
+	
+	\caption[Diagrama de blocos dos sistemas de controle do q-PLL.]{Diagrama de blocos dos possíveis sistemas de controle do q-PLL.}
+	\label{ap02:ftmfs}
+\end{figure}
+
+O diagrama de blocos da Fig.\ref{ap02:ftmf} é a estrutura de controle típica no projeto de controle de PLLs \cite{Artigos-08-06,Teses-08-01}, em que a divisão pela amplitude do sinal de entrada faz parte da estrutura do controlador. Esta divisão foi colocada em destaque, pois se observa que é possível reorganizar o diagrama de blocos como ilustrado na Fig.~\ref{ap02:ftmfN}. Deve-se notar que, se a amplitude do sinal de entrada é sempre conhecida, o comportamento dinâmico do sistema é dado pelo diagrama de blocos da Fig.~\ref{ap02:ftmfN}. O comportamento dinâmico do sistema para o caso em que o sistema tem variações de amplitude será analisado para um controlador projetado na condição nominal.
+
+Deve-se ressaltar que, nas estruturas de controle apresentadas na Fig~\ref{ap02:ftmfs} não é possível utilizar o filtro de referência para alterar o comportamento dinâmico com relação à referência. Isso se deve ao fato que a referência é sempre zero. Esses sistemas também podem ser vistos como a estrutura de controle clássica dos PLLs \cite{Livros-Best,Artigos-08-13}, conforme ilustrado na Fig.~\ref{ap02:vco}. O PLL é composto de um detector de fase (PD $-$ \textit{phase detector}), de um controlador e de um oscilador de tensão controlado (VCO $-$ \textit{voltage-controlled oscillator}).  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/vco.eps}
+	\caption{Estrutura clássica para estudo de PLLs.}
+	\label{ap02:vco}
+\end{figure}
+
+Para o funcionamento completo do q-PLL é ainda necessário determinar o sinal $\vec{u}_{\alpha \beta}$ para o cálculo da potência reativa $q_{xu}$. Esse pode ser determinado a partir de suas relações em regime permanente em (\ref{eq:sxu-reg}), isto é:
+
+\begin{equation}
+\label{eq:ualpha}
+u_{\alpha} \approx \cos(\hat{\theta}_x)
+\end{equation}
+
+\begin{equation}
+\label{eq:ubeta}
+u_{\beta} \approx \textrm{sen}(\hat{\theta}_x).
+\end{equation}
+
+E, para determinar $\hat{\theta}_x$ resolve-se a integral (\ref{eq:thetax}), em que esta foi determinada a partir de (\ref{eq:Deltatheta}), (\ref{eq:omega0q}) e (\ref{eq:Deltaomegatilde}).
+
+\begin{equation}
+\label{eq:thetax}
+\hat{\theta}_x=\int_{t_0}^t \hat{\omega} d\tau=\int_{t_0}^t (\bar{\omega}_0+\tilde{\hat{\omega}}) d\tau
+\end{equation}
+
+O diagrama de blocos completo do q-PLL está ilustrado na Fig.~\ref{ap02:pll}, referindo-se ao q-PLL simplesmente por PLL. Pode-se observar todas as equações derivadas nesta seção. A divisão dos sinais $x_{\alpha}$ e $x_{\beta}$ pelo valor de pico $\bar{x}_{pk}$ foi propositalmente colocada no início\footnote{Este ganho pode ser considerado como parte do projeto do controlador.} do diagrama de blocos para explicitar que é necessária a divisão pela amplitude do sinal $\vec{x}_{\alpha\beta}$. A multiplicação por (3/2) para obtenção da potência reativa não precisa ser realizada, pois nesse caso o interesse é obter $\Delta\tilde{\theta}$ para controlar o erro de fase. Adicionalmente, é apresentada como saída do PLL a frequência estimada, em que a mesma pode ser filtrada por um filtro passa-baixas para eliminar possíveis ruídos que irão depender da característica do sinal de entrada.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/pll.eps}
+	\caption{Diagrama de blocos do q-PLL.}
+	\label{ap02:pll}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Projeto do Controlador do PLL}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os requisitos que devem ser atendidos pelo controlador do PLL são o seguimento de referência e a rejeição de perturbações, ambas do tipo degrau.   
+
+Escrevendo as funções de transferência, para o diagrama de blocos da Fig.~\ref{ap02:ftmfN}, da saída com relação à entrada e da saída com relação à perturbação para o controlador $C_{PLL}=k_C N_C/D_C$ obtêm-se (\ref{eq:YrNDpll}) e (\ref{eq:YqNDpll}), respectivamente. Observa-se que para qualquer tipo de controlador o seguimento de referência está garantindo (a planta é integradora). Para garantir rejeição de perturbações do tipo degrau o controlador deve ter um pólo na origem. Assim, o controlador PI é uma escolha adequada para o projeto do sistema de controle, cuja função de transferência é dada por (\ref{eq:pi}). Deve-se notar que ganho do controlador deve ser negativo, pois o ganho da planta também é negativo.
+
+\begin{equation}
+\label{eq:YrNDpll}
+\dfrac{\Delta \tilde{\theta}(s)}{\Delta \tilde{\theta}^* (s)}=\dfrac{-k_CN_{C}}{D_{C}s-k_C N_{C}}
+\end{equation}
+
+\begin{equation}
+\label{eq:YqNDpll}
+\dfrac{\Delta \tilde{\theta}(s)}{ \tilde{\omega}_q (s)}=\dfrac{D_{C}}{D_{C}s-k_C N_{C}}
+\end{equation}
+
+Substituindo (\ref{eq:pi}) em (\ref{eq:YrNDpll}) e (\ref{eq:YqNDpll}) obtêm-se (\ref{eq:Yrpll}) e (\ref{eq:Yqpll}). 
+
+\begin{equation}
+\label{eq:Yrpll}
+\dfrac{\Delta \tilde{\theta}(s)}{\Delta \tilde{\theta}^* (s)}=\dfrac{-(k_C s+ k_C/T_i)}{s^2-k_Cs-k_C/T_i}
+\end{equation}
+
+\begin{equation}
+\label{eq:Yqpll}
+\dfrac{\Delta \tilde{\theta}(s)}{ \tilde{\omega}_q (s)}=\dfrac{s}{s^2-k_Cs-k_C/T_i}
+\end{equation}
+
+Para a sintonia dos parâmetros do controlador, considera-se que o sistema em malha fechada tem um comportamento predominante de segunda ordem com fator de amortecimento $\xi$ e frequência natural $\omega_n$, de acordo com a função de transferência (\ref{eq:H2}). 
+
+\begin{equation}
+\label{eq:H2}
+H(s)=\dfrac{2\xi\omega_n s+\omega_n^2}{s^2+2\xi\omega_ns+\omega_n^2}
+\end{equation}
+
+Assim, os parâmetros do controlador podem ser obtidos por (\ref{eq:kcPLL}) e (\ref{eq:TiPLL}).
+
+\begin{equation}
+\label{eq:kcPLL}
+k_C=-2\xi\omega_n
+\end{equation}
+
+\begin{equation}
+\label{eq:TiPLL}
+T_i=\dfrac{2\xi}{\omega_n}
+\end{equation}
+
+Para a sintonia do controlador em função de requisitos de margem de fase e largura de banda, pode-se mostrar que a relação destes parâmetros com o fator de amortecimento e a frequência natural são dadas por (\ref{eq:xi-mf}) e por (\ref{eq:wn-B2}), respectivamente \cite{Livros-Best}.
+
+\begin{equation}
+\label{eq:wn-B2}
+\omega_n(\xi,BW)=\dfrac{2\pi BW}{\sqrt{1+2\xi^2+\sqrt{4\xi^4+4\xi^2+2}}}
+\end{equation}
+
+Antes de definir os requisitos dinâmicos que devem ser atendidos pelo controlador do PLL, serão apresentados conceitos sobre a estabilidade de PLLs. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceitos de Estabilidade de PLLs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Segundo \cite{Livros-Best}, ao se projetar um PLL, deve-se ser capaz de responder as seguintes perguntas: 
+
+\begin{itemize}
+\item $ $ Sobre quais condições o PLL entra em sincronismo? 
+\item $ $ Sobre quais condições o PLL perde o sincronismo? 
+\item $ $ Qual o tempo que o PLL leva para sincronizar? 
+\end{itemize}
+
+As respostas dessas perguntas não podem ser obtidas diretamente a partir do modelo linearizado visto que o PLL é não linear. Em \cite{Livros-Best} são apresentadas as regiões de operação do PLL, as quais definem os seus limites de estabilidade (LE) dinâmica e estática. Essas regiões e os limites\footnote{Considera-se que a malha de controle do PLL é suficiente para atenuar componentes harmônicas do sinal de entrada.} estão ilustrados em torno da frequência central na Fig.~\ref{ap02:regioesPLL}, em que: o limite de estabilidade estática é dado pela frequência $\Delta\omega_H$, conhecida como \textit{hold range} e o limite de estabilidade dinâmica é dado pela frequência $\Delta\omega_{PO}$, conhecida como \textit{pull-out range}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/regioesPLL.eps}
+	\caption{Regiões de operação do PLL.}
+	\label{ap02:regioesPLL}
+\end{figure}
+
+Observa-se que, do ponto de vista prático não há muito interesse na frequência \textit{hold range}, pois só é possível alcançar tal limite com uma variação da frequência de entrada extremamente lenta. A frequência \textit{pull-out range} representa o maior degrau de frequência que pode ser aplicado sem que o mesmo perca o sincronismo. A frequência $\Delta\omega_P$ é conhecida como \textit{pull-in range} e determina a região para a qual o PLL sempre alcança o sincronismo, mas o processo pode ser muito lento. A frequência $\Delta\omega_L$ é conhecida como \textit{lock range} e determina a região para a qual o PLL sempre alcança o sincronismo muito rapidamente (\textit{single beat}).
+
+De acordo com \cite{Livros-Best}, a determinação desses limites depende da estrutura de controle e do tipo\footnote{Em \cite{Livros-Best} são definidos quatros tipos básicos de PLL de acordo com o tipo de detector de fase. O princípio de funcionamento do q-PLL, que é obter um sinal (potência reativa) cujo valor médio é nulo quando o sinal é rastreado, é o mesmo do PLL do tipo 2 encontrado nesta referência.} de PLL empregado. Para o controlador PI e um detector de frequência do tipo 2 os limites da Fig.~\ref{ap02:regioesPLL} são apresentados na Tabela~\ref{tab:Best}. Observa-se que algumas regiões têm limite infinito, o que se deve à característica de erro nulo do controlador PI. No entanto, deve-se observar que este resultado depende, de fato,  do ganho estático do controlador e é limitado na prática pela máxima frequência que é possível rastrear. Para a implementação digital do PLL a máxima frequência depende do limite numérico do processador. E, é ainda possível sincronizar em harmônicas do sinal de entrada com alguns tipos de detectores de fase. Portanto, é recomendado limitar a frequência de saída do controlador PI \cite{Livros-Best}.
+
+\begin{table}[!htb]
+\caption{Limites das regiões de operação do PLL}
+\label{tab:Best}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  | c  }
+\hline
+$\Delta\omega_L$ & $\Delta\omega_{PO}$& $\Delta\omega_{P}$ & $\Delta\omega_H$\\
+\hline
+\hline
+
+$\pi\xi\omega_n$ &  $2,46\omega_n(\xi+0,65)$ & $\infty$ & $\infty$ \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Por mais que teoricamente seja sempre possível sincronizar o PLL para variações de frequência até $\Delta\omega_{P}$, na prática esse limite é reduzido, além do processo de sincronismo ser extremamente lento. O tempo de resposta na região compreendida entre $\Delta\omega_{P}$ e $\Delta\omega_{L}$ pode ser calculado por (\ref{eq:Tpull}), em que $\Delta\omega_0$ é a variação incial da frequência do sinal de entrada com a frequência central. O tempo de resposta para variações de frequência até $\Delta\omega_{P}$ pode ser calculado a partir de (\ref{eq:Tlock}). Observa-se ainda que máxima taxa de variação na frequência do sinal de referência para que o PLL não perca o sincronismo é $\omega_n^2$, mas é comum considerar na prática um limite inferior para essa taxa de $\omega_n^2/2$ \cite{Livros-Best}.
+
+\begin{equation}
+\label{eq:Tpull}
+T_{P}\approx\dfrac{4\Delta\omega_0^2}{\pi^2\xi\omega_n^3}
+\end{equation}
+
+\begin{equation}
+\label{eq:Tlock}
+T_L\approx\dfrac{2\pi}{\omega_n}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aspectos da Implementação Digital}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ao implementar o PLL de maneira digital, percebe-se que a fase rastreada não é instantaneamente igual à fase do sinal de sinal de entrada. Esse fato fica evidente se for observado que, para calcular o sinal de potência reativa, é necessária a estimativa da fase do sinal de entrada para o cálculo de (\ref{eq:ualpha}) e de (\ref{eq:ubeta}). No entanto, só está disponível a amostra calculada no ciclo anterior, o que significa que a fase estimada está sendo ``amostrada''. Assim, representando o atraso digital no diagrama de blocos da Fig.~\ref{ap02:ftmfN} obtém-se como resultado o diagrama de blocos\footnote{A função de transferência da planta $G(z)$ é obtida a partir de algum método de discretização, pois é necessária realizá-la digitalmente. Foi utilizado o método de Tustin.} da Fig.~\ref{ap02:pll-digital}, em que o sinal $\Delta\tilde{\theta}$ foi separado nas parcelas relativas ao sinal de entrada e ao sinal estimado.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/pll-digital.eps}
+	\caption{Diagrama de blocos para análise do PLL digital.}
+	\label{ap02:pll-digital}
+\end{figure}
+
+A presença do atraso, em geral, na malha do PLL é imperceptível tanto para a estabilidade do sistema em malha fechada quanto para os algoritmos que utilizam a informação do PLL. No entanto, devido à operação com relativa baixa frequência de comutação ($f_s\leq10$~kHz), este atraso pode ser significativo, principalmente para os algoritmos que utilizam a informação do ângulo. O erro estático proveniente desse atraso pode ser obtido do diagrama de blocos da Fig.~\ref{ap02:pll-digital}, em que deve-se observar que o PI garante erro nulo em regime permanente. Portanto, em (\ref{eq:regime-PLL}) confirma-se que em regime permanente a fase do sinal estimado não é instantaneamente igual à do sinal de entrada. 
+
+\begin{equation}
+\label{eq:regime-PLL}
+\Delta\tilde{\theta}[k]=\tilde{\theta}_{x}[k]-\tilde{\hat{\theta}}_{x}[k-1]=0\Rightarrow\tilde{\hat{\theta}}_{x}[k-1]=\tilde{{\theta}}_{x}[k]
+\end{equation}
+
+Então, qual é o valor instantâneo da fase estimada? Esse valor pode ser estimado considerando que o sistema se encontra em regime permanente e em sincronismo. Dessa forma, a fase estimada no ciclo $k$ é igual à próxima leitura do sinal de entrada. Essa estimativa está expressa em (\ref{eq:theta-pllest}), em que se observa que o avanço de fase é dado por $\omega T_a$ com $\omega$ igual à frequência do sinal de entrada e $T_a$ igual ao período de amostragem.
+
+\begin{equation}
+\label{eq:theta-pllest}
+\tilde{\hat{\theta}}_x[k]=\tilde{\theta}_x[k+1]\approx\tilde{\theta}_x[k]+\omega T_a
+\end{equation}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/theta-pll.eps}
+	\caption{Avanços de fase na saída do PLL.}
+	\label{ap02:theta-pll}
+\end{figure}
+
+O avanço de fase está ilustrado em função da frequência do sinal de entrada para diversas frequências de amostragem ($f_a$) na Fig.~\ref{ap02:theta-pll}. Observa-se que este pode representar uma parcela considerável do ciclo do sinal de entrada. Para a aplicação do GSIP com frequência de amostragem igual a 8~kHz e o maior avanço de fase é igual a 2,7$^{\circ}$ em 60~Hz.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sintonia do Controlador}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta seção é considerado que os sinais de entrada do PLL têm amplitude constante e igual a um. Portanto, o diagrama de blocos das Fig.~\ref{ap02:ftmf} e da Fig.~\ref{ap02:ftmfN} se tornam equivalentes. Para o caso de sinais de entrada com amplitude não unitária, deve-se normalizar os sinais de entrada pelo valor nominal da amplitude.
+
+São considerados dois tipos de sinais de entrada para o projeto do controlador. O primeiro são as tensões da rede, pois esta é a aplicação comumente encontrada. São analisados os seus requisitos de projeto. Em segundo lugar, são aplicadas as correntes do GSIP e analisadas as características que este sinal apresenta. A partir dessas características são definidos os critérios que o controlador deve atender.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Sinal de Entrada: Tensões da Rede}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ao aplicar as tensões da rede no PLL, este deve ser capaz de operar em condições desbalanceadas, sujeito a harmônicas de baixa frequência e componentes de sequência negativa \cite{Artigos-08-11,Teses-08-01}. Pode-se mostar que a primeira componente harmônica a ser rejeitada no sinal de potência reativa é a segunda harmônica, sendo esta causada pelos desbalanços entre as fases \cite{Teses-08-01,Livros-pq}. Portanto, é conveniente projetar o PLL com uma largura de banda abaixo da segunda harmônica de modo que haja suficiente atenuação dessa componente. Considerou-se uma largura de banda uma década abaixo da segunda harmônica, de modo que a atenuação é aproximadamente 23~dB. 
+
+A escolha do fator de amortecimento ou da margem de fase é feita tendo como critério o desempenho dinâmico do sistema. Em \cite{Artigos-08-08} foi realizada uma otimização para determinar o fator de amortecimento ótimo do sistema (\ref{eq:H2}). Obteve-se como parâmetro ótimo um amortecimento de $1/\sqrt{2}$, isto é, uma margem de fase de $65^\circ$. Portanto, utilizando este valor para o fator de amortecimento e considerando uma rede elétrica com frequência fundamental de 60~Hz, obtêm-se uma largura de banda de 12~Hz. A partir de (\ref{eq:wn-B2}) determina-se a frequência natural como sendo 36,6~rad/s. Os parâmetros do controlador obtidos a partir de (\ref{eq:kcPLL}) e (\ref{eq:TiPLL}) são apresentados na Tabela~\ref{tab:vpll}. 
+
+\begin{table}[!htb]
+\caption{Parâmetros do controlador do PLL aplicado às tensões da rede}
+\label{tab:vpll}
+
+\centering
+
+\begin{center}
+\begin{tabular}{ c  | c  }
+\hline
+$k_C$ & $T_i$\\
+\hline
+\hline
+
+ $-51,8$ 1/s & $38,6$ ms \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Os diagramas de resposta em frequência da resposta à referência e da resposta à perturbação do sistema projetado estão ilustrados na Fig.~\ref{ap02:bodes-vpll} para os casos contínuo e digital\footnote{Discretização pelo método de Tustin e com frequência de amostragem de 8~kHz.}. Observa-se que o comportamento do sistema em baixa frequência é praticamente o mesmo. A atenuação obtida em 120~Hz foi de 23,1~dB para os dois casos, confirmando a metodologia de projeto.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/bodes-vpll.eps}
+	\caption{Diagramas de reposta em frequência da resposta à referência e à perturbação para o PLL aplicado às tensões da rede.}
+	\label{ap02:bodes-vpll}
+\end{figure}
+
+Nas Fig.~\ref{ap02:steps-vpll}(a) e (b) estão mostradas, respectivamente, a resposta ao degrau de referência e a ação de controle para o caso digital, isto é, a variação de frequência em torno do ponto de equilíbrio. O tempo de resposta é cerca de 100~ms. A resposta ao degrau de perturbação e a ação de controle para o caso digital estão mostradas nas Fig.~\ref{ap02:steps-vpll}(c) e (d), cujo tempo de resposta é 80~ms. Nota-se que a ação de controle compensa a perturbação de frequência de 1~Hz.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/steps-vpll.eps}
+	\caption[Respostas ao degraus  para o PLL aplicado às tensões da rede.]{Respostas ao degraus  para o PLL aplicado às tensões da rede: (a) de referência com a respectiva ação de controle em (b); e, (c) de perturbação com a respectiva  ação de controle em (d).}
+	\label{ap02:steps-vpll}
+\end{figure}
+
+As frequências que limitam as regiões de operação do PLL e os tempos de resposta esperados são apresentados na Tabela~\ref{tab:vpll}. Dois processos de sincronização estão ilustrados na Fig.\ref{ap02:sinc-vpll}, para uma tensão de entrada com amplitude de 1~V, em sequência positiva e com uma frequência síncrona igual a $60$~Hz. A sincronização com uma frequência central de 60~Hz está ilustrada na Fig.~\ref{ap02:sinc-vpll}(a), em que se observa que o tempo de resposta está de acordo com o calculado. O tempo de resposta para $\Delta\omega_0=2\pi$(60~Hz) é igual a 1,7~s, cujo processo de sincronização é mostrado na Fig.~\ref{ap02:sinc-vpll}(b) para uma frequência central igual a zero.
+
+\begin{table}[!htb]
+\caption{Limites das regiões de operação e tempos de resposta do PLL aplicado às tensões da rede}
+\label{tab:sinc-vpll}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  | c  }
+\hline
+$\Delta\omega_L$ & $\Delta\omega_{PO}$& $T_L$ & $T_P$\\
+\hline
+\hline
+
+$2\pi$(13 Hz) & $2\pi$(20 Hz) & $171$ ms & 1,2$\cdot10^{-5}(\Delta\omega_0)^2$ \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/sinc-vpll.eps}
+	\caption{Processos de sincronização do PLL aplicado às tensões da rede.}
+	\label{ap02:sinc-vpll}
+\end{figure}
+
+O desempenho do PLL na presença de harmônicas e desbalanços de tensão será discutido na seção~\ref{pll:simulacao}, em que serão apresentados mais resultados de simulação.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Sinal de Entrada: Correntes do GSIP}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No que diz respeito às características do sinal de entrada, as correntes são equilibradas e não haverão harmônicas de baixa ordem, pois a corrente será controlada para atingir esse objetivo. Portanto, pode-se projetar o PLL com uma largura de banda bem maior que o aplicado às tensões da rede. 
+
+Para este projeto\footnote{No Capítulo~\ref{chapter-modulacao} será analisado o processo de identificação de setores de corrente com diferentes larguras de banda. A mesma metodologia apresentada nessa seção pode ser empregada para determinar os parâmetros dos outros controladores empregados. O PLL foi analisado para a largura de banda de 200~Hz porque este é o maior valor dentre os comparados na estratégia de identificação de setores de corrente.} considera-se uma largura de banda de 200~Hz, de forma que se obtenha uma atenuação um pouco maior do que 23~dB na frequência de comutação. Assim como para o PLL aplicado às tensões da rede, considera-se um amortecimento de $1/\sqrt{2}$ e, portanto, a partir de (\ref{eq:wn-B2}) obtém-se uma frequência natural de 610~rad/s. Os parâmetros do controlador obtidos a partir de (\ref{eq:kcPLL}) e (\ref{eq:TiPLL}) são apresentados na Tabela~\ref{tab:ipll}, juntamente com os limites das regiões de operação e tempos de resposta do PLL. Observa-se que este PLL é bem mais rápido e que a região da frequência \textit{lock range} é bem maior e abrange toda a região de operação do GSIP (10 a 60~Hz).
+
+\begin{table}[!htb]
+\caption{Parâmetros do controlador, limites das regiões de operação e tempos de resposta do PLL aplicado às correntes do GSIP}
+\label{tab:ipll}
+
+\centering
+
+\begin{center}
+\begin{tabular}{ c || c }
+\hline
+$k_C$ & $-863,5$ 1/s \\
+\hline
+
+$T_i$ & $2,3$ ms \\
+\hline
+
+$\Delta\omega_L$ & $2\pi$(215 Hz) \\
+\hline
+
+$\Delta\omega_{PO}$ & $2\pi$(324 Hz) \\
+\hline
+
+$T_L$ & $10,3$ ms \\
+\hline
+
+$T_P$ & 2,5$\cdot10^{-9}(\Delta\omega_0)^2$ \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Os diagramas de resposta em frequência da resposta à referência e à perturbação dos sistemas contínuo e digital são apresentados na Fig.~\ref{ap02:bodes-ipll}. Verifica-se que os requisitos de projeto foram atendidos. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/bodes-ipll.eps}
+	\caption{Diagramas de reposta em frequência da resposta à referência e à perturbação para o PLL aplicado às correntes do GSIP.}
+	\label{ap02:bodes-ipll}
+\end{figure}
+
+A seguir será analisado o problema de variação de amplitude aplicado às correntes do GSIP dado um ponto de operação de amplitude das correntes. Será verificado o desempenho dinâmico do PLL frente a essas variações.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise do Problema de Variação de Amplitude} \label{sec:kX}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta seção será abordado o problema da variação da amplitude do sinal de entrada por meio da análise do lugar das raízes do sistema contínuo\footnote{A análise torna-se mais simples e como verificado no diagrama de resposta em frequência da Fig.~\ref{ap02:bodes-ipll} as respostas do sistemas contínuo e digital são praticamente iguais.}. Esta ferramenta é ideal quando apenas um parâmetro da planta apresenta variações, como é o caso em questão.
+
+Para iniciar a análise, considera-se que o valor da amplitude $\bar{x}_{pk}$ da planta da Fig.~\ref{ap02:ftmf} é variável e reescreve-se o mesmo como $x_{pk}$. O ganho na malha de controle permanece inalterado no seu valor nominal de projeto $\bar{x}_{pk}$. Definindo $k_X$ como o fator de variação de amplitude, isto é, $k_X=x_{pk}/\bar{x}_{pk}$, podem ser determinadas as novas funções de transferência do sistema. A relação da saída para a referência  é dada por (\ref{eq:Yrpll-kX}), em que os parâmetros do controlador foram substituídos pelos valores determinados em (\ref{eq:kcPLL}) e em (\ref{eq:TiPLL}). Observa-se que a resposta nominal não será mais atendida e os índices de desempenho do sistema irão variar. A variação do fator de amortecimento em função de $k_X$ pode ser determinada a partir de (\ref{eq:xi-kX}) e a variação da frequência natural por (\ref{eq:wn-kX}). 
+
+\begin{equation}
+\label{eq:Yrpll-kX}
+\dfrac{\Delta \tilde{\theta}(s)}{\Delta \tilde{\theta}^* (s)}=\dfrac{k_X ( 2\xi\omega_n s + \omega_n^2)}{s^2+2k_X\xi\omega_n s+k_X\omega_n^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:xi-kX}
+\xi'=\xi\sqrt{k_X}
+\end{equation}
+
+\begin{equation}
+\label{eq:wn-kX}
+\omega'_n=\omega_n\sqrt{k_X}
+\end{equation}
+
+Para ilustrar essas variações, foi determinado o lugar das raízes de (\ref{eq:Yrpll-kX}), conforme apresentado na Fig.~\ref{ap02:rlocus}, em que foi considerado o controlador projetado para as correntes do GSIP. O ponto onde $k_X\!=\!1$ corresponde à condição nominal de projeto. Observa-se que, para diminuições da amplitude do sinal de entrada ($k_X\!<\!1$), o sistema se torna mais oscilatório e a largura de banda do sistema diminui. E, para aumentos de amplitude ($k_X\!>\!1$), o amortecimento aumenta e largura de banda aumenta. Essas variações na posições dos pólos podem degradar o funcionamento do PLL, sem comprometer a estabilidade, na primeira sincronização e/ou quando o sistema está sujeito à variações de frequência e/ou quando há harmônicas no sinal de entrada. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/rlocus.eps}
+	\caption{Lugar das raízes dos pólos de malha fechada de $\Delta \tilde{\theta}/\Delta \tilde{\theta}^*$ e de $\Delta \tilde{\theta}/\tilde{\omega}_q$ para variações de $k_X$.}
+	\label{ap02:rlocus}
+\end{figure}
+
+No caso das correntes do GSIP deste trabalho a variação no valor da amplitude das correntes se dá entre 2,5~A e 40~A. Portanto, a escolha do ponto de operação que será considerado como parâmetro nominal não é trivial. Caso seja considerado o valor máximo como ponto de operação nominal o sistema terá no valor mínimo uma largura de banda de 38~Hz e uma margem de fase de 20$^\circ$, o que evidentemente não é adequado para o desempenho do PLL. Da mesma forma, se for considerado o valor mínimo como ponto de operação nominal, o sistema terá no valor máximo uma largura de banda de 1430~Hz e uma margem de fase de 88$^\circ$, o que é prejudicial do ponto de vista de rejeição ruídos. Portanto, a média geométrica entre os valores máximo e mínimo parece ser a escolha mais adequada,  por resultar na mesma variação de ganho acima (4 vezes mais) e abaixo (4 vezes menos) da média. Entretanto, o desempenho dinâmico do sistema ainda está sujeito a grande variações dos índices de desempenho conforme evidenciado na Fig.~\ref{ap02:rlocus}.
+
+Como solução a esse problema de variação de ganho é proposta uma solução simples: a divisão do sinal de entrada pela sua amplitude. Isto é, o PLL opera sempre com sinais de entrada normalizados pela amplitude. Na próxima seção serão apresentados três métodos de como determinar a amplitude do sinal de entrada. 
+
+%\pagebreak
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{PLL Normalizado}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O PLL normalizado (PLL$_\textrm{N}$) utiliza a amplitude da componente fundamental de sequência positiva do sinal de entrada para normalizar as entradas do PLL. A formulação proposta mantém o PLL robusto à variações de amplitude e permite que, durante transitórios, a largura de banda aumente, tornando o sincronismo mais rápido. Neste trabalho serão analisadas três estratégias para determinação da amplitude, mas somente uma permite obter as melhores características dinâmicas. Todas são equivalentes em condições senoidais e em regime permanente.  Estas serão mais adiante validadas por simulações numéricas com sinais de entrada na presença de harmônicas, variações de amplitude e de frequência. 
+
+Observa-se que, a aplicação da amplitude do sinal de entrada para manter  o desempenho dinâmico do PLL para variações de amplitude foi primeiramente apresentada em \cite{Artigos-08-19}. Essa estratégia será identificada entre possibilidades empregadas neste trabalho, mas o princípio do PLL é modificado devido ao ângulo ser determinado por uma função arco tangente. Com a metodologia empregada não há necessidade de cálculo dessa função. Essa formulação pelo cálculo do arco tangente torna a frequência de saída do PLL sensível a variações de amplitude \cite{Artigos-08-19}. Com relação à aplicação do PLL para determinação da fase de correntes de geradores ou conversores conectados à rede, em \cite{Artigos-08-17} foi proposto um PLL aplicados às correntes do estator e do rotor de um DFIG conectado à rede para estimação do ângulo do rotor, mas não é analisado o problema de variação da amplitude.
+
+A seguir serão apresentadas as técnicas baseada em três estratégias. Após concluir essas descrições, será verificada a estabilidade e a influência da normalização no comportamento dinâmico do sistema. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Descrição das Técnicas de Normalização}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A estimação da amplitude de um sinal $\vec{x}_{\alpha\beta}$ em condições balanceadas e puramente senoidal pode ser  determinada a partir do cálculo da norma (\ref{eq:norma}). É possível estimar com boa precisão a amplitude das tensões da rede em condições normais de operação \cite{Artigos-08-18,Artigos-08-16}. Devido à presença de ruídos e harmônicas de baixa ordem é necessário filtrar a norma. No entanto, na presença de harmônicas de ordem muito baixa o seu desempenho pode ser bastante prejudicado, pois a amplitude filtrada não é igual à componente fundamental de sequência positiva. O emprego desta técnica se mostrou inicialmente interessante para o PLL aplicado nas correntes do GSIP \cite{Patente-Autocontrole}, pois nesse caso as correntes estão naturalmente equilibradas e sem harmônicas de baixa ordem.
+
+\begin{equation}
+\label{eq:norma}
+\hat{x}_{pk}=|\!|\vec{x}_{\alpha\beta}|\!|=\sqrt{x_{\alpha}^2+x_{\beta}^2}
+\end{equation}
+
+As outras duas técnicas são válidas na presença de harmônicas e podem efetivamente mitigar tais efeitos. Para análise e compreensão dessas estratégias consideram-se as potências $p_{xu}$ e $q_{xu}$ reescritas em (\ref{eq:pxuh}) e (\ref{eq:qxuh}), respectivamente. Nelas foram adicionadas parcelas referentes ao conteúdo harmônico dos sinais de entrada (denotadas pelo subscrito $h$). Estes conteúdos harmônicos representam todas as frequências que devem ser rejeitadas para determinar os sinais de sequência positiva da fundamental. Os sinais $\tilde{p}_{xu}$ e $\tilde{q}_{xu}$ representam perturbações não harmônicas em torno dos pontos de equilíbrio. 
+
+\begin{equation}
+\label{eq:pxuh}
+p_{xu}\approx\bar{p}_{xu}+\tilde{p}_{xu}+{p}_{xu,h}
+\end{equation}
+
+\begin{equation}
+\label{eq:qxuh}
+q_{xu}\approx\bar{q}_{xu}+\tilde{q}_{xu}+{q}_{xu,h}
+\end{equation}
+
+Como citado anteriormente, o ponto de equilíbrio $\bar{p}_{xu}$ é proporcional à amplitude da fundamental e o de $\bar{q}_{xu}$ é igual a zero. Portanto, a amplitude pode ser estimada tanto pelo cálculo da potência ativa $p_{xu}$ quanto pelo cálculo do módulo da potência aparente $\dot{s}_{xu}$. Em ambos os casos os sinais de potência ativa e/ou potência reativa devem ser filtrados independentemente por filtros passa-baixas com frequência de corte suficiente para rejeitar as harmônicas do sinal de entrada, isto é, rejeitar as parcelas ${p}_{xu,h}$ e ${q}_{xu,h}$. Observa-se que a utilização do módulo da potência aparente para o cálculo da amplitude é equivalente a ter um algoritmo de detecção de sequência positiva  \cite{Livros-pq}, em que se utiliza apenas a informação da amplitude deste algoritmo. Nota-se que se somente a potência ativa é utilizada para estimar a amplitude, o sinal de ângulo ainda terá harmônicas, por não haver filtragem do sinal de potência reativa. Contudo, como a própria malha de controle do PLL é projetada com característica de rejeição de ruídos, isso não se apresenta como um empecilho para o emprego desta abordagem.
+
+O diagrama de blocos do PLL$_\textrm{N}$	está ilustrado na Fig.~\ref{ap02:pllN}. No bloco ``cálculo da amplitude'' executa-se um dos três métodos apresentados. Estes são ilustrados na Fig.~\ref{ap02:calc-xpk}, em que se observam os sinais e os filtros necessários para realizar todos os métodos.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/pllN.eps}
+	\caption{Diagrama de blocos do PLL$_{\textrm{N}}$.}
+	\label{ap02:pllN}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\mbox{
+	
+	\subfigure[]{
+	\includegraphics[scale=\escalafig]{Figuras/ap02/xpk.eps}}
+	
+	\subfigure[]{
+  \includegraphics[scale=\escalafig]{Figuras/ap02/pxu.eps}}}
+	
+	\subfigure[]{
+	\includegraphics[scale=\escalafig]{Figuras/ap02/sxu.eps}}
+		
+	\caption[Técnicas para cálculo da amplitude do PLL.]{Técnicas para cálculo da amplitude pela: (a) norma, (b) ``potência ativa'' e (c) ``potência aparente''.}
+
+	\label{ap02:calc-xpk}
+\end{figure}
+
+Deve-se notar que, em todos os casos, é possível eliminar o processo de normalização pelo cálculo direto do ângulo a partir da função arco tangente. Nesse caso, o processo de normalização é intrínseco, pois se realiza uma divisão entre as partes imaginária e real do sinal de potência aparente. Portanto, o caso em que é empregado o módulo da potência aparente é equivalente à técnica apresentada em \cite{Artigos-08-19}. Embora sejam equivalentes tais processos, verificou-se, a partir de simulações numéricas, que esses só são equivalentes em regime permanente. Esta diferença se deve ao fato do sinal de potência reativa precisar ser filtrado para o cálculo da função arco tangente, não refletindo variações instantâneas de fase.  Enquanto isso, na estratégia de normalização verifica-se que, quando há variações de amplitude e/ou frequência, é possível aumentar instantaneamente a largura de banda  e diminuir o tempo de resposta do PLL. Após os transitórios, o sistema naturalmente tende a reduzir a largura de banda de forma a manter a característica desejada com a normalização, isto é, ter um ganho $k_X$ unitário. Essa é uma grande vantagem do PLL$_\textrm{N}$ proposto neste trabalho.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise da Estabilidade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na seção~\ref{sec:kX} foi demonstrada a influência do ganho $k_X$ na dinâmica do PLL e nota-se na Fig.~\ref{ap02:rlocus} que este deve ser maior que zero para que o sistema se mantenha estável. Portanto, esta análise tem como objetivos demonstrar que o valor do ganho $k_X$ é positivo durante toda a operação e, quantificar qual a variação do ganho quando o sistema está sujeito a perturbações de amplitude e de ângulo. Serão analisados os métodos baseados no cálculo das potências, pois a análise do método pelo cálculo da norma pode ser feita de forma similar. Como foi verificado por simulações que o seu desempenho durante transitórios não é satisfatório frente a esses dois métodos, optou-se por não demonstrar sua análise. 
+
+Para esta análise deve-se considerar que $p_{xu}$ pode ser aproximado por (\ref{eq:pxu}), pois deseja-se determinar o comportamento em torno do ponto de equilíbrio de amplitude quando o sistema não se encontra em sincronismo. Dessa forma, a linearização de (\ref{eq:pxu}) resulta em (\ref{eq:pxu-lin}). Observa-se que, se $\Delta\theta$ é zero, isto é, o sistema está em sincronismo, as variações de ângulo e/ou frequência não causam variações no sinal de potência. Este último resultado pode ser obtido linearizando a equação original de $p_{xu}$, cuja equação é igual a (\ref{eq:pxu-lin}) sem a parcela referente à perturbação de ângulo. Ambos os resultados serão confirmados pela simulação do modelo não linear do PLL$_\textrm{N}$.
+
+\begin{equation}
+\label{eq:pxu}
+p_{xu}\approx\dfrac{3}{2}x_{pk}(1-|\textrm{sen}(\Delta\theta)|)+p_{xu,h}
+\end{equation}
+
+\begin{equation}
+\label{eq:pxu-lin}
+p_{xu}\approx\dfrac{3}{2}\bar{x}_{pk}+\dfrac{3}{2}\tilde{x}_{pk}-\dfrac{3}{2}\bar{x}_{pk}|\Delta\tilde{\theta}|+p_{xu,h}
+\end{equation}
+
+Como o sinal de potência ativa deve ser filtrado para eliminar harmônicas, há um atraso na determinação das perturbações de amplitude e de ângulo que é dado pela função de transferência do filtro passa-baixas $F_{\textrm{LP}}(s)$. Portanto, o sinal de potência na saída do filtro é (\ref{eq:pxuf}), em que foi considerado que a parcela referente às harmônicas após a filtragem é desprezível. Para determinar a variação de $p_{xu}$ com relação às variações de frequência, deve-se substituir (\ref{eq:Yqpll}) em (\ref{eq:pxuf}).
+
+\begin{equation}
+\label{eq:pxuf}
+p_{xu}\approx\dfrac{3}{2}\bar{x}_{pk}+\dfrac{3}{2}(F_{\textrm{LP}}(s)\tilde{x}_{pk})-\dfrac{3}{2}\bar{x}_{pk}(F_{\textrm{LP}}(s)|\Delta\tilde{\theta}|)
+\end{equation}
+
+No caso do sinal de potência aparente, o módulo é função apenas da amplitude, pois os termos referentes ao seno e cosseno se cancelam ao calcular o módulo em (\ref{eq:sxu-reg}). O resultado da linearização do módulo da potência aparente após ter sido filtrado é dado por (\ref{eq:sxu-lin}).
+
+\begin{equation}
+\label{eq:sxu-lin}
+|\dot{s}_{xu}|\approx\dfrac{3}{2}\bar{x}_{pk}+\dfrac{3}{2}(F_{\textrm{LP}}(s)\tilde{x}_{pk})
+\end{equation}
+
+Observa-se de (\ref{eq:pxuf}) e de (\ref{eq:sxu-lin}) que, para perturbações de amplitude estes resultados nunca serão nulos ao menos que também o seja o valor da amplitude do sinal de entrada. Portanto, é interessante para não causar uma divisão por zero, que os sinais sejam limitados em um valor mínimo. Este limite inferior também pode ser utilizado em conjunto com um limite superior para limitar o valor do ganho $k_X$ e, portanto, limitar o desempenho dinâmico do PLL. O efeito da perturbação de ângulo (causado por perturbações de frequência) é a diminuição do valor da potência ativa e, consequente, aumento do ganho $k_X$, pois $k_X=x_{pk}/\hat{x}_{pk}$. Logo, esse efeito é benéfico para melhoria do desempenho dinâmico do PLL$_\textrm{N}$, pois durante perturbações de frequência a largura de banda do sistema sempre irá aumentar, o que diminui o tempo de resposta. Em regime permanente, o sistema retorna à sua característica de projeto com valor de ganho unitário, pois a rejeição de perturbação foi garantida no projeto do controlador. Observa-se que, caso o critério de escolha do tipo de método para determinação da amplitude seja, além do desempenho dinâmico do PLL, a característica do sinal de amplitude estimada necessária para um outro algoritmo, nada impede que no método pela potência ativa a amplitude seja estimada pelo módulo da potência aparente. Neste caso a amplitude estimada só será utilizada nesse algoritmo adicional e não como parte do PLL$_\textrm{N}$. 
+
+%Para demonstrar que o modelo desenvolvido é representativo do comportamento do sistema, são apresentados na Fig.~\ref{ap02:linVSnl} resultados obtidos a partir das funções de transferência e do modelo não linear do PLL$_\textrm{N}$ representado na Fig.~\ref{ap02:pllN}. Estes resultados foram obtidos com a aplicação de um degrau de amplitude e um degrau de frequência entre os instantes $t=0,6$~s e $t=1$~s da Fig.~\ref{ap02:p-lin}, cujos dados são apresentados  e discutidos na próxima seção. Na Fig.~\ref{ap02:linVSnl} observa-se que os resultados obtidos em torno do ponto de operação reproduzem fielmente comportamento do modelo não linear, comprovando as análises e as conclusões obtidas.
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/ap02/tensoes3ph.eps}
+%	\caption{Diagrama de blocos do PLL$_{\textrm{N}}$.}
+%	\label{ap02:linVSnl}
+%\end{figure}
+
+%\pagebreak
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Resultados de Simulação} \label{pll:simulacao}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Serão apresentados resultados de simulação do PLL$_\textrm{N}$ para sinais de entrada de tensão. Estes sinais são empregados em duas condições, uma contendo harmônicas e outra com perturbações de amplitude e frequência. Será verificado o comportamento dinâmico para os diferentes métodos de normalização. A frequência de corte dos filtros passa-baixas para filtrar os sinais de norma ou potência em todos os casos empregados é igual a largura de banda dos controladores do PLL. No caso em que os sinais de entrada são as correntes do GSIP, o desempenho do PLL$_\textrm{N}$ é verificado como parte integrante do método ou de modulação do VSR$_\Delta$ ou de autocontrole com compensação. Portanto, os resultados serão apresentados quando discutidos os referidos métodos.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise do Desempenho Dinâmico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Primeiramente, são comparados os desempenhos dos PLLs e das estratégias de normalização com a aplicação das tensões de entrada ilustradas na Fig.~\ref{ap02:e3ph}. Estas tensões têm uma frequência síncrona ($f_e\!=\!1/T_e$) igual a 60~Hz. As suas componentes harmônicas e de sequência negativa são dadas na Tabela~\ref{tab:e-h}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/tensoes3ph.eps}
+	\caption{Tensões de entrada sujeita a harmônicas.}
+	\label{ap02:e3ph}
+\end{figure}
+
+\begin{table}[!htb]
+\caption{Componentes harmônicas da tensão de entrada}
+\label{tab:e-h}
+
+\centering
+
+\begin{center}
+\begin{tabular}{ c || c | c | c}
+\hline
+Harmônica & Amplitude & Fase inicial & Sequência  \\
+\hline
+
+1 & 311~V &  $0^\circ$ & $+$\\
+\hline
+
+1 & 31,1~V &  $0^\circ$ & $-$\\
+\hline
+
+3 & 31,1~V &$0^\circ$ & $+$ \\
+\hline
+
+5 & 31,1~V & $180^\circ$ & $+$\\
+\hline
+
+7 & 31,1~V & $0^\circ$ & $+$\\
+\hline
+
+11 & 15,6~V &$180^\circ$ & $+$ \\
+\hline
+
+13 & 15,6~V & $0^\circ$ & $+$\\
+\hline
+
+67 & 31,1~V & $0^\circ$ & $+$\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Para ficar evidente a diferença entre os desempenhos dos métodos, considerou-se a frequência central igual a zero. Os resultados obtidos estão ilustrados\footnote{Os subscritos e sobrescritos nas variáveis ilustradas denotam o tipo de PLL e o método de estimativa da amplitude.} na Fig.~\ref{ap02:sinc-w0}, em que podem ser observadas as frequências e a variação do ganho $k_X$ dos PLL normalizados. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/sinc-w0.eps}
+	\caption[Processo de sincronização do PLL e do PLL$_\textrm{N}$.]{Processo de sincronização do PLL e do PLL$_\textrm{N}$ na região de \textit{pull-in range}.}
+	\label{ap02:sinc-w0}
+\end{figure}
+
+Da Fig.~\ref{ap02:sinc-w0} verifica-se que o comportamento do PLL sujeito a harmônicas é praticamente idêntico ao funcionamento sem harmônicas ilustrado na Fig.~\ref{ap02:sinc-vpll}. Dentre os PLL$_\textrm{N}$, fica evidente a diminuição do tempo de resposta ao utilizar os sinais de potência e a influência do aumento do ganho $k_X$ ilustrado na Fig.~\ref{ap02:sinc-w0}(b) na diminuição do tempo de resposta. Embora o sinal de potência ativa seja mais susceptível a perturbações, devido ao aumento na largura de banda o sincronismo acontece bem mais que todos os outros métodos. O resultado obtido com a aplicação da norma não era esperado, pois se esperava que este fosse ao menos mais rápido que o do PLL convencional. No entanto, como essa operação se dá em uma região de operação não linear e a diferença entre os tempos de resposta não é significativa, atribui-se essas diferenças à inicialização com ruído, pois a diferença entre as regiões que o PLL entra em sincronismo é muito sútil. Para todos os casos foram obtidos os mesmos resultados em regime permanente, cuja forma de onda da fundamental reconstruída a partir da amplitude e da fase estimadas ($\hat{e}_{a,+1}$) é ilustrada na Fig.~\ref{ap02:eA}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/tensaoA.eps}
+	\caption[Tensões reconstruídas a partir dos sinais dos PLLs.]{Tensão da fase $a$, fundamental e fundamental reconstruídas a partir dos sinais dos PLLs.}
+	\label{ap02:eA}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/perturbacoes-lin.eps}
+	\caption{PLLs sujeitos a perturbações de amplitude e de frequência.}
+	\label{ap02:p-lin}
+\end{figure}
+
+O comportamento frente a distúrbios foi verificado aplicando sucessivos degraus de amplitude e frequência, conforme ilustrado na Fig. \ref{ap02:p-lin} e na Fig.~\ref{ap02:p-nl}. No primeiro caso as variações são aplicadas individualmente e no segundo são aplicadas perturbações simultâneas. As tensões foram submetidas a grandes variações de amplitude (3 vezes mais e 6 vezes menos) e de frequência (variações de 10~Hz), conforme ilustrado na Fig.~\ref{ap02:p-lin}(c) e na Fig.~\ref{ap02:p-nl}(c). Nestas figuras estão ilustradas também as amplitudes das componentes fundamentais estimadas em cada PLL$_\textrm{N}$. Percebe-se que a amplitude estimada pelo sinal de potência aparente não é susceptível a perturbações de frequência, enquanto que para a estimada pelo sinal de potência ativa há um significativo decaimento da amplitude durante as perturbações de frequência. Observa-se que quando há somente variações de amplitude a frequência estimada não é afetada em nenhum caso. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/perturbacoes-nl.eps}
+	\caption[PLLs sob perturbações simultâneas.]{PLLs sob perturbações simultâneas de amplitude e de frequência.}
+	\label{ap02:p-nl}
+\end{figure}
+
+Para todos os casos, verifica-se que os melhores resultados são obtidos utilizando o sinal de potência ativa para estimar a amplitude. Apenas em uma situação ilustrada o tempo de resposta do PLL é o mais rápido dentre os PLL normalizados. No entanto, nessa situação o valor de $k_X$ aumenta e a característica de atenuação de ruídos desse sistema é comprometida.
+
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise do Desempenho Estático} \label{pll:estatico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta seção será apresentada uma importante característica na implementação digital de ambos os PLLs, que é o avanço do ângulo estimado em regime permanente. Primeiramente, observa-se na Fig.~\ref{ap02:theta-reg} que a fase do sinal entrada e a fase estimada estão sincronizadas, cujo resultado foi obtido a partir do PLL$_\textrm{N}$ com $f\!=1/T\!=\!60$~Hz. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/theta.eps}
+	\caption{Fase do sinal de entrada e fase estimada pelo PLL$_\textrm{N}$.}
+	\label{ap02:theta-reg}
+\end{figure}
+
+No entanto, observando em detalhe tais fases, nota-se que a fase estimada está ligeiramente adiantada da fase do sinal de entrada, conforme ilustrado na Fig.~\ref{ap02:theta}. Nessa figura também está ilustrada a fase estimada com uma amostra de atraso e percebe-se que está é igual à fase do sinal de entrada no exato momento da amostragem. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap02/theta_reg.eps}
+	\caption{Detalhe da fase do sinal de entrada e fase estimada pelo PLL$_\textrm{N}$.}
+	\label{ap02:theta}
+\end{figure}
+
+A partir dessas observações pode-se concluir que a fase estimada pelos PLLs é a fase do sinal de entrada mais um avanço de fase correspondente a uma amostra. Deve-se ressaltar que este resultado é benéfico para os algoritmos de controle, pois esta compensação é necessária para reduzir os efeitos dos atrasos digitais nas malhas de controle de corrente, conforme será discutido na análise das estratégias de identificação de setores de corrente no Capítulo~\ref{chapter-modulacao}.
+

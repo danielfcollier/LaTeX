@@ -1,0 +1,1037 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Autocontrole de Corrente Aplicado ao GSIP} \label{chapter-auto}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O autocontrole de corrente foi proposto em \cite{Artigos-18-01} com o objetivo de obter comportamento resistivo visto pela fonte de alimentação nos terminais de conversores estáticos e sem a necessidade de medir a tensão de entrada. Como exemplo de aplicações pode-se citar a correção do fator de potência em retificadores PWM monofásicos do tipo $boost$, como por exemplo, o ilustrado na Fig.~\ref{ctrl:retificador1ph}. Observa-se que com esta técnica é somente possível ter fluxo de potência unidirecional, pois o princípio da técnica pode ser entendido com a emulação de uma resistência, que é um elemento passivo e, portanto, é capaz apenas de absorver potência. Essa resistência é do tipo não dissipativa (\textit{loss-free resistor}), conforme discutido em \cite{Livros-Erickson}. Diversas aplicações do autocontrole em retificadores monofásicos podem ser encontradas na literatura \cite{Artigos-18-03,Artigos-18-04,Artigos-18-05,Artigos-18-06, Artigos-18-11, Artigos-18-12}, em que se observa que a técnica recebe diferentes denominações.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/retificador1ph.eps}
+	\caption{Exemplo de retificador monofásico do tipo $boost$.}
+	\label{ctrl:retificador1ph}
+\end{figure}
+
+A extensão para o caso trifásico foi proposta em \cite{Teses-03-06} para retificadores PWM trifásicos sem neutro. A aplicação da técnica pode ser vista como a composição de dois circuitos monofásicos independentes autocontrolados, onde a terceira corrente é obtida pela restrição natural de corrente em sistemas a três condutores ($i_a+i_b+i_c=0$). No entanto, a aplicação do autocontrole de corrente proposto em \cite{Teses-03-06} acarreta em perdas adicionais no GSIP. Mais adiante será demonstrado que a técnica é equivalente, em regime permanente, à estratégia de controle UPF devido ao atraso causado pela indutância de eixo em quadratura. Portanto, não é vantajoso aplicar diretamente essa técnica, pois se sabe que o melhor desempenho, para o GSIP com $L_d\!=\!L_q$, é obtido com a técnica de controle ZADC. 
+
+Neste trabalho propõe-se uma modificação dessa técnica de ``autocontrole tradicional'' para compensar o atraso causado pela indutância de eixo em quadratura do GSIP. Com essa compensação, é possível obter um controle equivalente ao controle ZADC, sem a necessidade de medir a posição do rotor do GSIP ou de medir as tensões de entrada quando aplicado a fontes de alimentação. O conceito proposto, para compensar o atraso causado pela indutância de eixo em quadratura na técnica de autocontrole de corrente, é inicialmente apresentado para retificadores monofásicos segundo a metodologia apresentada em \cite{Teses-03-06}. Estes conceitos serão então aplicados aos retificadores trifásicos conectados a fontes de alimentação e, em seguida, aos retificadores trifásicos conectados ao GSIP. 
+
+A partir do modelo desenvolvido é possível determinar o desempenho dinâmico e a estabilidade do sistema. Além disto, com este modelo é possível migrar com facilidade o projeto de controladores da potência do GSIP aplicados em técnicas de FOC para a estratégia de controle de corrente proposta. Ainda serão abordados aspectos da implementação digital, pois os atrasos afetam significativamente a estabilidade do sistema. Esses atrasos limitam a mínima potência que pode ser processada pelo retificador PWM trifásico. Serão determinados os parâmetros do autocontrole de corrente com compensação quando a técnica é aplicada ao WECS deste trabalho. Com isso mostra-se a viabilidade do emprego da técnica aos WECSs. Por fim, são apresentados resultados experimentais da técnica aplicada a uma fonte de alimentação trifásica utilizando o VSR$_\Delta$. Dessa forma, a técnica de controle de corrente é validada na prática.
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Autocontrole em Retificadores Monofásicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocontrole Tradicional}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A partir da modelagem por VMQI é possível descrever o comportamento médio do retificador monofásico da Fig.~\ref{ctrl:retificador1ph} por (\ref{eq:tensao1ph}). Considera-se  que o capacitor de saída $C$ com uma característica de fonte CC de tensão $V_{dc}$, $P_o$ é a potência de saída e $u$ é o complemento da função de razão cíclica dado por (\ref{eq:u1ph}).
+
+\begin{equation}
+\label{eq:tensao1ph}
+\left\{
+\begin{array}{c l}
+ L_b \dfrac{di}{dt} &= |e| - v_r \quad $\textrm{, com }$ v_r=u\cdot V_{dc} \\
+ \\
+ P_o &= V_{dc}\cdot(u\cdot i)
+ \end{array}
+ \right.
+\end{equation}
+
+\begin{equation}
+\label{eq:u1ph}
+u=1-d
+\end{equation}
+
+Visando atingir comportamento resistivo do retificador, isto é, a tensão média gerada $v_r$ proporcional à corrente de entrada, aplica-se como sinal de controle $u$ a corrente de entrada multiplicada por um ganho $k_I$. Esta situação está ilustrada na Fig.~\ref{ctrl:auto1ph}. Assim, o retificador, do ponto de vista da fonte de alimentação, se comporta como uma resistência equivalente não dissipativa $R_{eq}$. O circuito equivalente do retificador para está condição está ilustrado na Fig.~\ref{ctrl:auto1phEq}.  
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{ctrl:auto1ph}
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1ph.eps}}
+	
+	\subfigure[]{
+	\label{ctrl:auto1phEq}
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1phEq.eps}}
+	}
+	\caption{Retificador monofásico operando com autocontrole.}
+\end{figure}
+
+No entanto, a operação não se dá com fator de potência unitário visto pela tensão de entrada, uma vez que a presença do indutor gera uma corrente atrasada em regime permanente dada por (\ref{eq:atraso1ph}). Nota-se ainda que, o atraso  é dependente do valor da resistência equivalente. Esse atraso é, em geral, muito pequeno quando o autocontrole é aplicado em fontes de alimentação, pois o valor da indutância \textit{boost} é muito pequeno.
+
+\begin{equation}
+\label{eq:atraso1ph}
+\dot{I}=\dfrac{\dot{E}}{\sqrt{R_{eq}^2+(\omega_e L_b)^2}}e^{-j\phi} \quad \textrm{, com } \phi=\textrm{arctan}\left( \dfrac{\omega_e L_b}{R_{eq}} \right)
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Princípios do Autocontrole com Compensação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Com o objetivo de compensar o atraso causado pela presença do indutor $boost$, deve-se reformular o problema do autocontrole. Para tanto, considera-se a equação que descreve o comportamento em regime permanente do retificador em (\ref{eq:E-ss}). Percebe-se que para obter um comportamento resistivo da corrente visto pela tensão de entrada, a tensão gerada pelo retificador dada por (\ref{eq:Vr-ss}) deve ser proporcional à corrente de entrada e com uma parcela $X_{eq}\!=\!\omega_e L_b$ proporcional à corrente adiantada em 90$^\circ$, isto é, uma corrente em quadratura. Esta última parcela é empregada para cancelar o atraso causado pela presença do indutor $boost$. 
+
+\begin{equation}
+\label{eq:E-ss}
+\dot{E} = j\omega_e L_b \dot{I} + \dot{V}_r
+\end{equation}
+
+\begin{equation}
+\label{eq:Vr-ss}
+\dot{V}_r = R_{eq}\dot{I} - jX_{eq}\dot{I}
+\end{equation}
+
+A corrente em quadratura à corrente de fase é aqui denominada de $i_\textrm{q}$ e representa uma corrente com a mesma amplitude da corrente de fase e adiantada em $90^{\circ}$. Fisicamente, a parcela proporcional à corrente em quadratura é equivalente à tensão sobre um capacitor conectado em série, cuja capacitância é dada por (\ref{eq:Ceq}). O circuito equivalente para esta condição está ilustrado na Fig.~\ref{ctrl:auto1phCompEq1}. Este, ainda pode ter uma representação alternativa ilustrada na Fig.~\ref{ctrl:auto1phCompEq2}, em que de fato observa-se que o objetivo da estratégia de compensação em quadratura é cancelar efeito do indutor $boost$. Entre essas representações, a que mais é adequada é a do capacitor, pois a adição de um indutor negativo de valor maior que o necessário poderia levar o sistema à instabilidade. No entanto, do ponto de vista didático a representação do indutor é mais adequada para mostrar o objetivo da estratégia de controle e, portanto, essa representação será utilizada ao longo deste trabalho. O circuito equivalente em regime permanente visto pela fonte de alimentação tem comportamento apenas resistivo, conforme ilustrado na Fig.~\ref{ctrl:auto1phCompEq}.
+
+\begin{equation}
+\label{eq:Ceq}
+C_{eq}=\dfrac{1}{\omega_e^2 L_b}
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{ctrl:auto1phCompEq1}
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1phCompEq1.eps}}
+	
+	\subfigure[]{
+	\label{ctrl:auto1phCompEq2}
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1phCompEq2.eps}}
+	}
+	
+	\subfigure[]{
+	\label{ctrl:auto1phCompEq}
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1phCompEq.eps}}
+	
+	\caption{Circuitos equivalentes do retificador monofásico com a técnica de autocontrole com compensação.}
+	\label{ctrl:auto1phCompEqs}
+\end{figure}
+
+A operação do sistema proposto com compensação é ilustrada em destaque no diagrama de blocos da Fig.~\ref{ctrl:auto1phCompCtrl}. Observa-se que, o ganho de referência do autocontrole $k_I^*$ é gerado por uma malha de controle de tensão \cite{Teses-03-06, Artigos-18-01} e é adicionado o	bloco de cálculo da ``corrente em quadratura''. A tensão de entrada, que em outras estratégias de controle é vista como uma perturbação a ser rejeitada, passa a ser vista como uma referência do sistema de controle. Nesse caso, o controle de tensão é responsável por regular o valor de $k_I^*$ para que a entrada do integrador (indutor) seja nula no sentido do modelo de pequenos sinais\footnote{Isto é, a cada um (ou meio) período de comutação a resposta dinâmica da corrente segue com erro nulo a tensão de entrada.}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto1phCompCtrl.eps}
+	\caption{Diagrama de blocos do autocontrole com compensação para o retificador monofásico.}
+	\label{ctrl:auto1phCompCtrl}
+\end{figure}
+
+Como esse trabalho não tem como objetivo aplicações em retificadores monofásicos, não serão discutidos aspectos de implementação do cálculo da corrente em quadratura aplicada a esses conversores.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Autocontrole em Retificadores Trifásicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocontrole Tradicional}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assim como visto para retificadores monofásicos, é possível obter comportamento resistivo nos terminais de retificadores trifásicos a partir da geração de sinais de controle proporcionais às correntes de fase. Como a técnica é aplicada em conversores sem neutro, pode-se controlar apenas duas fases como dois circuitos monofásicos independentes \cite{Teses-03-06}. A terceira corrente é obtida pela restrição natural de sistema a três condutores ($i_a\!+\!i_b\!+\!i_c\!=\!0$). Assim como o sinal de comando para a terceira fase. Por questões de conveniência, será mantida a notação de vetores $abc$, mas observa-se que são apenas necessários cálculos e medição das correntes de duas fases. 
+
+O comportamento médio das malhas de corrente, que são de modo diferencial, do retificador trifásico pode ser descrito em variáveis de fase a partir de (\ref{eq:tensao3ph}). Aplicando sinais de comando proporcionais às correntes de entrada (\ref{eq:Req-3ph}), verifica-se que também é obtido um comportamento resistivo nos terminais do retificador, conforme ilustrado na Fig.~\ref{ctrl:auto3phEq}. O que é equivalente à técnica de controle UPF do GSIP, pois as correntes e as tensões nos terminais estão em fase, isto é, há somente processamento de potência ativa pelo conversor. Portanto, essa técnica não é vantajosa para operação do GSIP. 
+
+\begin{equation}
+\label{eq:tensao3ph}
+ L\dfrac{d\vec{i}_{abc}}{dt}=\vec{e}_{abc} - r\vec{i}_{abc} - \vec{v}_{abc,r}
+\end{equation}
+
+\begin{equation}
+\label{eq:Req-3ph}
+\vec{v}_{abc,r} = k_I V_{dc}\vec{i}_{abc}  = R_{eq}\vec{i}_{abc} 
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto3phEq.eps}
+	\caption{Circuito equivalente do retificador trifásico operando com autocontrole tradicional.}
+	\label{ctrl:auto3phEq}
+\end{figure}
+
+O atraso nas correntes com relação à tensão de entrada proveniente da aplicação desta técnica pode ser calculado a partir de (\ref{eq:atraso3ph}).
+
+\begin{equation}
+\label{eq:atraso3ph}
+\phi=\textrm{arctan}\left( \dfrac{\omega_e L}{r+R_{eq}} \right)
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocontrole com Compensação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Obtenção das Correntes em Quadratura}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para gerar sinais que compensem o atraso causado pelo indutor $boost$, devem ser aplicados sinais adicionais proporcionais às correntes em quadratura trifásicas $\vec{i}_{abc,\textrm{q}}$, conforme dado em (\ref{eq:uComp3ph}) \cite{Patente-Autocontrole}.
+
+\begin{equation}
+\label{eq:uComp3ph}
+\vec{v}_{abc,r} = k_I V_{dc} \vec{i}_{abc} - \omega_e L \vec{i}_{abc,\textrm{q}}
+\end{equation}
+
+De acordo com a definição de corrente em quadratura dada anteriormente, é necessário obter correntes adiantadas em 90º e de mesma amplitude das correntes de fase. A obtenção dessas correntes pode ser realizada de diversas maneiras, como por exemplo, uso de integradores, derivadores, filtros, entre outros. Observa-se que, como é necessário realizar tais operações com correntes comutadas, o desempenho dos métodos baseados em derivadores e filtros é degradado, principalmente durante transitórios. O processo de integração é menos susceptível a ruídos, mas tem o desempenho dinâmico degradado pelo atraso do processo de integração. No entanto, devido às condições de equilíbrio do caso trifásico no GSIP, as correntes em quadratura podem ser obtidas a partir de relações vetoriais simples, conforme apresentado na Fig.~\ref{ctrl:auto3phCorrentes}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto3phCorrentes.eps}
+	\caption{Geração das correntes em quadratura para o caso trifásico.}
+	\label{ctrl:auto3phCorrentes}
+\end{figure}
+
+A relação matemática entre as correntes em quadratura e as correntes de fase é dada por (\ref{eq:iq3ph}), em que a matriz de transformação $\left[\mathbf{K}_\textrm{q}\right]$ é dada por (\ref{eq:Kq}). O fato dessa matriz de transformação ser inversível é devido à redundância causada pela notação, pois só é necessária a informação de duas fases.
+
+\begin{equation}
+\label{eq:iq3ph}
+\vec{i}_{abc,\textrm{q}} =  \left[\mathbf{K}_\textrm{q}\right] \vec{i}_{abc}
+\end{equation}
+
+\begin{equation}
+\label{eq:Kq}
+\left[\mathbf{K}_\textrm{q}\right]=\dfrac{1}{\sqrt{3}}\left[
+\begin{matrix}
+ 0 & -1 &  1 \\
+ 1 &  0 & -1 \\
+-1 &  1 &  0
+\end{matrix}
+\right]
+\end{equation}
+
+O diagrama de blocos do sistema de controle proposto é apresentado na Fig.~\ref{ctrl:auto3phCompCtrl}, em que o ganho de referência do autocontrole é gerado por uma malha de controle de tensão. A relação do ganho $k^*_I$ para controle da tensão será discutido quando forem tratadas as técnicas de controle da potência na seção~\ref{sec:auto-Po}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto3phCompCtrl.eps}
+	\caption{Diagrama de blocos do autocontrole com compensação para o retificador trifásico.}
+	\label{ctrl:auto3phCompCtrl}
+\end{figure}	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection[Compensação no Plano Alpha Beta]{Compensação no Plano $\alpha\beta$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A técnica de autocontrole com compensação também pode ser aplicada nas correntes do plano $\alpha\beta$. Embora, seja mais intuitiva a apresentação da técnica no sistema $abc$, devido à comparação com o caso monofásico e as relações vetoriais do caso trifásico. No entanto, a utilização da transformada $\alpha\beta$ pode ser conveniente em alguns casos para evitar cálculos e processamento de variáveis desnecessárias.
+
+A aplicação da transformação $\alpha\beta$ em (\ref{eq:tensao3ph}) gera como resultado (\ref{eq:tensao3ph-ab}). E, aplicando também a transformação nos sinais de comando (\ref{eq:uComp3ph}) obtém-se (\ref{eq:uComp3ph-ab}). 
+	
+\begin{equation}
+\label{eq:tensao3ph-ab}
+ L\dfrac{d\vec{i}_{\alpha\beta}}{dt}=\vec{e}_{\alpha\beta} - r\vec{i}_{\alpha\beta} - \vec{v}_{\alpha\beta,r}
+\end{equation}	
+
+\begin{equation}
+\label{eq:uComp3ph-ab}
+\vec{v}_{\alpha\beta,r} = k_I V_{dc} \vec{i}_{\alpha\beta} - \omega_e L \vec{i}_{\alpha\beta,\textrm{q}}
+\end{equation}
+
+Observa-se que, as transformações das correntes em quadratura do eixo $\alpha$ ($i_{\alpha,\textrm{q}}$) e do eixo $\beta$ ($i_{\beta,\textrm{q}}$) estão intrinsicamente relacionadas a ortogonalidade do plano $\alpha\beta$. Isto é, a corrente em quadratura à corrente $i_\alpha$ é a corrente $-i_{\beta}$ e a corrente em quadratura à corrente $i_\beta$ é a própia corrente $i_{\alpha}$ . Portanto, obtém-se como transformação do vetor de correntes em quadratura (\ref{eq:iab-q}).
+
+\begin{equation}
+\label{eq:iab-q}
+\vec{i}_{\alpha\beta,\textrm{q}}=[\begin{matrix} -i_\beta & i_\alpha \end{matrix}]^T
+\end{equation}
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Análise da Estabilidade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pode-se provar que a aplicação das correntes em quadratura garante comportamento resistivo em regime permanente e característica capacitiva à compensação. Como resultado dessa característica capacitiva, a sobrecompensação irá adiantar a corrente, mas não irá instabilizar o sistema em malha fechada. Portanto, o sistema deve ser estável para qualquer valor de compensação em quadratura. 
+
+Para análise da estabilidade, considera-se somente\footnote{Da mesma forma do controle no plano $dq0$, supõe-se que a dinâmica da malha de corrente é muito mais rápida do que as malhas que controlam a potência, isto é, o ganho $k_I$. Em \cite{Artigos-18-02} é verificado que está suposição é válida também para o controle de tensão do retificador monofásico \textit{boost}.} a dinâmica das malhas de corrente $dq$ dada por (\ref{eq:auto3phComp-dq0}). O resultado da transformação $dq0$ nas correntes em quadratura é $\vec{i}^e_{dq,\textrm{q}}$,  e  $\hat{L}$ é o valor estimado do indutor $boost$. Pode-se mostrar que o resultado da transformação $dq0$ nas correntes em quadratura gera como resultado (\ref{eq:iq-dq0}). 
+
+\begin{equation}
+\label{eq:auto3phComp-dq0}
+ L\dfrac{d\vec{i}^e_{dq}}{dt}=\vec{e}_{dq}^e - r\vec{i}^e_{dq} - \omega_e L \vec{i}^e_{qd} - k_I V_{dc}\vec{i}^e_{dq} + \omega_e \hat{L} \vec{i}^e_{dq,\textrm{q}}
+\end{equation}
+
+\begin{equation}
+\label{eq:iq-dq0}
+\vec{i}^e_{dq,\textrm{q}} = \vec{i}^e_{qd} = [\begin{matrix} -i_q^e & i_d^e \end{matrix}]^T
+\end{equation}
+
+Substituindo (\ref{eq:iq-dq0}) em (\ref{eq:auto3phComp-dq0}), e escrevendo o sistema em uma forma matricial apropriada, para análise de sistemas descritos por matrizes, obtém-se (\ref{eq:auto3phComp-dq02}). Esse sistema descreve o comportamento em malha fechada do conversor operando com autocontrole com compensação. 
+
+\begin{equation}
+\label{eq:auto3phComp-dq02}
+ \dfrac{d\vec{i}^e_{dq}}{dt} = -\dfrac{1}{L} \left[
+\begin{matrix}
+ r+k_I V_{dc} & -\omega_e(L-\hat{L}) \\
+ \omega_e(L-\hat{L}) &  r+k_I V_{dc}
+\end{matrix}\right] \vec{i}^e_{dq}
++ \dfrac{1}{L} \mathbf{I}_2  \vec{e}^e_{dq}
+\end{equation} 
+
+A estabilidade do sistema em malha fechada pode ser então verificada a partir dos autovalores \cite{Livros-Chen} da matriz (\ref{eq:auto3ph-A}). Os autovalores calculados são apresentados em (\ref{eq:auto3ph-lambda}). Da análise da parte real dos autovalores conclui-se que se $r\!>\!0$ o sistema é sempre estável, pois não há interesse em emular uma resistência equivalente negativa, uma vez que o valor desta seria limitado em $-r$ e há risco de instabilizar o sistema. A partir da característica da parte imaginária dos autovalores, nota-se que se a indutância estimada for maior que o valor do indutor $boost$, haverá apenas uma troca entre os modos de oscilação da corrente de eixo direto e da corrente de eixo em quadratura, mas sem levar o sistema à instabilidade. O fator de amortecimento e a frequência natural dos autovalores do sistema são dados por (\ref{eq:auto3ph-qsi}) e (\ref{eq:auto3ph-wn}), respectivamente. 
+
+\begin{equation}
+\label{eq:auto3ph-A}
+ [\mathbf{A}]= -\dfrac{1}{L} \left[
+\begin{matrix}
+ r+k_I V_{dc} & -\omega_e(L-\hat{L}) \\
+ \omega_e(L-\hat{L}) &  r+k_I V_{dc}
+\end{matrix}\right] 
+\end{equation} 
+
+\begin{equation}
+\label{eq:auto3ph-lambda}
+\Lambda=-\dfrac{(r+k_IV_{dc})}{L}\pm j \dfrac{\omega_e (L-\hat{L})}{L}=-\xi\omega_n\pm\omega_n\sqrt{1-\xi^2}
+\end{equation} 
+
+\begin{equation}
+\label{eq:auto3ph-qsi}
+\xi=\dfrac{r+k_I V_{dc}}{\sqrt{(r+k_IV_{dc})^2+[\omega_e(L-\hat{L})]^2}}
+\end{equation} 
+
+\begin{equation}
+\label{eq:auto3ph-wn}
+\omega_n=\dfrac{\sqrt{(r+k_IV_{dc})^2+[\omega_e(L-\hat{L})]^2}}{L}
+\end{equation} 
+
+A característica dinâmica do sistema autocontrolado pode ser obtida a partir das relações de transferência de (\ref{eq:auto3phComp-dq02}). A matriz de transferência pode ser obtida a partir de (\ref{eq:Gm}) \cite{Livros-Chen}, em que $[\mathbf{B}]$ é dado por (\ref{eq:Bm}) e $[\mathbf{C}]$ é igual a matriz identidade de ordem dois. Aplicando as matrizes do sistema em (\ref{eq:Gm}) obtém-se como resultado (\ref{eq:GmS}), em que este resultado é apresentado em função de $\xi$ e $\omega_n$ para compactação dos resultados.
+
+\begin{equation}
+\label{eq:Gm}
+[\mathbf{H}(s)]=[\mathbf{C}](s\mathbf{I}_2-\mathbf{A})^{-1}[\mathbf{B}]
+\end{equation} 
+
+\begin{equation}
+\label{eq:Bm}
+[\mathbf{B}]=-\dfrac{1}{L}\mathbf{I}_2
+\end{equation} 
+
+\begin{equation}
+\label{eq:GmS}
+[\mathbf{H}(s)]\!=\!\left[ \begin{matrix} \dfrac{i_d^e}{e_d^e} & \dfrac{i_d^e}{e_q^e} \\ & \\ \dfrac{i_q^e}{e_d^e} & \dfrac{i_q^e}{e_q^e} \end{matrix} \right] \!=\! \dfrac{1}{L} \! \left[ \begin{matrix} \dfrac{s+\xi\omega_n}{s^2+2\xi\omega_ns+\omega_n^2} & \dfrac{\omega_n\sqrt{1-\xi^2}}{s^2+2\xi\omega_ns+\omega_n^2} \\ & \\ \dfrac{-\omega_n\sqrt{1-\xi^2}}{s^2+2\xi\omega_ns+\omega_n^2} & \dfrac{s+\xi\omega_n}{s^2+2\xi\omega_ns+\omega_n^2} \end{matrix} \right]
+\end{equation} 
+
+A partir de (\ref{eq:GmS}), percebe-se que a característica dinâmica do sistema é variável conforme a carga e é diferente para as duas técnicas de autocontrole\footnote{A característica do autocontrole tradicional é obtida com $\hat{L}\!=0\!$.}. A relação entre a largura de banda de cada função de transferência de (\ref{eq:GmS}) com os parâmetros $\xi$ e $\omega_n$  pode ser obtida nos pontos em que o ganho estático é reduzido a $1/\sqrt{2}$ do seu valor (-3~dB). Entretanto, devem ser analisadas apenas as relações de transferência com relação a tensão de eixo em quadratura, pois para tensões de entrada senoidais descritas em variáveis de fase por (\ref{eq:tensoes-abc}) e com  valor de pico igual à $E_{pk,f}$, a transformada $dq0$ das tensões de entrada  é igual a (\ref{eq:tensoes-dq0}). Portanto, a tensão de eixo direto é sempre nula. Assim, a largura de banda da malha de corrente de eixo direto pode ser determinada a partir de (\ref{eq:wn-B}) e a da malha de corrente de eixo em quadratura por (\ref{eq:wn-Bauto}). 
+
+\begin{equation}
+\label{eq:tensoes-abc}
+\vec{e}_{abc}=E_{pk,f}\left[ \begin{matrix} \cos(\theta_e) & \cos(\theta_e\!\!-\!\!2\pi/3) & \cos(\theta_e\!\!+\!\!2\pi/3) \end{matrix} \right]^T
+\end{equation} 
+
+\begin{equation}
+\label{eq:tensoes-dq0}
+\vec{e}_{dq0}=\left[ \begin{matrix} 0 & E_{pk,f} & 0 \end{matrix} \right]^T
+\end{equation} 
+
+\begin{equation}
+\label{eq:wn-Bauto}
+BW(\xi,\omega_n)=\dfrac{\omega_n}{2\pi\xi}\sqrt{1\!+\!\xi^2\!-\!2\xi^4\!+\!\sqrt{4\xi^8\!-\!4\xi^6\!-\!2\xi^4\!+\!2\xi^2\!+\!1}}
+\end{equation}
+
+A largura de banda normalizada pela frequência natural em hertz e em função do fator de amortecimento é ilustrada na Fig.~\ref{ctrl:3ph-BW} para as duas malhas de corrente. Nota-se que, a malha de corrente de eixo em quadratura é sempre mais rápida que a malha de eixo direto, o que significa que a potência ativa entregue a carga se estabiliza primeiro, enquanto o fator de potência se estabiliza logo em seguida. Deve-se observar que, o fator de amortecimento só varia na técnica de autocontrole tradicional e será menor à medida que a carga aumentar, mas, em geral, o seu valor não é muito reduzido da unidade. Isto acontece principalmente se a técnica for aplicada em fontes de alimentação, em que o valor do indutor $boost$ é muito pequeno. Para o sistema eólico em análise neste trabalho, o fator de amortecimento mínimo é cerca de 0,8 ao aplicar a técnica de autocontrole tradicional.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/3phBW.eps}
+	\caption{Largura de banda das técnicas de autocontrole em função dos parâmetros dos autovalores do sistema.}
+	\label{ctrl:3ph-BW}
+\end{figure}
+
+Os pontos de equilíbrio do sistema foram obtidos substituindo (\ref{eq:tensoes-dq0}) em (\ref{eq:auto3ph-A}), cujos resultados são dados por (\ref{eq:i-eq}). Logo, se a indutância estimada tiver o mesmo valor do indutor $boost$ o sistema irá operar com corrente de eixo direto nula. Portanto, é possível obter um controle equivalente ao ZADC do GSIP. Se o valor do indutor é sobrestimado,  a corrente de eixo direto é negativa, caracterizando um comportamento capacitivo do conversor. O caso em que $\hat{L}\!=\!0$ recai na técnica de autocontrole tradicional e, portanto, a corrente de eixo direto não é nula.
+
+\begin{equation}
+\label{eq:i-eq}
+\left\{ \begin{matrix} I^e_{d} = \dfrac{\omega_e (L-\hat{L})E_{pk,f}}{[\omega_e(L-\hat{L})]^2+(r+k_IV_{dc})^2} & \\ & \\ I^e_{q} = \dfrac{(r+k_IV_{dc}) E_{pk,f}}{[\omega_e(L-\hat{L})]^2+(r+k_IV_{dc})^2}& \end{matrix} \right.
+\end{equation} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Validação da Análise por Simulação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para verificar a validade da modelagem até então desenvolvida, são comparados os resultados obtidos a partir da simulação do VSR\footnote{Foi empregada a modulação vetorial descrita no Apêndice~\ref{apendice:vsr}.}, do modelo de grandes sinais e das funções de transferência obtidas. Para tanto, considera-se o sistema descrito na Fig.~\ref{ctrl:vsr-sim}. O ganho do autocontrole para esta análise foi escolhido de forma que a potência de saída seja de 2~kW ao aplicar a técnica de autocontrole com compensação.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vsr-sim.eps}
+	\caption{Circuito simulado do VSR para análise da modelagem.}
+	\label{ctrl:vsr-sim}
+\end{figure}	
+
+Os resultados obtidos ao inicializar o conversor estão ilustrados\footnote{As variáveis referentes ao modelo de grandes sinais são denotadas pelo sobrescrito MG e as referentes às funções de transferência por FT.} na Fig.~\ref{ctrl:auto-sim} e na Fig.~\ref{ctrl:autoq-sim} para a técnica de autocontrole tradicional e com compensação ($\hat{L}\!=\!L$), respectivamente. Em ambos os casos, nas figuras (a) estão ilustradas as correntes obtidas no circuito comutado do VSR e no modelo de grandes sinais (em linhas contínuas e grossas). Observa-se que, o modelo de grandes sinais descreve exatamente o comportamento médio das correntes das correntes das fases $a$ e $b$ e das correntes de eixo direto e em quadratura. Verifica-se que somente com a técnica de autocontrole com compensação é possível obter corrente de eixo direto nula. O comportamento dinâmico das correntes $dq$ é observado em detalhes nas figuras (b) e (c), onde percebe-se que o tempo de resposta das malhas de corrente de eixo em quadratura são praticamente iguais. Isso acontece porque $\xi\!=\!0,9907$  para a técnica de autocontrole tradicional na condição simulada. E, como comentado anteriormente a estabilização da malha de corrente de eixo direto acontece após a corrente de eixo em quadratura atingir o regime permanente conforme ilustrado na Fig.~\ref{ctrl:auto-sim}(b) e Fig.~\ref{ctrl:auto-sim}(c).
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vsr_auto_s.eps}
+	\caption{Resultados de simulação do autocontrole tradicional.}
+	\label{ctrl:auto-sim}
+\end{figure}	
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vsr_autoq_s.eps}
+	\caption{Resultados de simulação do autocontrole com compensação.}
+	\label{ctrl:autoq-sim}
+\end{figure}	 
+
+Mais adiante, neste capítulo, será demonstrado como controlar a potência processada pelo conversor ao utilizar as técnicas de autocontrole de corrente. A seguir é analisada a aplicação da técnica de compensação no controle das correntes do GSIP.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Autocontrole com Compensação no GSIP}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta seção serão aplicados no GSIP os conceitos de autocontrole de corrente com compensação derivados anteriormente para retificadores trifásicos conectados a fontes de alimentação trifásicas. 
+
+Tendo como base o circuito equivalente do GSIP em regime permanente da Fig.~\ref{msip:regime}, conclui-se que a tensão que o retificador trifásico deve gerar é equivalente a (\ref{eq:uComp3ph}), de forma que a compensação elimine o efeito da indutância de eixo em quadratura do gerador. No entanto, como o modelo do GSIP está apresentado na convenção motor (correntes entrando no GSIP), deve-se inverter os sinais das correntes. Este resultado é dado por (\ref{eq:auto-gsip-vs}).
+
+\begin{equation}
+\label{eq:auto-gsip-vs}
+\vec{v}_{abc,s} = - \left( k_I V_{dc} \vec{i}_{abc,s} - \omega_r \hat{L}_q \vec{i}_{abc,s,\textrm{q}} \right)
+\end{equation}
+
+Assim como para os retificadores trifásicos aplicados a fontes de alimentação, pode-se demonstrar a estabilidade do método a partir do modelo do GSIP no sistema $dq0$.  No entanto, não podem ser tiradas conclusões sobre o funcionamento do GSIP com a técnica de autocontrole de corrente com compensação diretamente do equacionamento desenvolvido para o caso aplicado a fontes de alimentação. Embora esse caso e o GSIP tenham modelos equivalentes em regime permanente, o modelo dinâmico do GSIP no plano $dq0$ é bastante diferente. Isso se deve ao fato que as indutâncias do GSIP serem dependentes da posição do rotor no sistema $abc$. Dessa forma, a aplicação de  (\ref{eq:auto-gsip-vs}) no GSIP será analisada a partir do modelo desenvolvido no plano $dq0$.
+
+Sejam as equações referentes à dinâmica das correntes $dq$ do GSIP em (\ref{eq:EDOdq0}) e reescritas em (\ref{eq:idq-gsip}).
+
+\begin{equation}
+\label{eq:idq-gsip}
+\left\{\begin{array}{c l}
+ L_d \dfrac{di^r_{d,s}}{dt} &=  v^r_{d,s}-r_s i^r_{d,s}+ \omega_r L_q  i^r_{q,s} \\
+ \\
+ L_q \dfrac{di^r_{q,s}}{dt} &=  v^r_{q,s}-r_s i^r_{q,s}- \omega_r L_d i^r_{d,s}-\lambda'^r_m \omega_r 
+ \end{array}  \right.
+\end{equation}
+
+Aplicando a transformação $dq0$ em (\ref{eq:auto-gsip-vs}) e substituindo em (\ref{eq:idq-gsip}), obtém-se o modelo $dq0$ do GSIP utilizando a técnica de autocontrole com compensação apresentado em (\ref{eq:auto-gsip-dq0}). A obtenção das correntes em quadratura foi omitida, pois as mesmas podem ser obtidas de maneira semelhante a (\ref{eq:iq-dq0}). 
+
+\begin{equation}
+\label{eq:auto-gsip-dq0}
+ \dfrac{d\vec{i}^r_{dq,s}}{dt} = -\left[
+\begin{matrix}
+ \dfrac{r_s+k_I V_{dc}}{L_d} & -\dfrac{\omega_r(L_q-\hat{L}_q)}{L_d} \\
+ \dfrac{\omega_r(L_d-\hat{L}_q)}{L_q} &  \dfrac{r_s+k_I V_{dc}}{L_q}
+\end{matrix}\right] \vec{i}^r_{dq,s}
++ \left[
+\begin{matrix}
+ 0 \\
+ -\dfrac{\lambda'^r_m \omega_r}{L_q} 
+\end{matrix}\right]
+\end{equation} 
+
+Os autovalores de (\ref{eq:auto-gsip-dq0}) são dados por (\ref{eq:auto-gsip-lambda}), em que o fator de amortecimento é dado por (\ref{eq:xi-dq0}) e a frequência natural por (\ref{eq:wn-dq0}).
+
+\begin{equation}
+\label{eq:auto-gsip-lambda}
+\Lambda=-\xi\omega_n\pm\omega_n\sqrt{1-\xi^2}
+\end{equation} 
+
+\begin{equation}
+\label{eq:xi-dq0}
+\xi=\dfrac{(L_d+L_q)(r_s+k_I V_{dc})}{2\sqrt{L_d L_q}\sqrt{(r_s+k_I V_{dc})^2+\omega_r^2(L_d-\hat{L}_q)(L_q-\hat{L}_q)}}
+\end{equation} 
+
+\begin{equation}
+\label{eq:wn-dq0}
+\omega_n=\sqrt{\dfrac{(r_s+k_I V_{dc})^2+\omega_r^2(L_d-\hat{L}_q)(L_q-\hat{L}_q)}{L_dL_q}}
+\end{equation} 
+
+Do modelo (\ref{eq:auto-gsip-dq0}), pode-se obter os pontos de equilíbrio das correntes dados por (\ref{eq:Idqsr}).  
+
+\begin{equation}
+\label{eq:Idqsr}
+\left\{ \begin{matrix} I^r_{d,s} = -\dfrac{\omega_r  (L_q-\hat{L}_q) (\lambda'^r_m \omega_r) } {\omega_r^2 (L_d-\hat{L}_q) (L_q-\hat{L}_q) +(r_s+k_IV_{dc})^2} & \\ & \\ I^r_{q,s} = -\dfrac{(r_s+k_IV_{dc}) (\lambda'^r_m\omega_r)} {\omega_r^2(L_d-\hat{L}_q)(L_q-\hat{L}_q)+(r_s+k_IV_{dc})^2}& \end{matrix} \right.
+\end{equation} 
+
+Observa-se que se a indutância de eixo em quadratura estimada é igual ao valor da indutância de eixo em quadratura, isto é, $\hat{L}_q\!=\!L_q$, obtêm-se como pontos de operação de (\ref{eq:Idqsr}) uma corrente de eixo direto nula e uma corrente de eixo em quadratura dada por (\ref{eq:Iqsr-autoq}). Portanto, é possível obter um controle equivalente ao ZADC sem a necessidade de medir a posição do rotor! É importante ressaltar que esse resultado é independente do conhecimento da indutância de eixo direto, o que é outra vantagem dessa abordagem. No entanto, é necessária a informação da velocidade do GSIP para a  realização da técnica, mas esta pode ser obtida a partir da aplicação de um circuito PLL normalizado\footnote{Apresentado no Apêndice~\ref{apendice:pll}.} nas correntes. Dessa forma, evita-se a necessidade de se utilizar um sensor de velocidade e garante-se que a técnica tenha características \textit{sensorless} no GSIP \cite{Artigos-Sensorless}.
+
+\begin{equation}
+\label{eq:Iqsr-autoq}
+I_{q,s}^r=-\dfrac{\lambda'^r_m\omega_r}{r_s+k_IV_{dc}}
+\end{equation}
+
+As funções de transferência da corrente de eixo direto e da corrente de eixo em quadratura são escritas em relação à tensão de eixo em quadratura $e_{q}^r$, conforme apresentado em (\ref{eq:G-gsip}). Esta tensão é obtida pelo produto do fluxo dos ímãs permanentes e da velocidade angular elétrica do rotor. Observa-se que, quando $L_d\!=\!L_q$ as mesmas conclusões obtidas para a aplicação em fontes de alimentação são válidas sobre a dinâmica do sistema. E, como esse é o caso de interesse desse trabalho, a análise sobre o comportamento dinâmico do GSIP pode ser inferida da seção anterior.
+
+\begin{equation}
+\label{eq:G-gsip}
+[\mathbf{H}(s)]=\left[ \begin{matrix} \dfrac{i_{d,s}^r}{e_{q}^r} \\ \\ \dfrac{i_{q,s}^r}{e_{q}^r} \end{matrix} \right] = -\dfrac{1}{L_q} \left[ \begin{matrix} \dfrac{\omega_r(L_d-\hat{L}_q)/L_q}{s^2+2\xi\omega_n s+ \omega_n^2} \\ \\ \dfrac{s+(r_s+k_I V_{dc})/L_d}{s^2+2\xi\omega_n s+ \omega_n^2} \end{matrix} \right] 
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Controle da Potência} \label{sec:auto-Po}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para poder controlar o torque, velocidade ou a tensão do barramento CC utilizando as mesmas técnicas apresentadas na seção~\ref{sec:dq0-potencia}, é necessário relacionar o ganho do autocontrole com essas variáveis. A relação exata do ganho do autocontrole de corrente com compensação em função dos parâmetros do GSIP é dada por (\ref{eq:Iqsr-autoq}), em que parte-se do princípio que o valor da indutância de eixo em quadratura é estimado corretamente, isto é, $\hat{L}_q\!=\!L_q$. Como esta relação depende da resistência do estator, não é interessante trabalhar diretamente com a mesma devido à dependência paramétrica da mesma. Portanto, propõe-se desprezá-la, obtendo como resultado (\ref{eq:Iqsr-aprox}). Dessa forma, devem ser analisadas as implicações da aproximação realizada para o controle da potência.
+
+\begin{equation}
+\label{eq:Iqsr-aprox}
+I_{q,s}^r=-\dfrac{\lambda'^r_m\omega_r}{r_s+k_IV_{dc}}\approx -\dfrac{\lambda'^r_m\omega_r}{k_IV_{dc}}
+\end{equation}
+
+Sabe-se que, para a condição em que $L_d\!=L_q$, o torque é proporcional à corrente de eixo em quadratura. Assim, conclui-se que, o erro ao relacionar o ganho do autocontrole por (\ref{eq:Iqsr-aprox}) é o mesmo para cálculo do torque. Este erro será máximo na condição de corrente nominal, pois o ganho será mínimo, isto é, a resistência equivalente ($R_{eq}$) emulada pelo autocontrole será mínima para permitir que mais corrente circule no circuito, conforme evidenciado em (\ref{eq:Iqsr-autoq}). Supondo que as perdas na resistência do estator na condição de potência nominal representem uma porcentagem $\delta\%$ da potência ativa nominal entregue à carga ou ao barramento CC, o máximo erro cometido ao calcular a corrente ou o torque por (\ref{eq:Iqsr-aprox}) é igual a $\delta\%$ . Portanto, o controle em malha aberta do torque pode ser feito utilizando a técnica de autocontrole com compensação desde que o erro cometido seja aceitável. A relação entre o torque e o ganho do autocontrole é dada por (\ref{eq:Te-aprox}).
+
+\begin{equation}
+\label{eq:Te-aprox}
+k_I^*=-\dfrac{-\lambda'^r_m\omega_r}{V_{dc}k_{T_e}T_e^*}
+\end{equation}
+
+No caso das malhas de controle de velocidade e de controle de tensão no barramento CC, se for utilizado um controlador que garanta seguimento de referência e rejeição de perturbações, o próprio controlador irá compensar os efeitos causados pela aproximação proposta. Isto é, o controlador de velocidade gera um torque de referência maior que o necessário para o gerador, de forma que o torque elétrico produzido pelas correntes do GSIP compense o torque de carga ou garanta o seguimento da referência de velocidade. O mesmo se aplica ao controle de tensão com relação à carga e descarga do capacitor do barramento CC. Um controlador simples que realiza essas funções é o controlador PI e este foi utilizado no projeto dos controladores dessas malhas no Capítulo~\ref{chapter-controles}. Observa-se que, métodos de MPPT do tipo P\&O também são capazes de compensar os efeitos da aproximação proposta, pois o rastreamento só irá parar de variar o ganho de referência da malha de corrente quando o método identificar que a máxima potência foi alcançada.
+
+O diagrama de blocos da técnica de autocontrole de corrente com compensação aplicada ao GSIP está ilustrado na Fig.~\ref{ctrl:auto3phGSIP}. Observa-se que a velocidade do GSIP ($\hat{\omega}_{r,f}$) é estimada a partir da aplicação de um PLL$_\textrm{N}$ nas correntes. Para a geração da referência do autocontrole a partir das técnicas de  ``controle da potência'' é adicionado um estágio intermediário, em que realiza-se a aproximação proposta e nota-se que a velocidade estimada pelo PLL$_\textrm{N}$ é necessária para obter o valor do ganho. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto3phGSIP.eps}
+	\caption{Diagrama de blocos do autocontrole com compensação no GSIP.}
+	\label{ctrl:auto3phGSIP}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aspectos da Implementação Digital}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Estabilidade com Baixa Carga}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Devido ao aumento da largura de banda com baixa carga e aos atrasos da implementação digital, a técnica de autocontrole de corrente ao operar com baixa carga está sujeita à instabilidade. Duas metodologias para determinação do limite e melhoria da estabilidade da técnica de autocontrole tradicional em retificadores monofásicos do tipo \textit{boost} são encontradas na literatura \cite{Artigos-18-06, Artigos-Lange}. 
+
+O primeiro autor discretiza  o modelo de pequenos sinais do conversor pelo método de Euler e obtém conclusões a partir da análise do pólo da função de transferência obtida. No entanto, o mesmo não considera efeitos de atraso e o máximo valor de ganho obtido é sobrestimado, isto é, o limite encontrado de potência mínima que o conversor pode processar é menor do que o real. Contudo, na aplicação de retificadores unidirecionais monofásicos isso não se mostrou um problema, pois a partir desse limite o conversor passa a operar em modo de condução descontínua, o que melhora a estabilidade do sistema \cite{Artigos-18-06}. 
+
+Já o segundo autor analisa a estabilidade considerando os efeitos dos atrasos. Como resultado obtém-se um valor de ganho menor, cuja validade da análise é realizada por simulações e por resultados experimentais.
+
+Contudo, os resultados obtidos para o caso monofásico não podem ser generalizados para o caso trifásico, pois há o acoplamento entre os eixos $dq$. No entanto, é fundamental determinar esse limite para garantia da operação segura do GSIP. O modelo do GSIP autocontrolado considerando os atrasos\footnote{A variável de tempo está explícita para indicar o atraso nos sinais de comando.} é dado por (\ref{eq:gsip-autoZ}). Observa-se que, a análise desse sistema não é trivial, pois a representação exata do modelo é função de estados infinitos \cite{Livros-Julio}. Uma solução para essa representação, seria aumentar a frequência de amostragem ($f_a\!=\!1/T_a$) e representar o sistema no tempo discreto por meio da transformada $z$, de forma que o atraso seja múltiplo inteiro do novo período de amostragem. No entanto, essa solução irá aumentar a ordem do sistema pelo fator entre o atraso e o novo período de amostragem vezes o número de estados, o que se apresenta como uma desvantagem. Além dessa abordagem ainda assim ser uma simplificação, fica difícil representar o sistema e obter relações simples entre o ganho máximo e a estabilidade do sistema. 
+ 
+\begin{equation}
+\label{eq:gsip-autoZ}
+\left\{\!\!\!\begin{array}{c l}
+ L_d \dfrac{di^r_{d,s}(t)}{dt} =&  -r_s i^r_{d,s}(t)+ \omega_r L_q i^r_{q,s}(t)+ \\
+ &-k_I V_{dc} i^r_{d,s}(t-3T_a/2)- \omega_r \hat{L}_q i^r_{q,s}(t-3T_a/2) \\
+ \\
+ L_q \dfrac{di^r_{q,s}(t)}{dt} =&  -r_s i^r_{q,s}(t)- \omega_r L_d i^r_{d,s}(t) -\lambda'^r_m \omega_r + \\
+ &-k_I V_{dc} i^r_{q,s}(t-3T_a/2)+ \omega_r \hat{L}_q i^r_{d,s}(t-3T_a/2)
+ \end{array}  \right.
+\end{equation}
+
+Para resolver o problema do acomplamento e tornar a análise do sistema mais simples, devem ser interpretadas as relações físicas do sistema (\ref{eq:gsip-autoZ}). Esse sistema pode ser representado por meio do circuito elétrico equivalente ilustrado na Fig.~\ref{ctrl:gsip-autoZ}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/gsip-autoZ.eps}
+	\caption{Circuito equivalente do GSIP aplicando a técnica de autocontrole com compensação digital.}
+	\label{ctrl:gsip-autoZ}
+\end{figure}	
+
+Independentemente da técnica de autocontrole empregada, observa-se que no circuito da Fig.~\ref{ctrl:gsip-autoZ} a tensão de velocidade no circuito de eixo em quadratura é praticamente nula com baixas cargas. Isso acontece porque o valor da resistência equivalente é muito alto e a corrente de eixo direto é muito pequena. Portanto, desprezar o efeito dessa tensão no circuito de eixo em quadratura, que é o circuito que se deseja obter as relações de estabilidade, é fisicamente plausível. Essa suposição é reforçada pelo resultado obtido para o sistema contínuo, em que a conclusão sobre a estabilidade do sistema é independente da compensação empregada. O mesmo se aplica à queda de tensão sobre a resistência do estator, que será muito pequena e pode ser desprezada. Desprezar a resistência significa ignorar um amortecimento natural do sistema e, portanto, se o sistema é estável sem a resistência, também o será com a mesma. Para o circuito de eixo direto não há interesse em analisá-lo, pois a tensão interna é nula e a tensão de velocidade é uma imagem do que acontece no circuito de eixo em quadratura. 
+
+Dessa forma, a estabilidade será analisada a partir do circuito apresentado na Fig.~\ref{ctrl:gsip-autoZ2}. Observa-se que, esse circuito é equivalente ao apresentado em \cite{Artigos-Lange} para análise do retificador monofásico e, portanto, será aplicada a mesma metodologia.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/gsip-autoZ2.eps}
+	\caption{Circuito equivalente para análise da estabilidade do GSIP autocontrolado.}
+	\label{ctrl:gsip-autoZ2}
+\end{figure}	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise Matemática da Estabilidade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Considere o diagrama de blocos da Fig.~\ref{ctrl:gsip-autoZ-blocos}, que representa as funções de transferência do circuito elétrico da Fig.~\ref{ctrl:gsip-autoZ2}. A estabilidade desse sistema pode ser analisada a partir da margem de fase da função de transferência de malha aberta dada por (\ref{eq:FTMAq}). 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/gsip-autoZ-blocos.eps}
+	\caption{Diagrama de blocos para análise da estabilidade do GSIP autocontrolado digitalmente.}
+	\label{ctrl:gsip-autoZ-blocos}
+\end{figure}	
+
+\begin{equation}
+\label{eq:FTMAq}
+G(s)=\dfrac{k_I V_{dc}}{L_qs}e^{-s\frac{3T_a}{2}}
+\end{equation}
+
+O limite da estabilidade do sistema é obtido no ponto em que a margem de fase é nula (\ref{eq:PMq}). A margem de fase é calculada no ponto em que o módulo de (\ref{eq:FTMAq}) é unitário, isto é, na frequência de cruzamento $\omega_0$. 
+
+\begin{equation}
+\label{eq:PMq}
+PM=-\pi-\arg(G(j\omega_0))=-\dfrac{\pi}{2}+\dfrac{3}{2}\omega_0T_a
+\end{equation}
+
+Dessa forma, o valor máximo de ganho do autocontrole é dado por (\ref{eq:kmax-auto}) e a potência mínima que pode ser processada pelo conversor por (\ref{eq:pmin-auto}). Para esse sistema, a largura de banda é um pouco menor do que a frequência de cruzamento, mas a sua determinação analítica é dificultada pela presença dos atrasos.
+
+\begin{equation}
+\label{eq:kmax-auto}
+k_{I,max}=\dfrac{\pi}{3}\dfrac{L_q f_a}{V_{dc}}
+\end{equation}
+
+\begin{equation}
+\label{eq:pmin-auto}
+P_{o,min}=\dfrac{9}{2\pi}\dfrac{(\lambda'^r_m\omega_r)^2}{L_q f_a}
+\end{equation}
+
+Observa-se que, a metodologia empregada em \cite{Artigos-18-06} também foi aplicada para analisar a estabilidade do sistema autocontrolado. Isto é, foi aplicada a discretização pelo método de Euler em (\ref{eq:auto-gsip-dq0}). Como resultado, obteve-se o mesmo valor de ganho máximo do caso monofásico, cujo limite de potência mínima é dado por (\ref{eq:pmin-autoM}). Ao utilizar esse limite para o caso trifásico, pode-se levar o sistema a instabilidade. Essa diferença tem um erro de 95\% com relação ao valor calculado por (\ref{eq:pmin-auto}). Esse resultado é válido para as duas estratégias de autocontrole.
+
+\begin{equation}
+\label{eq:pmin-autoM}
+P_{o,min}=\dfrac{3}{4}\dfrac{(\lambda'^r_m\omega_r)^2}{L_q f_a}
+\end{equation}
+
+% stop
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Validação da Análise por Simulação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para verificar a estabilidade foi considerada a operação do WECS com circuito comutado do VSR e do VSR$_\Delta$, em que o GSIP é descrito pelo seu circuito elétrico equivalente em regime permanente (Fig.~\ref{msip:regime}) e foi empregado o programa PSIM\textregistered. Serão apresentados resultados somente do VSR, pois a partir de resultados de simulação percebeu-se que o VSR está mais susceptível à instabilidade do que o VSR$_\Delta$. Isso se deve ao fato do VSR$_\Delta$ entrar em modo de condução descontínua ao processar a mínima potência da condição de estabilidade do autocontrole. Verifica-se a necessidade de uma análise mais aprofundada sobre o comportamento nesse modo de operação. Esse fenômeno também ocorre no caso monofásico \cite{Artigos-18-06}. No entanto, não serão abordados neste trabalho avanços para garantia da estabilidade das técnicas de autocontrole a vazio, pois WECSs não operam nesta condição \cite{Livros-15}. Dessa forma, esta seção apresenta uma dificuldade do autocontrole ao ser implementado de maneira digital, devido à não garantia da estabilidade e impossibilidade de operar a vazio.
+
+O procedimento para testar os limites operacionais do autocontrole digital será realizado simulando o sistema com um valor de ganho abaixo do valor máximo e variar lentamente este valor até atingir a instabilidade. Desta forma, determinam-se os instantes em que a instabilidade ocorre. Para verificar que os limites de estabilidade estão próximos em ambas as estratégias de autocontrole de corrente, o procedimento será aplicado considerando também a aplicação do autocontrole tradicional. 
+
+De acordo com a análise que será realizada na próxima seção, o valor máximo do ganho autocontrole calculado a partir de (\ref{eq:kmax-auto}) é igual a 103,4~m$\Omega$/V. E, a partir de (\ref{eq:pmin-auto}) determina-se a potência mínima que deve ser processada pelo retificador. Esta é função da frequência de operação do rotor, cujo comportamento é uma função quadrática, conforme ilustrado na Fig.~\ref{ctrl:auto-pminxfr}. De acordo com a análise dos pontos de operação desenvolvida no Capítulo~\ref{chapter-gsip-controle}, a frequência elétrica mínima do rotor é igual a 22,44~Hz. Portanto, para esta condição de operação a potência mínima é igual a 65~W.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/pminxfr.eps}
+	\caption[Potência mínima para estabilidade do autocontrole aplicado ao WECS.]{Potência mínima para estabilidade do autocontrole aplicado ao WECS deste trabalho.}
+	\label{ctrl:auto-pminxfr}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\paragraph*{Estabilidade do VSR}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na Fig.~\ref{ctrl:autoq-vsr-est} e na Fig.~\ref{ctrl:auto-vsr-est} estão ilustrados os resultados de simulação obtidos com o autocontrole tradicional e com compensação, respectivamente. Nessas figuras (b), estão ilustrados o valor máximo do ganho e o ganho de referência, em que se observa que o ganho de referência é variado lentamente durante 1~s.  Verifica-se nestas figuras que os limites de estabilidade são obtidos para 96~m$\Omega$/V ($PM\!=\!6,4^\circ$) e 98~m$\Omega$/V ($PM\!=\!4,7^\circ$), respectivamente. Portanto, confirma-se a premissa anterior que o comportamento do sistema é muito parecido com baixa carga. E, que o limite de estabilidade está próximo do valor estimado pela análise do circuito equivalente com as aproximações realizadas.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/autoq-vsr-est.eps}
+	\caption{Resultado de simulação para análise da estabilidade do autocontrole com compensação no VSR.}
+	\label{ctrl:autoq-vsr-est}
+\end{figure}	
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/auto-vsr-est.eps}
+	\caption{Resultado de simulação para análise da estabilidade do autocontrole tradicional no VSR.}
+	\label{ctrl:auto-vsr-est}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\paragraph*{Estabilidade do VSR}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%Na Fig.~\ref{ctrl:vsr-auto-z} está ilustrada a situação em que o VSR se encontra operando com autocontrole tradicional e é variada a resistência de carga. Verifica-se que o valor do ganho de referência ultrapassa o valor máximo do ganho e que o sistema tende à instabilidade.  
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/controles/vsr_auto_z.eps}
+%	\caption{Circuito equivalente para análise da estabilidade do GSIP autocontrolado.}
+%	\label{ctrl:vsr-auto-z}
+%\end{figure}	
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/controles/vsr_autoq_z.eps}
+%	\caption{Circuito equivalente para análise da estabilidade do GSIP autocontrolado.}
+%	\label{ctrl:vsr-autoq-z}
+%\end{figure}	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\paragraph*{Estabilidade do VSR$_\Delta$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Erro Estático Não-Nulo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/controles/delta_autoq_atraso.eps}
+%	\caption{Circuito equivalente para análise da estabilidade do GSIP autocontrolado.}
+%	\label{ctrl:delta-autoq-atrasos}
+%\end{figure}	
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/controles/delta_autoq_Lcomp.eps}
+%	\caption{Circuito equivalente para análise da estabilidade do GSIP autocontrolado.}
+%	\label{ctrl:delta-autoq-Lcomp}
+%\end{figure}	
+%
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aplicação ao WECS} \label{auto-wecs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise da Viabilidade do Emprego do Autocontrole}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A viabilidade da aplicação do autocontrole de corrente com compensação ao WECS em análise é verificada por meio da análise dos pontos de operação, conforme apresentado no Capítulo~\ref{chapter-gsip-controle}. Observa-se que, não é preciso reformular os problemas de otimização, pois a metodologia de análise utilizada neste capítulo foi realizada a partir das variáveis do plano $dq0$. Portanto, para determinar os pontos de operação de interesse, deve-se substituir os resultados obtidos no Capítulo~\ref{chapter-gsip-controle} nas relações derivadas neste capítulo. A aproximação realizada na seção~\ref{sec:auto-Po} não é considerada para a determinação dos pontos de operação, pois, como visto, é possível utilizar controladores que compensem o efeito dessa aproximação.
+
+O WECS é analisado para o caso de interesse, em que $\!\hat{L}_q\!=\!L_q\!$ e $\!L_d\!=\!L_q$. Dessa forma, o ganho $k_I$ pode ser determinado a partir de (\ref{eq:Iqsr-autoq}), cujo resultado obtido para o sistema em análise é apresentado na Fig.~\ref{ctrl:auto3ph-ki}. Além do ganho, está também ilustrado o valor máximo de ganho para que o sistema opere em condições estáveis ao ser implementado de maneira digital. Verifica-se que, o valor máximo é cerca de duas vezes maior do que o ganho obtido na condição de vento mínima, que é igual a 54,08~m$\Omega$/V. Portanto, o autocontrole de corrente com compensação pode ser aplicado ao sistema eólico em análise de maneira analógica ou digital, em que a implementação digital não necessita de técnicas para melhorar a estabilidade com baixa carga\footnote{Em \cite{Artigos-18-06, Artigos-Lange} são apresentados métodos para melhorar a estabilidade com baixa carga no caso de retificadores monofásicos.}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ki.eps}
+	\caption{Ganho do autocontrole com compensação em função dos pontos de operação.}
+	\label{ctrl:auto3ph-ki}
+\end{figure}
+
+A resistência equivalente e a capacitância equivalente emuladas pelo conversor autocontrolado estão ilustradas, respectivamente, na Fig. \ref{ctrl:auto3ph-req} e na Fig.~\ref{ctrl:auto3ph-ceq}. Observa-se que, ambos os resultados estão dentro de valores fisicamente realizáveis. A resistência foi obtida pela multiplicação do ganho $k_I$ pelo valor da tensão no barramento CC $V_{dc}$. Já o valor da capacitância foi obtido partir de (\ref{eq:Ceq}), em que foi substuído $L_b$ por $L_q$ e $\omega_e$ por $\omega_r$. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/req.eps}
+	\caption{Resistência equivalente em função dos pontos de operação.}
+	\label{ctrl:auto3ph-req}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ceq.eps}
+	\caption{Capacitância equivalente em função dos pontos de operação.}
+	\label{ctrl:auto3ph-ceq}
+\end{figure}
+
+Outro parâmetro de interesse é largura de banda do sistema em malha fechada da malha de corrente de eixo em quadratura ilustrada na Fig.~\ref{ctrl:auto3ph-BW}. Esta foi obtida considerando que o sistema é implementado com controle analógico, a partir de (\ref{eq:wn-B}), em que o fator de amortecimento e a frequência natural são dados, respectivamente, por (\ref{eq:xi-dq0}) e por (\ref{eq:wn-dq0}). Observa-se que há uma variação da largura de banda de cerca de seis vezes entre a potência nominal ($BW\!=\!124$~Hz) e a potência mínima ($BW\!=\!714$~Hz). A verificação da qualidade da regulação de corrente será realizada a partir de resultados de simulação na próxima seção.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/BW.eps}
+	\caption{Largura de banda em função dos pontos de operação.}
+	\label{ctrl:auto3ph-BW}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulação da Operação do WECS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assim como no Capítulo~\ref{chapter-controles}, é feita uma simulação do WECS no ambiente \textit{Simulink} do MATLAB\textregistered. O autocontrole com compensação e o PLL$_\textrm{N}$ são implementados de maneira analógica, em que a largura de banda do PLL$_\textrm{N}$\footnote{Da mesma forma que foi implementado para a estrégia de identificação de setores de corrente.} é de 100~Hz, conforme apresentado no Capítulo~\ref{chapter-modulacao}. Para a simulação do modelo do WECS são consideradas as mesmas condições apresentadas no Capítulo~\ref{chapter-controles}, em que foi empregado o controle de corrente no plano $dq0$ na operação do WECS.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Análise do Desempenho Estático}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dos resultados obtidos pela simulação do modelo de grandes sinais, verifica-se que as características de regulação de corrente e da potência empregando tanto o controle no plano $dq0$ quanto o autocontrole com compensação são muito parecidas. As pequenas diferenças encontradas são devidas à aproximação realizada em (\ref{eq:Iqsr-aprox}) para a determinação do ganho de referência do autocontrole. 
+
+Na Tabela~\ref{tab:auto-zadc} são apresentados os resultados obtidos aplicando o autocontrole com compensação e o controle no plano $dq0$ para quatro condições de velocidade de vento. Nota-se que os resultados são diferentes apenas na região I ($v_w\!\leq8$~m/s), pois  foi empregado um método de MPPT que não tem capacidade de compensar os efeitos da aproximação (\ref{eq:Iqsr-aprox}). Para as regiões II e III, o controle de velocidade é, de fato, capaz de compensar a aproximação e os resultados obtidos são iguais ao do controle no plano $dq0$.
+
+\begin{table}[!htb]
+\caption{Comparação dos resultados de simulação obtidos com as técnicas de autocontrole e $dq0$}
+\label{tab:auto-zadc}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  || c  | c | c  | c | c  }
+\hline
+ $v_w$ [m/s] & 3 & 6 & 9 & 12 & Tipo\\
+\hline
+\hline
+ \multirow{2}{*}{$I_{q,s}^r$ [A]}  & -2,47 & -9,81 & -24,18 & -38,11 & Autocontrole \\
+\cline{2-6}
+ & -2,49 & -9,97 & -24,18 & -38,11 & $dq0$\\
+\hline
+\hline
+ \multirow{2}{*}{$P_e$ [W]}  & -121,24 & -969,35 & -3144,55 & -4957,08  & Autocontrole\\
+\cline{2-6}
+ & -121,26 & -970,07 & -3144,55 & -4957,08 & $dq0$\\
+\hline
+\hline
+ \multirow{2}{*}{$P_t$ [W]}  & -118,49 & -925,84 & -2881,53 & -4303,46  & Autocontrole\\
+\cline{2-6}
+ & -118,51 & -925,31 & -2881,53 & -4303,46 & $dq0$ \\
+\hline
+\hline
+ \multirow{2}{*}{$f_r$ [Hz]}  & 22,61 & 45,55 & 60,00 & 60,00  & Autocontrole\\
+\cline{2-6}
+ &  22,44 & 44,88 & 60,00 & 60,00 & $dq0$\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+O desempenho estático da técnica foi também verificado pela simulação do circuito comutado do VSR$_\Delta$ conectado ao modelo elétrico do GSIP em regime permanente (Fig.~\ref{msip:regime}), e, para tanto, foi empregado o programa PSIM\textregistered. A simulação foi feita considerando as condições teóricas de frequência elétrica do rotor da Tabela~\ref{tab:res-foc} e do ganho de referência teórico do autocontrole dado na Tabela~\ref{tab:ki-auto}. Além disso, a modulação empregada no VSR$_\Delta$ é a estratégia SVM~II com a identificação dos setores de corrente utilizando o mesmo algoritmo de PLL$_\textrm{N}$ empregado para determinação da velocidade do GSIP e com a compensação dos atrasos digitais na modulação. Os resultados obtidos são apresentados na Tabela~\ref{tab:res-auto}, em que observa-se que os resultados estão de acordo com os valores obtidos teoricamente. Nota-se que, apenas para baixas condições de carga há uma divergência entre os resultados, mas essa é pequena e é devida à baixa qualidade de corrente em condições de baixa carga. 
+
+\begin{table}[!htb]
+\caption{Ganho teórico do autocontrole com compensação nas condições simuladas}
+\label{tab:ki-auto}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  || c  | c | c  | c   }
+\hline
+ $v_w$ [m/s] & 3 & 6 & 9 & 12 \\
+\hline
+{$k_I$ [m$\Omega$/V]}  & 54,08 & 26,40 & 13,98 & 8,40 \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htb]
+\caption{Resultados teóricos e de simulação do VSR$_\Delta$}
+\label{tab:res-auto}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  || c  | c | c  | c | c  }
+\hline
+ $v_w$ [m/s] & 3 & 6 & 9 & 12 & Tipo\\
+\hline
+\hline
+ \multirow{2}{*}{$I_{q,s}^r$ [A]}  & -2,35 & -9,83 & -24,29 & -38,69 & Autocontrole \\
+\cline{2-6}
+ & -2,49 & -9,97 & -24,18 & -38,11 & Teórico\\
+\hline
+\hline
+ \multirow{2}{*}{$P_e$ [W]}  & -114,31 & -956,42 & -3160,80 & -5033,44  & Autocontrole\\
+\cline{2-6}
+ & -121,26 & -970,07 & -3144,55 & -4957,08 & Teórico\\
+\hline
+\hline
+ \multirow{2}{*}{$P_t$ [W]}  & -111,61 & -912,27 & -2895,85 & -4358,89  & Autocontrole\\
+\cline{2-6}
+ & -118,51 & -925,31 & -2881,53 & -4303,46 & Teórico \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+As correntes de fase do estator para a condição de carga mínima ($v_w\!=\!3$~m/s) estão ilustradas\footnote{$T_r\!=\!1/f_r$, em que $f_r$ é a frequência elétrica do rotor na condição de vento simulada. A frequência elétrica do rotor é apresentada na Tabela~\ref{tab:res-foc}.} na Fig.~\ref{ctrl:pmin-auto}, em que se observa que as mesmas estão em fase com a onda\footnote{É apresentado o valor negativo do $\cos(\theta_r)$ porque foi utilizada a conveção motor.} de força magnetomotriz do rotor, $-\cos(\theta_r)$, e que a THD dessas correntes é igual a 4,30\%. Para a condição de carga nominal ($v_w\!=\!12$~m/s) ilustrada na Fig.~\ref{ctrl:pmax-auto}, as correntes estão também alinhadas ao campo magnético do rotor e a sua THD é de 0,48\%.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/pmin-auto.eps}
+	\caption{Correntes do GSIP obtidas por simulação na condição de potência mínima ($v_w\!=\!3$~m/s).}
+	\label{ctrl:pmin-auto}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/pmax-auto.eps}
+	\caption{Correntes do GSIP obtidas por simulação na condição de potência nominal ($v_w\!=\!12$~m/s).}
+	\label{ctrl:pmax-auto}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Análise do Desempenho Dinâmico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uma vez que foi verificado que as características de regulação estáticas da técnica de autocontrole com compensação são semelhantes ao do controle no plano $dq0$, serão apenas resultados referentes ao sinais de potência do sistema eólico.
+
+As potências obtidas da operação do sistema na região I estão ilustradas na Fig.~\ref{ctrl:potencias-I-auto}, em que foi aplicado do perfil de vento mostrado na Fig.~\ref{ctrl:vento-I}. Nesta figura também é mostrada a potência nos terminais do GSIP resultante da operação com controle no plano $dq0$. Observa-se que os resultados são praticamente iguais em ambas as estratégias. Para a condição simulada, a potência média disponível no vento foi de 2312~W e o coeficiente de potência médio foi de 43,25\%, o que siginifica que a potência média extraída ($P_{we}$) da turbina foi de 999,88~W. O módulo da potência média nos terminais do GSIP foi de 962,26~W e o valor médio das perdas no VSR$_\Delta$ empregando a modulação SVM~II foi de 17,53~W, portanto, o rendimento médio do conversor foi de 98,18\%. Estes resultados são bem próximos aos obtidos no Capítulo~\ref{chapter-controles} com o controle de corrente no plano $dq0$.
+ 
+% Pw = 2312,0
+% PDcond = 9,2889
+% PScond = 6,8584
+% PSsw   = 1,3787 
+ 
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/potencias-I-auto.eps}
+	\caption{Curvas de potências resultantes na operação da região I.}
+	\label{ctrl:potencias-I-auto}
+\end{figure}
+
+Na Fig.~\ref{ctrl:potencias-II-auto} estão ilustradas as curvas de potência resultantes da operação na região II com o perfil de vento mostrado na Fig.~\ref{ctrl:vento-II}. Embora não fosse esperado, a potência média extraída com o emprego da técnica de autocontrole com compensação foi maior. Isso se deve à aproximação empregada gerar um torque (em termos do ganho) de referência menor do que o necessário, o que faz com que a velocidade aumente para uma dada potência de entrada. E, como as correntes do GSIP são menores, as perdas nos enrolamentos são menores, o que resulta no aumento de potência média processada pelo retificador. Observa-se que, a princípio seja benéfico este efeito, deve-se garantir que a elevação de velocidade não comprometa a estrutura da turbina eólica. Na Fig.~\ref{ctrl:wm-auto} estão as velocidades mecânica da turbina em ambos os casos estudados, em que verifica-se que o aumento de velocidade na técnica de autocontrole com compensação não é muito elevado e, portanto, não compromete o funcionamento adequado do sistema. Observa-se que, podem ainda ser empregados controladores de velocidade com dinâmicas mais rápidas, o que dimuiria o efeito da aproximação em condições transitórias, ou pode-se também limitar à velocidades menores.
+
+% Pw = 11138,0
+% PDcond = 45,7095
+% PScond = 35,2929
+% PSsw   =  4,3973
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/potencias-II-auto.eps}
+	\caption{Curvas de potências resultantes na operação da região II.}
+	\label{ctrl:potencias-II-auto}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/wm-auto.eps}
+	\caption{Velocidade mecânica da turbina na operação da região II.}
+	\label{ctrl:wm-auto}
+\end{figure}
+
+Outro parâmetro de interesse na operação do sistema é o ângulo de entrada do retificador $\delta_i$, pois é necessário verificá-lo para confirmar a viabilidade do emprego do VSR$_\Delta$ para controle de corrente com alta qualidade. Este é ilustrado na Fig.~\ref{ctrl:deltai-II-auto} para ambas as estratégias de controle de corrente empregadas neste trabalho, em que verifica-se que nos dois casos os resultados estão próximos e dentro dos limites $-30^\circ\!\leq\!\delta_i\!\leq\!30^\circ$.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/deltai-II-auto.eps}
+	\caption{Ângulo de entrada do retificador na operação da região II.}
+	\label{ctrl:deltai-II-auto}
+\end{figure}
+
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Resultados Experimentais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fim de comprovar o funcionamento da técnica de autocontrole com compensação, foram realizados experimentos com um VSR$_\Delta$ de 6,5~kVA disponível no Instituto de Eletrônica de Potência (INEP), conforme ilustrado\footnote{O conversor é composto também de um estágio inversor trifásico (VSI) para conexão com a rede elétrica \cite{Artigos-CELESC}.} na Fig.~\ref{ctrl:vsr-delta}. Foi empregado o DSC de ponto flutuante F28335 da \textit{Texas Instruments}. 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vsr-delta.eps}
+	\caption{VSR$_\Delta$ utilizado para testes.}
+	\label{ctrl:vsr-delta}
+\end{figure}
+
+Os parâmetros e o \textit{setup} de testes estão ilustrados na Fig.~\ref{ctrl:auto-setup}. Observa-se que, o estágio retificador foi conectado à rede elétrica por meio de uma fonte trifásica (um autotransformador com tensão de saída variável) para ajuste da tensão de entrada. Os capacitores de entrada $C_{in}$ foram empregados para fornecer característica de fonte de tensão senoidal à conexão do indutor $boost$ com a fonte, visto que o mesma tem característica indutiva devido aos enrolamentos do autotransformador. Na saída do retificador foi conectada uma fonte CC para emulação do funcionamento do estágio inversor.  O valor do ganho do autocontrole foi ajustado para que ao aplicar a técnica de autocontrole com compensação a potência de saída seja igual a 2~kW.
+
+\begin{figure}[!htb]
+	\includegraphics[scale=0.85]{Figuras/controles/auto-setup.eps}
+	\caption{Configuração do VSR$_\Delta$ para testes.}
+	\label{ctrl:auto-setup}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.85]{Figuras/controles/auto-dsp.eps}
+	\caption{Fluxograma do autocontrole de corrente empregado no DSC para testes. Os números romanos entre parênteses indicam a sequência em que o algoritmo é executado.}
+	\label{ctrl:auto-dsp}
+\end{figure}
+
+O fluxograma do programa executado para realizar os testes é mostrado na Fig.~\ref{ctrl:auto-dsp}. A técnica de controle de corrente empregada foi tanto o autocontrole quanto o autocontrole com compensação. Para a modulação do VSR$_\Delta$ foi empregada a técnica SVM~I. A largura de banda do PLL$_\textrm{N}$ foi ajustada em 100~Hz, conforme apresentado no Capítulo~\ref{chapter-modulacao}.   
+
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultados do Autocontrole Tradicional}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na Fig.~\ref{ctrl:sim01-auto} estão ilustrados\footnote{Na figura as formas de onda estão ilustradas para facilitar a comparação com os resultados experimentais obtidos, pois ambas estão com a mesma proporção.} os resultados de simulação para a condição de teste realizada, em que são mostradas a corrente ($3i_{ab}\!=i_a\!-\!i_b$) e a tensão de entrada ($e_{ab}\!=\!e_a\!-\!e_b$) de linha. Dessa forma, verifica-se a partir dos resultados experimentais mostrados na Fig.~\ref{ctrl:exp01-auto} que estes estão de acordo com os obtidos por simulação. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/sim01-auto.eps}
+	\caption{Resultado de simulação do autocontrole. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:sim01-auto}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp01-auto.eps}
+	\caption{Resultado experimental do autocontrole. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:exp01-auto}
+\end{figure}
+
+Na Fig.~\ref{ctrl:exp02-auto} são apresentadas em detalhes as formas de onda de tensão e corrente. A partir desta, percebe-se que há uma defasagem entre a tensão de entrada e a corrente, confirmando que na técnica de autocontrole tradicional existe um atraso causado pela presença do indutor \textit{boost}.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp02-auto.eps}
+	\caption{Resultado experimental em detalhes do autocontrole. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:exp02-auto}
+\end{figure}
+
+Sabe-se que, na técnica de autocontrole tradicional as correntes do retificador estão em fase com as tensões sintetizadas pelo mesmo. Esta situação está ilustrada na Fig.~\ref{ctrl:exp04-auto}, em que são mostradas a tensão de linha ($v_{ab}$) sintetizada pelo retificador; e, a corrente e tensão ilustradas na Fig.~\ref{ctrl:exp02-auto}. Observa-se que a corrente e a tensão sintetizada pelo retificador estão em fase.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp04-auto.eps}
+	\caption{Resultado experimental do autocontrole. Corrente $3i_{ab}$ e tensões $v_{ab}$ e $e_{ab}$.}
+	\label{ctrl:exp04-auto}
+\end{figure}
+
+Nas Fig.~\ref{ctrl:sim02-auto} e Fig.~\ref{ctrl:exp05-auto} são apresentados, respectivamente, resultados de simulação e experimentais. Nestas estão mostradas as correntes de fase, da tensão do barramento CC e da tensão de linha sintetizada pelo VSR$_\Delta$. Dessa forma, confirma-se que os resultados experimentais estão de acordo com as análise desenvolvidas no decorrer deste trabalho.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.85]{Figuras/controles/sim02-auto.eps}
+	\caption{Resultado de simulação do autocontrole. Correntes de fase e tensões $v_{ab}$ e $v_{dc}$.}
+	\label{ctrl:sim02-auto}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.85]{Figuras/controles/exp05-auto.eps}
+	\caption{Resultado experimental do autocontrole. Correntes de fase e tensões $v_{ab}$ e $v_{dc}$.}
+	\label{ctrl:exp05-auto}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultados do Autocontrole com Compensação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na Fig.~\ref{ctrl:sim01-autoq} estão ilustrados\footnote{Na figura as formas de onda estão ilustradas para facilitar a comparação com os resultados experimentais obtidos, pois ambas estão com a mesma proporção.} os resultados de simulação para a condição de teste realizada, em que são mostradas a corrente ($3i_{ab}\!=i_a\!-\!i_b$) e a tensão de entrada ($e_{ab}\!=\!e_a\!-\!e_b$) de linha. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/sim01-autoq.eps}
+	\caption{Resultado de simulação do autocontrole. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:sim01-autoq}
+\end{figure}
+
+Dessa forma, verifica-se a partir dos resultados experimentais mostrados na Fig.~\ref{ctrl:exp01-autoq} que estes estão de acordo com os obtidos por simulação. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp01-autoq.eps}
+	\caption{Resultado experimental do autocontrole com compensação. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:exp01-autoq}
+\end{figure}
+
+Na Fig.~\ref{ctrl:exp02-autoq} são apresentadas em detalhes as formas de onda de tensão e corrente. A partir desta, percebe-se que não há defasagem entre a tensão de entrada e a corrente, confirmando que o atraso causado pela presença do indutor \textit{boost} é apropriadamente compensado pela técnica proposta.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp02-autoq.eps}
+	\caption{Resultado experimental em detalhes do autocontrole com compensação. Corrente $3i_{ab}$ e tensão $e_{ab}$.}
+	\label{ctrl:exp02-autoq}
+\end{figure}
+
+Com a técnica com compensação verifica-se que as tensões sintetizadas pelo VSR$_\Delta$ não estão em fase, mas adiantadas, conforme ilustrado na Fig.~\ref{ctrl:exp04-autoq}.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/controles/exp04-autoq.eps}
+	\caption{Resultado experimental do autocontrole com compensação. Corrente $3i_{ab}$ e tensões $v_{ab}$ e $e_{ab}$.}
+	\label{ctrl:exp04-autoq}
+\end{figure}
+
+Nas Fig.~\ref{ctrl:sim02-autoq} e Fig.~\ref{ctrl:exp05-autoq} são apresentados, respectivamente, resultados de simulação e experimentais. Nestas estão mostradas as correntes de fase, da tensão do barramento CC e da tensão de linha sintetizada pelo VSR$_\Delta$. Dessa forma, confirma-se que os resultados experimentais estão de acordo com as análise desenvolvidas no decorrer deste trabalho.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.9]{Figuras/controles/sim02-autoq.eps}
+	\caption{Resultado de simulação do autocontrole com compensação. Correntes de fase e tensões $v_{ab}$ e $v_{dc}$.}
+	\label{ctrl:sim02-autoq}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.9]{Figuras/controles/exp05-autoq.eps}
+	\caption{Resultado experimental do autocontrole com compensação. Correntes de fase e tensões $v_{ab}$ e $v_{dc}$.}
+	\label{ctrl:exp05-autoq}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo foi realizada uma revisão bibliográfica da técnica de autocontrole de corrente, em que identificou-se que a mesma ainda é pouco difundida na literatura. Nesse contexto, observa-se que não há uma denominação em comum para a técnica e suas variações \cite{Artigos-18-01,Teses-03-06,Artigos-18-06}, o que dificulta  sua difusão e o compartilhamento de resultados entre os pesquisadores do assunto. 
+
+Foram apresentados os conceitos da técnica aplicada a retificadores monofásicos e a sua extensão ao caso trifásico \cite{Teses-03-06}. Esses conceitos são fundamentais para entender o princípio de emulação de elementos passivos da técnica, em que, na técnica tradicional faz-se o conversor se comportar como uma resistência. Dessa forma, identificou-se a possibilidade de compensar os atrasos causados pelo indutor \textit{boost} por meio da adição de uma característica capacitiva ao conversor, isto é, o conversor passa a emular uma resistência em série com um capacitor. No entanto, surge a problemática de como será adicionada essa característica capacitiva, pois é necessário garantir a estabilidade na operação do conversor. Esse problema foi resolvido de uma maneira simples, que se deve à condição de equilíbrio natural de sistemas trifásicos a três condutores, em que foram gerados sinais em quadratura a partir de simples relações vetoriais do sistema $abc$. 
+
+A análise da aplicação desses comandos foi feita em detalhes a partir do modelo do conversor conectado a fontes de alimentação trifásicas no plano $dq0$. A vantagem de descrever o conversor neste sistema de variáveis é tornar os estados do sistema sinais constantes e eliminar a dependência da variável do tempo (a posição do sistema de referência) para a análise do sistema. Dessa forma, o sistema foi analisado a partir de conceitos de estabilidade de sistemas lineares. A partir da análise dos autovalores do sistema e das suas funções de transferência foram determinadas as condições de estabilidade e a característica dinâmica do sistema. Os modelos desenvolvidos foram comparados por resultados de simulação com a resposta do circuito comutado do VSR, em que se confirma que a modelagem realizada está de acordo com o sistema comutado. 
+
+A partir dos resultados obtidos ao aplicar a técnica de compensação em fontes de alimentação, identificou-se a possibilidade de aplicar a técnica ao controle de corrente no GSIP. Devido às características particulares do GSIP, esse foi analisado a partir do seu modelo no plano $dq0$ desenvolvido no Capítulo~\ref{chapter-modelagem}. Foi demonstrado que, independentemente do conhecimento da posição do rotor, da indutância de eixo direto ou da resistência do estator é possível obter corrente de eixo direto nula. Portanto, além de eliminar a necessidade do sensor de posição, a técnica é robusta a variações paramétricas da resistência do estator. No entanto, é necessária a velocidade do GSIP para aplicação da técnica. Para tanto, aplica-se  nas correntes do GSIP o PLL$_\textrm{N}$ analisado no Apêndice~\ref{apendice:pll}. Além do mais, mostra-se como aplicar as técnicas de controle da potência utilizadas em técnica de controle por campo orientado e apresentadas no Capítulo~\ref{chapter-controles}.
+ 
+Foram apresentados e discutidos os aspectos da implementação digital da técnica, em que se observa que a estabilidade do sistema é crítica com baixas cargas. Foi apresentada a determinação do limite da estabilidade com base no sentimento físico do circuito equivalente do sistema, ao invés de obter uma solução matemática exata para um problema que se mostrou ser de difícil análise. Dessa forma, obteve-se uma expressão aproximada do limite de estabilidade  e verificou-se a partir de simulações que o limite de estabilidade é muito próximo ao calculado. Além do mais, identifica-se a possibilidade da operação do VSR$_\Delta$ em modo de condução descontínua e a necessidade de maiores investigações sobre esse assunto para a aplicação da técnica em sistemas que operam a vazio.
+
+Na seção~\ref{auto-wecs} confirma-se a viabilidade da aplicação do autocontrole com compensação digital ao WECS. São analisados os pontos de operação do sistema a partir dos resultados obtidos no Capítulo~\ref{chapter-gsip-controle}, em que se observa que não é necessário reformular a análise do sistema. Os pontos de operação podem ser determinados aplicando as relações entre as variáveis do autocontrole com as variáveis do plano $dq0$, desenvolvidas neste capítulo. O sistema é estudado pela simulação do modelo de grandes sinais do WECS, em que verifica-se que a análise dos pontos de operação está de acordo com os resultados de simulação. O desempenho da técnica no WECS sob variações de vento é analisado pela transferência de potência à rede, pois verifica-se que as características de regulação de corrente do autocontrole são muito próximas a do FOC. Nota-se que embora as características de transferência de potência são muito parecidas, deve-se tomar cuidado com a técnica de autocontrole devido à sua regulação dinâmica de corrente ser prejudicada pela aproximação proposta em (\ref{eq:Iqsr-aprox}).
+
+Por fim, são realizados experimentos em laboratório para validação da técnica de controle proposta. Verifica-se que, de fato, é possível atingir o objetivo proposto de compensar o atraso causado pela presença do indutor $boost$.

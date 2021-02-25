@@ -1,0 +1,221 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Anti-\textit{windup} e Limitação dos Controladores no Plano \textit{dq0}} \label{apendice:anti-windup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nos sistemas de controle práticos, há limitações na ação de controle que podem ser exercidas sobre o sistema. Essas limitações são devidas às restrições naturais ou de projeto do sistema e podem comprometer o funcionamento do sistema em malha fechada \cite{Artigos-13-01}. Como resultado dessas limitações, o controlador não atua mais sobre o sistema, pois há uma incoerência entre a saída do controlador e o sinal de comando de fato aplicado sobre o sistema. Como resultado dessa incoerência o controlador é atualizado incorretamente. Este fenômeno é conhecido na literatura como \textit{windup} (sobrecarga) \cite{Artigos-13-01}. Diversos fenômenos adversos podem resultar da operação do sistema na condição de \textit{windup} do controlador, como por exemplo a significativa diminuição do desempenho do sistema frente a transitórios, grandes oscilações na resposta e até mesmo levá-lo à instabilidade. Em aplicações de eletrônica de potência, os momentos mais críticos da operação dos controladores são com variações de carga, partida e em curtos-circuitos \cite{Artigos-13-08}.
+
+Como solução a esse fenômeno, pode-se aplicar técnicas anti-\textit{windup}. Com a aplicação dessas técnicas é possível preservar os projetos dos controladores realizados sem a consideração da existência do \textit{windup} e  aplicar em seguida a técnica de maneira independente. Neste trabalho será apresentada a técnica de reinicialização do integrador\footnote{Também conhecida como \textit{back-calculation and tracking} ou anti-\textit{reset windup}.} (\textit{integrator resetting}) aplicada ao controlador PI \cite{Artigos-13-01}, visto que este foi o único controlador linear utilizado neste trabalho. 
+
+Em seguida, são apresentadas técnicas de limitação dos controladores no plano $dq0$. Conforme apresentado no Capítulo~\ref{chapter-modelagem}, a limitação que existe nas razões cíclicas (máximo índice de modulação) é uma combinação não linear das razões cíclicas no plano $dq0$ ou $abc$ e, portanto, é necessário relacionar tais restrições com as encontradas em técnicas anti-\textit{windup} convencionais. Dessa forma, será possível melhorar o desempenho dinâmico do VSR$_\Delta$ quando sujeito às restrições operacionais.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Anti-\textit{windup} Aplicado ao Controlador PI}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controlador Analógico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seja um sistema com função de transferência $G(s)$ e controlado por um PI, conforme ilustrado na Fig.~\ref{ap04:sistema}. Este sistema está sujeito à perturbação $w$ e o controlador a uma limitação do tipo saturação definida em (\ref{eq:saturacao}).
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/sistema.eps}
+	\caption{Diagrama de blocos de um sistema controlado por um PI.}
+	\label{ap04:sistema}
+\end{figure}
+
+\begin{equation}
+\label{eq:saturacao}
+u_{sat}=\left\{
+\begin{array}{c l}
+ u_{min} & \textrm{, se } u<u_{min}\\
+ u &  \textrm{, se } u_{min}\leq u\leq u_{max} \\
+ u_{max} &  \textrm{, se } u>u_{max}
+\end{array}\right.
+\end{equation}
+
+Para evitar o fenômeno \textit{windup} do controlador PI será empregada a estrutura da Fig.~\ref{ap04:anti-windup}. Observa-se que esta estrutura atua diretamente no integrador do controlador, pois é nele que é armazenada a informação que pode levar à incoerência entre a saída do controlador e o sinal de comando de fato aplicado sobre o sistema. Deve-se notar que a parcela proporcional não armazena informação e, portanto, quando o sistema tem erro nulo a ação proporcional cessa instantaneamente, assim como o erro entre as ações de controle. Dessa forma, não é necessário que a estrutura anti-\textit{windup} atue sobre a parcela proporcional do controle. Além disso, a atuação sobre a parcela proporcional tornaria o anti-\textit{windup} susceptível a ruídos.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/anti-windup.eps}
+	\caption[Diagrama de blocos do PI com anti-\textit{windup}.]{Diagrama de blocos do PI com anti-\textit{windup} do tipo anti-\textit{reset windup}.}
+	\label{ap04:anti-windup}
+\end{figure}
+
+Para análise e projeto da constante de tempo $T_{aw}$ da estrutura anti-\textit{windup}, deve-se observar que quando o controlador não se encontra saturado o erro $e_{aw}$ é nulo e a estrutura é igual ao controlador PI. Para o caso em que o erro $e_{aw}$ não é nulo, o projeto pode ser visto como um problema de seguimento de referência, em que $u_{sat}$ é a referência, $1/T_{aw}$ é o ganho de um controlador proporcional e o integrador é a planta conforme evidenciado na Fig.~\ref{ap04:aw-projeto}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/aw-projeto.eps}
+	\caption{Diagrama de blocos para projeto da constante de tempo do anti-\textit{reset windup}.}
+	\label{ap04:aw-projeto}
+\end{figure}
+
+Pode-se então projetar a constante de tempo para que o sistema da Fig.~\ref{ap04:aw-projeto} tenha o desempenho dinâmico requisitado. A função de transferência de malha fechada do diagrama de blocos da Fig.~\ref{ap04:aw-projeto} é (\ref{eq:aw-ftmf}). 
+
+\begin{equation}
+\label{eq:aw-ftmf}
+\dfrac{u}{u_{sat}}=\dfrac{1}{1+sT_{aw}}
+\end{equation}
+
+No entanto, é interessante observar a resposta completa do controlador em (\ref{eq:aw-resposta}) antes de projetar a constante de tempo, pois devem ser observadas algumas características do mecanismo de anti-\textit{windup}. 
+
+\begin{equation}
+\label{eq:aw-resposta}
+u=\left[\dfrac{k_C(1+sT_i)}{sT_i}e\right]\cdot\left(\dfrac{sT_{aw}}{1+sT_{aw}}\right)+\dfrac{u_{sat}}{1+sT_{aw}}
+\end{equation} Observa-se que:
+
+\begin{itemize}
+\item $ $ se a constante de tempo $T_{aw}$ é muito maior que a constante de tempo do PI, a ação anti-\textit{windup} é praticamente inexistente;
+
+\item $ $ se a constante de tempo $T_{aw}$ é muito menor que a constante de tempo do PI, a ação anti-\textit{windup} atua também sobre a parcela proporcional do PI. Esse efeito não é desejado na prática, pois quaisquer ruídos na malha de controle serão rapidamente rejeitados pela ação anti-\textit{windup}. Essa ação pode gerar o aparecimento de oscilações no sinal de controle;
+
+\item $ $ se a constante de tempo $T_{aw}$ é igual à constante de tempo do controlador PI, a ação anti-\textit{windup} é suficientemente rápida para evitar a sobrecarga do PI e a ação acontece de maneira ``natural'', pois a ação é na mesma base tempo que o integrador do PI acumula informação. Observa-se que a ação proporcional do controlador é preservada em (\ref{eq:aw-Ti}). Esta é a escolha mais usual na prática \cite{Artigos-13-01}. Neste caso o controlador PI também pode ser implementado pelo diagrama de blocos da Fig.~\ref{ap04:astrom}.
+\end{itemize}
+
+\begin{equation}
+\label{eq:aw-Ti}
+u=k_C\cdot e+\dfrac{u_{sat}}{1+sT_{i}}
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/astrom.eps}
+	\caption[Diagrama de blocos do PI com anti-\textit{reset windup}.]{Diagrama de blocos do PI com anti-\textit{reset windup} com $T_{aw}=T_i$.}
+	\label{ap04:astrom}
+\end{figure}
+
+No caso de se utilizar um controlador com ação $feedforward$, as mesmas estruturas podem ser utilizadas. Separando as parcelas de realimentação $u_{fb}$ e de \textit{feedforward} $u_{ff}$ do sinal de controle $u$, isto é $u=u_{fb}+u_{ff}$, pode-se mostrar que o sinal de realimentação será dado por (\ref{eq:aw-ufb}). Isto significa que a parcela de realimentação está limitada pela diferença entre o limite do saturador e a parcela de controle \textit{feedforward}.
+
+\begin{equation}
+\label{eq:aw-ufb}
+u_{fb}=k_C\cdot e+\dfrac{u_{sat}-u_{ff}}{1+sT_{i}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controlador Digital}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para caso da implementação digital será empregada a mesma estrutura da Fig.~\ref{ap04:anti-windup}. A constante de tempo da ação anti-\textit{windup} empregada é igual a constante de tempo discreta ($T_{i,z}$) do controlador PI discreto (ver (\ref{eq:cix-dig})). Observa-se que, devido à impossibilidade de instantaneamente atuar sobre a saída do controlador há um atraso entre o erro $e_{aw}$ atual e o erro efetivo utilizado para atuar sobre o integrador discreto, conforme ilustrado no diagrama de blocos da Fig.~\ref{ap04:aw-digital}. O efeito desse atraso são mais oscilações na saída do controlador, principalmente se fosse aplicada uma ação anti-\textit{windup} com uma constante de tempo muito mais rápida que a do controlador PI. A função de transferência do integrador discreto $\int_z$ ilustrado na Fig.~\ref{ap04:anti-windup} é dada por (\ref{eq:intz}).
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/anti-windupZ.eps}
+	\caption{Diagrama de blocos do anti-\textit{reset windup} para o PI digital.}
+	\label{ap04:aw-digital}
+\end{figure}
+
+\begin{equation}
+\label{eq:intz}
+\int_z=\dfrac{1}{z-1}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Limitação das Variáveis no Plano \textit{dq0}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pela análise do limite das razões cíclicas no Capítulo~\ref{chapter-modelagem}, sabe-se que a relação que limita as razões cíclicas de eixo direto e em quadratura é não linear. Para garantir que o conversor não irá operar na região de sobremodulação essa relação precisa ser respeitada. Duas soluções podem ser empregadas para manter o conversor fora da região de sobremodulação. A primeira, e mais simples, é projetar o conversor com um índice de modulação nominal bem abaixo da unidade. No entanto, este deve ser capaz de suportar variações dinâmicas e eventuais sobrecargas, pois não há limitação das razões cíclicas. A outra opção é limitar as razões cíclicas no algoritmo de controle, o que acarreta maior dificuldade de implementação.  
+
+Embora o retificador empregado neste trabalho tenha sido projetado com um índice de modulação abaixo do valor máximo\footnote{O índice de modulação nominal é 0,71.}, deve-se observar que ao atingir esse índice de modulação opera-se com o valor máximo das tensões estatóricas. Portanto, deve-se limitar as razões cíclicas para que este limite não seja ultrapassado. Isto também se aplica à corrente de eixo em quadratura do GSIP que deve ser limitada no seu valor máximo. Adicionalmente, deve-se limitá-la para que a corrente solicitada pelo controlador de potência seja para fluxo de potência unidirecional.
+
+Dessa forma, será analisado a seguir como limitar as variáveis no plano $dq$ de forma a preservar a direção do vetor de referência gerado pelo controlador. Preservar a direção do vetor no plano $dq$ é essencial para que não hajam descontinuidades ou harmônicas de baixa ordem nas variáveis controladas do sistema $abc$. Em seguida, estes conceitos serão aplicados para limitar as correntes e as funções de razão cíclica do VSR$_\Delta$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise Matemática}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seja o vetor $\vec{f}_{abc}$, cujo limite de amplitude para obter componentes senoidais é $F_{max}$. O limite em função das variáveis do plano $dq$ é dado por (\ref{eq:Flim}). 
+
+\begin{equation}
+\label{eq:Flim}
+\sqrt{f_d^2+f_q^2}\leq F_{max}
+\end{equation}
+
+A representação de (\ref{eq:Flim}) é ilustrada na Fig.~\ref{ap04:Flim}, em que é apresentado um vetor de referência $\vec{f}^*_{dq}$. Observa-se que o módulo deste vetor no plano $dq$ é maior que o valor máximo permitido.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/Fmax.eps}
+	\caption{Representação do limite no plano $dq$.}
+	\label{ap04:Fmax}
+\end{figure}
+
+Para gerar componentes que preservem a direção do vetor e tenham amplitude máxima, determinam-se novas componentes a partir de (\ref{eq:fdsat}) e (\ref{eq:fqsat}). O novo vetor obtido está ilustrado com suas componentes na Fig.~\ref{ap04:Flim}, em que nota-se que de fato é possível preservar a direção do vetor limitado.
+
+\begin{equation}
+\label{eq:fdsat}
+f^*_{d,sat}=\left(\dfrac{f_d^*}{\sqrt{f_d^{*2}+f_q^{*2}}}\right) F_{max}
+\end{equation}
+
+\begin{equation}
+\label{eq:fqsat}
+f^*_{q,sat}=\left(\dfrac{f_q^*}{\sqrt{f_d^{*2}+f_q^{*2}}}\right) F_{max}
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/Flim.eps}
+	\caption{Representação do vetor limitado no plano $dq$.}
+	\label{ap04:Flim}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Correntes de Referência do GSIP}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste caso como será implementada apenas a estratégia de controle ZADC, a limitação circular (\ref{eq:Flim}) se reduz à dois pontos no plano $dq$. Isto é, a corrente de eixo em quadratura deve ser limitada por (\ref{eq:IqLim}). O limite inferior representa o valor de pico da máxima corrente que pode circular no GSIP e o superior é necessário devido à restrição de fluxo de potência unidirecional do VSR$_\Delta$.
+
+\begin{equation}
+\label{eq:IqLim}
+-\sqrt{2}I_{s,max} \leq I_{q,s}^{r*} \leq 0
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aplicação nas Funções de Razão Cíclica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No caso das funções de razão cíclica, deve-se limitar as variáveis no plano $dq$ por meio de (\ref{eq:fdsat}) e de (\ref{eq:fqsat}). Observa-se que, diferentes interpretações e estratégias de implementação podem se aplicadas, como em \cite{Artigos-13-09}. No entanto, desde que se mantenha a orientação do vetor de referência, não será comprometido o desempenho do sistema em regime permanente. 
+
+Para o VSR$_\Delta$ há ainda uma restrição adicional a ser respeitada que é a restrição de ângulo $\delta_i$. A região de operação do VSR$_\Delta$ para o caso em que se emprega a estratégia de controle ZADC está ilustrada na Fig.~\ref{ap04:vsr_delta}. O limite da função de razão cíclica é colocado em termos de um valor nominal de índice de modulação $M_N$ e dos ângulos máximo e mínimo que se pode operar o retificador. Nesse caso a mudança de direção do vetor de referência será inevitável durante alguns transitórios ou condições limites de operação.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/vsr_delta.eps}
+	\caption[Representação do vetor de função de razão cíclica.]{Representação do vetor de função de razão cíclica do VSR$_\Delta$ limitado no plano $dq$.}
+	\label{ap04:vsr_delta}
+\end{figure}
+
+Como estratégia de limitação para o VSR$_\Delta$, optou-se por preservar a parcela referente ao controle de potência de ativa, isto é, a amplitude da variável de eixo em quadratura. A limitação é realizada da seguinte maneira:
+
+\begin{itemize}
+
+\item $ $ Se $d_{d}^*$ é menor que $d_{d,max}$ e maior que $d_{d,min}$, aplicam-se (\ref{eq:fdsat}) e (\ref{eq:fqsat}) para determinar as novas razões cíclicas;
+
+\item $ $ Se $d_{d}^*$ é maior que $d_{d,max}$ ou menor que $d_{d,min}$ e $d_q^*$ é menor que $d'_{q,max}$ (ver 
+Fig.\ref{ap04:item2}), recalculam-se os limites de eixo direto por (\ref{eq:vdmax}) e  por (\ref{eq:vdmin}). Este procedimento é representado graficamente na Fig.~\ref{ap04:item2}, em que $\vec{d}'^*_{dq}$ é o novo vetor resultante;
+
+\item $ $ Se $d_{d}^*$ é maior que $d_{d,max}$ ou menor que $d_{d,min}$ e $d_q^*$ é maior que $d'_{q,max}$, o novo vetor resultante será formado por esses limites que foram violados.
+\end{itemize}
+
+\begin{equation}
+\label{eq:vdmax}
+d'_{d,max}=\tan(30°)d_q^*
+\end{equation}
+
+\begin{equation}
+\label{eq:vdmin}
+d'_{d,min}=\tan(-30°)d_q^*
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap04/item2.eps}
+	\caption[Representação da técnica de limitação das  razões cíclicas.]{Representação da técnica de limitação da função de razão cíclica do VSR$_\Delta$.}
+	\label{ap04:item2}
+\end{figure}
+
+
+
+

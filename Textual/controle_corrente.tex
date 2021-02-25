@@ -1,0 +1,886 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Sistemas de Controle do Retificador Ativo Trifásico no WECS} \label{chapter-controles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/controle-gsip.eps}
+	\caption[Elementos do controle do GSIP.]{Elementos do controle do GSIP. Em destaque os elementos que serão estudados neste capítulo.}
+	\label{ctrl:controle-gsip}
+\end{figure}
+
+No capítulo anterior foram apresentadas e analisadas as estratégias de controle das correntes para o controle do GSIP. Estas estratégias realizam uma função intermediária entre o controle da potência gerada e processada pelo conversor e o controle efetivo de corrente, conforme ilustrado na Fig.~\ref{ctrl:controle-gsip} a etapa de geração das referências de corrente.  Embora não esteja evidente nesta figura, as estratégias de controle das correntes influenciam diretamente nos comandos provenientes do controle da potência, pois como visto no capítulo anterior a estratégias de controle das correntes estão associadas diretamente a algum índice de desempenho ou função que se deseja alcançar no controle do GSIP. Portanto, as metodologias para o controle da potência irão depender diretamente dessas estratégias e sob certas condições, uma determinada metodologia pode ser empregada para mais de uma estratégia. O controle de corrente é independente das estratégias anteriores, pois trata-se de um problema de seguimento de referência. 
+
+Inicialmente será apresentado o controle de corrente no plano $dq0$, bem como os aspectos envolvidos na implementação digital dos controladores. Em seguida são apresentadas técnicas de controle da potência para o controle de torque, de velocidade e de tensão do barramento CC. Para atender os requisitos de operação nominal do WECS é ainda necessário aplicar métodos para o rastreamento da máxima potência (MPPT) na região I. Então, serão brevemente apresentados alguns métodos de MPPT encontrados na literatura para atender a estes requisitos. Por fim, será apresentado o sistema de controle proposto para operação e simulação do WECS. Esse sistema será validado por simulações numéricas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Controle de Corrente no Plano \textit{dq0}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dentre as técnicas de controle de corrente utilizadas em retificadores trifásicos de tensão \cite{Artigos-03-04}, a técnica de controle no plano $dq0$ é mais utilizada em aplicações do GSIP em acionamentos elétricos \cite{Artigos-01-31} e nas aplicações do GSIP em WECS \cite{Artigos-01-02,Artigos-04-21,Artigos-01-07}. O diagrama de blocos básico dessa estratégia de controle está ilustrado na Fig.~\ref{gsip:gsip-foc}. Nesta seção são abordados o projeto e implementação digital dos controladores. 
+
+Para o projeto dos controladores de corrente considera-se a implementação de um controle em cascata, em que a malha de controle de corrente é a malha interna e com dinâmica muito mais rápida que a malha externa. Isto é, as técnicas de controle da potência são suficientemente mais lentas que as malhas de controle de corrente para que se possa desacoplar a análise. Essa consideração facilita o projeto dos controladores, pois as malhas de controle de corrente e da potência podem ser consideradas independentes.
+
+Seja então a parcela do modelo dinâmico do GSIP conectado ao VSR$_{\Delta}$ referente a dinâmica das correntes reescrita em (\ref{eq:gsip-vsr}). 
+
+\begin{equation}
+\label{eq:gsip-vsr}
+\left\{\begin{array}{c l}
+ L_d \dfrac{di^r_{d,s}}{dt} &=  V_{dc} d^r_{d}-r_s i^r_{d,s}+L_q \omega_r i^r_{q,s} \\
+ \\
+ L_q \dfrac{di^r_{q,s}}{dt} &=  V_{dc} d^r_{q}-r_s i^r_{q,s}-L_d \omega_r i^r_{d,s}-\lambda'^r_m \omega_r \\
+ \end{array} 
+ \right.
+\end{equation}
+
+Esse modelo é não linear devido ao acoplamento causado pelas tensões de velocidade, mas pode ser matematicamente desacoplado reescrevendo os sinais de controle $d^r_d$ e $d^r_q$ como a soma de uma parcela de realimentação $d^r_{x,fb}$ e outra de desacoplamento $d^r_{x,de}$, em que $x\!=\!\{d,q\}$. Assim, fazendo a parcela de desacoplamento de eixo direto igual a (\ref{eq:dd-de}) e de eixo em quadratura igual a (\ref{eq:dq-de}) obtém-se um sistema linear descrito por (\ref{eq:gsip-de}).
+
+\begin{equation}
+\label{eq:dd-de}
+d^r_{d,de}=\dfrac{-L_q\omega_r i^r_{q,s}}{V_{dc}}
+\end{equation}
+
+\begin{equation}
+\label{eq:dq-de}
+d^r_{q,de}=\dfrac{L_d\omega_r i^r_{d,s}}{V_{dc}}
+\end{equation}
+
+\begin{equation}
+\label{eq:gsip-de}
+\left\{\begin{array}{c l}
+ L_d \dfrac{di^r_{d,s}}{dt} &=  -r_s i^r_{d,s} + V_{dc} d^r_{d,fb} \\
+ \\
+ L_q \dfrac{di^r_{q,s}}{dt} &= -r_s i^r_{q,s} + V_{dc} d^r_{q,fb}  -\lambda'^r_m \omega_r \\
+ \end{array} 
+ \right.
+\end{equation}
+
+Pode-se representar o sistema linear (\ref{eq:gsip-de}) pelas funções de transferência dadas por (\ref{eq:Gix}), em que o termo $-\lambda'^r_m\omega_r$ passa a ser considerado como uma perturbação de tensão de eixo em quadratura $e^r_{q}$. Essa perturbação pode ser pré-compensada por uma ação direta (\textit{feedforward}) na malha de eixo em quadratura com $d^r_{q,ff}\!=\!\lambda'^r_m\omega_r$. Portanto, o diagrama de blocos do sistema em malha aberta pode ser ilustrado pela Fig.~\ref{ctrl:ftma}, em que o sinal $d^r_{d,ff}$ é igual a zero, $e^r_{x}$ representa as perturbações de tensão e $v^r_{x,v}$ representa as tensões de velocidade. Observa-se que $e^r_d$ é igual a zero em (\ref{eq:gsip-de}).
+
+\begin{equation}
+\label{eq:Gix}
+G_{i,x}(s)=\dfrac{i^r_{x,s}(s)}{d^r_{x,fb}(s)}=\dfrac{V_{dc}}{L_x s + r_s}
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ftma.eps}
+	\caption[Diagrama de blocos do sistema em malha aberta em $dq0$.]{Diagrama de blocos do sistema em malha aberta para controle de corrente no plano $dq0$.}
+	\label{ctrl:ftma}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estrutura de Controle Empregada}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A estrutura de controle considerada possui dois graus de liberdade conforme apresentado em destaque na Fig.~\ref{ctrl:ftmf}. Esta é composta de um controlador $C_{i_x}$ e de um filtro de referência $F_{i_x}$. O filtro de referência é utilizado para acelerar a resposta e/ou minimizar os efeitos causados pelo(s) zero(s) do controlador. No diagrama de blocos da Fig.~\ref{ctrl:ftmf} considerou-se somente à parcela de razão cíclica referente à realimentação e uma perturbação de tensão (em termos da razão cíclica $d^r_{w,x}$). Esta parcela representa o não completo cancelamento nas ações de desacoplamento e/ou \textit{feedforward}. Observa-se que esse sistema representa a linearização de (\ref{eq:gsip-vsr}) em torno do ponto de operação, em que as ações de desacoplamento e \textit{feedforward} são constantes e suas variações são dadas por $d^r_{w,x}$. Por conveniência não será utilizada a notação para variáveis linearizadas por não haver necessidade de linearizar modelos lineares, mas observa-se que a análise é sentido do modelo de pequenos sinais. Isto é, não se pode concluir sobre a estabilidade do modelo de grandes sinais a partir desta análise.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ftmf.eps}
+	\caption[Diagrama de blocos do sistema em malha fechada em $dq0$.]{Diagrama de blocos do sistema em malha fechada para controle de corrente no plano $dq0$.}
+	\label{ctrl:ftmf}
+\end{figure}
+
+A função de transferência $M_i$ na Fig.~\ref{ctrl:ftmf} representa o circuito de medição de corrente e no caso das aplicações em controle digital é projetado para realizar um filtro anti-\textit{aliasing}. Considera-se que este filtro é relizado por um filtro passa-baixas de primeira ordem dado por (\ref{eq:faa}), em que $k_{Mi}$ é o ganho do circuito de medição. Por simplicidade, será considerado ganho unitário para todos os circuitos de medição\footnote{Caso seja necessário considerar o ganho de medição na implementação dos controladores, multiplica-se o ganho dos controladores e suas referências por $1/k_{Mi}$.}.
+
+\begin{equation}
+\label{eq:mi}
+M_i(s)=k_{Mi} F_{aa}(s)
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projeto Simplificado do Controlador}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para o projeto simplificado dos controladores de corrente considera-se que a dinâmica do circuito de medição é muito mais rápida que a dinâmica das malhas de corrente, isto é, que $M_i\!=\!1$. 
+
+Seja a função de transferência do controlador é igual a $C_{i,x}\!=\!k_C N_C / D_C$ e a do filtro de referência a $F_{i,x}\!=\!N_F/N_C$. Dessa forma, a função de transferência da saída com relação à referência é dada por (\ref{eq:i_ftmf}) e a função de transferência da saída com relação a perturbação por (\ref{eq:iq_ftmf}).
+
+\begin{equation} 
+\label{eq:i_ftmf}
+\dfrac{i^{r}_{x,s}}{i^{r*}_{x,s}}=\dfrac{k_C V_{dc}N_F}{k_C V_{dc}N_C+(L_xs+r_s)D_C}
+\end{equation}
+
+\begin{equation} 
+\label{eq:iq_ftmf}
+\dfrac{i^{r}_{x,s}}{d^{r}_{w,x}}=\dfrac{V_{dc}D_C}{k_C V_{dc}N_C+(L_xs+r_s)D_C}
+\end{equation}
+
+A partir dessas funções de transferência nota-se que para garantir seguimento de referência constante com erro nulo deve-se ter uma parcela integradora no controlador. Assim como para garantir rejeição de perturbações do tipo degrau. O controlador mais simples que atende a estes requisito\footnote{Como para a malha de corrente é mais importante garantir seguimento de referência e devido às características do controlador PI, será considerado a partir de agora somente o problema de seguimento de referência. } é o controlador proporcional integral (PI), cuja função de transferência é dada por (\ref{eq:pi}). Assim, o filtro de referência pode ser obtido segundo (\ref{eq:fr-s}), em que o parâmetro $b$ é o parâmetro de ajuste do filtro utilizado para acelerar a resposta com $0\!\leq\!b\!\leq 1$.
+
+\begin{equation}
+\label{eq:pi}
+C(s)=k_{C}\dfrac{(1+s T_{i})}{s T_{i}}
+\end{equation}
+
+\begin{equation}
+\label{eq:fr-s}
+F(s)=\dfrac{1+s b T_{i}}{1 + s T_{i}}
+\end{equation}
+
+Aplicando (\ref{eq:pi}) e (\ref{eq:fr-s}) em (\ref{eq:i_ftmf}) obtém-se (\ref{eq:i_ftmf2}). Relacionando essa função de transferência com a resposta de um sistema de segunda ordem padrão dada por (\ref{eq:2nd-std-ftmf}), pode-se obter os parâmetros do controlador em função do fator de amortecimento $\xi$ e da frequência natural $\omega_n$. Estes parâmetros são critérios de projeto. Assim, o ganho do controlador $k_C$ é dado por (\ref{eq:i_kc}), a constante de tempo $T_i$ por (\ref{eq:i_Ti}) e o parâmetro $b$ é igual a zero.
+
+\begin{equation}
+\label{eq:i_ftmf2}
+\dfrac{i_{x,s}(s)}{i^*_{x,s}(s)}=\dfrac{[V_{dc}k_{C}/(L_x T_{i})](1 + s b T_{i})}{s^2+s(r_s+k_{C}V_{dc})/L_x+k_{C}V_{dc} / (L_x T_{i})}
+\end{equation}
+
+\begin{equation}
+\label{eq:2nd-std-ftmf}
+H(s)=\dfrac{\omega_{n}^2}{s^2 + 2\xi\omega_{n} s + \omega_{n}^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:i_kc}
+k_{C}=\dfrac{2\xi\omega_{n}L_x-r_s}{V_{dc}}
+\end{equation}
+
+\begin{equation}
+\label{eq:i_Ti}
+T_{i}=\dfrac{2\xi\omega_{n}L_x-r_s}{L_x \omega_{n}^2}
+\end{equation}
+
+Como em aplicações de eletrônica de potência os parâmetros de projeto são, tipicamente, a margem de fase $PM$ e a largura de banda $BW$ do sistema em malha fechada é, portanto, interessante relacionar tais parâmetros com o fator de amortecimento e a frequência natural. Estes podem ser relacionados a partir de (\ref{eq:xi-mf}) e de (\ref{eq:wn-B}), em que essas relações foram obtidas considerando um sistema de segunda ordem padrão, cuja função de transferência em malha aberta é dada por (\ref{eq:2nd-std-ftma}) e a de malha fechada por (\ref{eq:2nd-std-ftmf}). Para determinar a relação com a margem de fase utiliza-se o ponto em que o módulo da função de transferência de malha aberta é unitário, isto é, a frequência de cruzamento. Para determinar a relação com a largura de banda utiliza-se o ponto em que o módulo da função de transferência de malha fechada é $1/\sqrt{2}$, isto é, um ganho de aproximadamente -3~dB \cite{Livros-Franklin-3d}. 
+
+\begin{equation}
+\label{eq:xi-mf}
+\xi(PM)=\dfrac{\tan(PM)}{[16+16\tan^2(PM)]^{1/4}}
+\end{equation}
+
+\begin{equation}
+\label{eq:wn-B}
+\omega_n(\xi,BW)=\dfrac{2\pi BW}{\sqrt{1-2\xi^2+\sqrt{4\xi^4-4\xi^2+2}}}
+\end{equation}
+
+\begin{equation}
+\label{eq:2nd-std-ftma}
+G(s)=\dfrac{\omega^2_n}{s(s+2\xi\omega_n)}
+\end{equation}
+
+Aplicando os parâmetros do GSIP e considerando uma margem de fase $65^{\circ}$ e uma largura de banda de 200~Hz, obtêm-se $\xi_x\approx0,7$ e $\omega_{n}\!=\!1239$~rad/s para as duas malhas de corrente, pois as indutâncias de eixo direto e em quadratura são iguais. Assim, a partir de (\ref{eq:i_kc}) e (\ref{eq:i_Ti}) obtêm-se os parâmetros do controlador\footnote{Esse projeto será referido no texto como PI$_1$.} apresentados na Tabela~\ref{tab:pi1}.
+ 
+\begin{table}[!htb]
+\caption{Parâmetros do controlador PI$_{1}$}
+\label{tab:pi1}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  }
+\hline
+ $k_{C}$ & $T_{i}$ & $b$\\
+\hline
+\hline
+
+$20\cdot10^{-3}$ 1/A & $1,06$ ms & 0 \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Observa-se que a largura de banda do sistema em malha fechada é tal que a dinâmica é oito vezes mais rápida que a do sistema em malha aberta. Esse valor foi utilizado para não acelerar demasiadamente a dinâmica do sistema, obter boa regulação de corrente e satisfazer requisitos de taxa de amostragem, uma vez que será implementado um sistema de controle digital. A discussão sobre resultados de simulação será realizada na próxima subseção, em que serão discutidos aspectos da implementação digital.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aspectos da Implementação Digital} \label{ctrl:PIsec}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Conforme discutido no Capítulo~\ref{chapter-modulacao}, o modulador digital que será utilizado insere um atraso de meio período de amostragem e o pior caso é quando o ganho do modulador é unitário. Considerou-se que o atraso computacional inserido pela atualização não instantânea dos registradores do processador digital é igual a um período de amostragem. Representando esses atrasos nas malhas de correntes obtém-se o diagrama de blocos ilustrado na Fig.~\ref{ctrl:ftmf-emu}. O projeto do controlador levando em consideração os efeitos da implementação digital pode ser feito de duas maneiras: o projeto por emulação e o projeto no tempo discreto. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ftmf_emu.eps}
+	\caption[Diagrama de blocos do considerando atrasos digitais em $dq0$.]{Diagrama de blocos considerando atrasos digitais para controle de corrente no plano $dq0$.}
+	\label{ctrl:ftmf-emu}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Projeto por Emulação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O projeto por emulação consiste em projetar controladores analógicos e então discretizar as funções de transferências dos filtros e controladores obtidos. 
+
+Segundo \cite{Livros-Franklin}, o processo de discretização pode resultar em distorção em algumas frequências acarretando em perda de informação do sinal contínuo, este fenômeno é conhecido como \textit{warping effect}. Esse fenômeno pode ser pré-compensado ou evitado a partir de relações entre a largura de banda do sistema em malha fechada, a taxa de amostragem e os métodos de discretização. 
+
+Ainda segundo \cite{Livros-Franklin}, para garantir que o comportamento do controlador digital seja praticamente idêntico ao do controlador analógico, deve-se utilizar uma frequência de amostragem\footnote{Estas relações são determinadas a partir de uma quantidade mínima e máxima de número de amostras que devem ser obtidas no tempo de subida da resposta ao degrau do sistema.} de 20 a 35 vezes maior que a largura de banda do sistema em malha fechada. E, caso a relação seja menor que 20 vezes pode ser necessário realizar o procedimento de pré-compensação conhecido como pré-\textit{warping}. 
+
+Em \cite{Livros-09} são apresentadas as condições que devem ser satisfeitas para não ter uma distorção maior do que 3\% do sinal contínuo utilizando os métodos de discretização  \textit{backward}-Euler, \textit{forward}-Euler e Tustin. Conclui-se que o método de discretização que possibilita ter a maior largura de banda dada uma frequência de amostragem é o método de Tustin. Por esse motivo será o método utilizado em todas as discretizações neste trabalho.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Projeto no Tempo Discreto}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+ 
+O projeto no tempo discreto é feito substituindo o PWM por um ZOH e discretizando as funções de transferência do sistema a partir da transformada $z$. O sistema de controle discreto está representado no diagrama de blocos da Fig.~\ref{ctrl:ftmf-dig}. Assim, a função de transferência de malha aberta da malha da corrente pela razão cíclica pode ser obtida por \ref{eq:Gix-dig}. Observa-se que o circuito de medição no caso discreto faz parte da função de transferência, $\mathcal{Z}$ representa a transformada \textit{z} e a frequência $\omega_x$ é dada por (\ref{eq:taux}). 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ftmf_dig.eps}
+	\caption[Diagrama de blocos para controle digital em $dq0$.]{Diagrama de blocos no tempo discreto para controle de corrente no plano $dq0$.}
+	\label{ctrl:ftmf-dig}
+\end{figure}
+
+\begin{flalign}
+\label{eq:Gix-dig}
+&G_{i,x}(z)=\mathcal{Z}\left\{\textrm{ZOH}(s)G_{i_x}(s)M_i(s)\right\}= \\
+&= \left(\dfrac{V_{dc}}{r_s}\right) \dfrac{\omega_x(1-e^{-\omega_cT_a})(z-e^{-\omega_xT_a})-\omega_c(1-e^{-\omega_xT_a})(z-e^{-\omega_cT_a})} {(\omega_x-\omega_c)(z-e^{-\omega_x T_a})(z-e^{-\omega_c T_a})} \nonumber
+\end{flalign}
+
+\begin{equation}
+\label{eq:taux}
+\omega_x=\dfrac{r_s}{L_x}
+\end{equation}
+
+A função de transferência do controlador PI no tempo discreto é dada por (\ref{eq:cix-dig}) e a do filtro de referência por (\ref{eq:fix-dig}). No caso discreto, o zero do filtro de referência foi posicionado em zero, pois é a posição mais rápida e é capaz de compensar parte do atraso computacional de uma amostra.
+
+\begin{equation}
+\label{eq:cix-dig}
+C(z)=k_{C}\dfrac{[1+(z-1)T_{iz}]}{(z-1)T_{iz}}
+\end{equation}
+
+\begin{equation}
+\label{eq:fix-dig}
+F(z)=\dfrac{z}{1+(z-1)T_{iz}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultados dos Projetos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+Aplicando as especificações anteriores e utilizando o método do lugar das raízes para projetar os controladores PI das malhas de correntes do GSIP tanto no projeto por emulação\footnote{Esse projeto será referido no texto como PI$_{2}$.} quanto no projeto no tempo discreto\footnote{Esse projeto será referido no texto como PI$_{3}$.}, obtêm-se os parâmetros dos controladores apresentados na Tabela~\ref{tab:pi23}. O parâmetro $T_{i,x}$ do controlador PI$_{3}$ foi obtido a partir de (\ref{eq:Tiz}), em que $T_{iz}$ é uma ``constante de tempo discreta''. 
+
+\begin{table}[!htb]
+\caption{Parâmetros do controlador PI$_{2}$ e PI$_{3}$}
+\label{tab:pi23}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c || c | c}
+\hline
+Parâmetros & PI$_{2}$ & PI$_{3}$ \\
+\hline
+\hline
+$k_{C}$ & $16,5\cdot 10^{-3}$~1/A & $17,3\cdot 10^{-3}$~1/A\\
+\hline
+ 
+$T_{i}$ & $1,31$~ms & $1,38$~ms \\
+\hline
+
+$b$ & 0  & - \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{equation}
+\label{eq:Tiz}
+T_{i}=T_{iz} \cdot T_a
+\end{equation}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/cix_bodes.eps}
+	\caption[Diagramas de respostas em frequência dos controladores em \textit{dq0}.]{Diagramas de respostas em frequência dos controladores projetados para o controle de corrente no plano \textit{dq0}.}
+	\label{ctrl:cix-bodes}
+\end{figure}
+
+Os diagramas de resposta em frequência dos três controladores projetados são apresentados na Fig.~\ref{ctrl:cix-bodes}, em que os controladores contínuos foram discretizados pelo método de Tustin. Observa-se que os controladores PI$_2$ e PI$_3$ são praticamente idênticos, o que já era esperado devido à alta relação (40 vezes) entre frequência de amostragem e largura de banda do sistema em malha fechada. O lugar das raízes do sistema discreto com o controlador projetado pelo método PI$_3$ está ilustrado na Fig.~\ref{ctrl:rlocus-ci}. E, a Fig.~\ref{ctrl:pzmap-ci} ilustra a posição dos pólos e zeros da função da transferência de malha fechada $i_{x,s}^*/i_{x,s}$ no plano $z$.
+
+\begin{figure}[!htpb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/rlocus_ci.eps}
+	\caption{Lugar das raízes para a malha de controle de corrente no plano $dq0$.}
+	\label{ctrl:rlocus-ci}
+\end{figure}
+
+\begin{figure}[!htpb]
+	\centering	
+	\includegraphics[scale=\escalafig]{Figuras/controles/pzmap_ci.eps}
+	\caption[Diagrama de pólose zeros para a malha de controle de corrente no plano $dq0$.]{Diagrama de pólos e zeros para a malha de controle de corrente no plano $dq0$.}
+	\label{ctrl:pzmap-ci}
+\end{figure}
+
+As respostas aos degraus do sistema discreto da Fig.~\ref{ctrl:ftmf-dig} utilizando todos os controladores projetados são apresentadas na Fig.~\ref{ctrl:ftmf-step}. É também ilustrada a resposta do sistema de segunda ordem padrão ($i_{x,s}$) com os parâmetros de projeto. Observa-se que todas as respostas têm desempenho dinâmico satisfatório e de acordo com o especificado.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/ftmf_step.eps}
+	\caption[Respostas aos degraus de referências na malha de controle de corrente em \textit{dq0}.]{Respostas aos degraus de referências na malha de controle de corrente no plano \textit{dq0}.}
+	\label{ctrl:ftmf-step}
+\end{figure}
+
+\clearpage
+
+Os índices de desempenho obtidos de cada resposta são apresentados na Tabela~\ref{tab:cix-resultados}. Observa-se que, os índices relacionados com o desempenho dinâmico em malha fechada são atendidos nos projetos PI$_{2}$ e PI$_{3}$. A margem de fase por estar associada à estabilidade do sistema em malha aberta, não é alterada pela utilização do filtro de referência. Por isso, percebe-se uma alteração do valor especificado para todos os casos, mas é satisfatória para operação do sistema. Observa-se que é possível projetar o sistema com outra metodologia caso o requisito de margem de fase seja um fator crítico no projeto, mas considera-se que os requisitos mais importantes são largura de banda e a garantia da estabilidade. 
+
+\begin{table}[!htb]
+\caption[Índices de desempenho obtidos nos projetos dos controladores]{Índices de desempenho obtidos nos projetos dos controladores PI}
+\label{tab:cix-resultados}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c | c || c | c | c}
+\hline
+Índice & Especificação & PI$_{1}$  & PI$_{2}$  & PI$_{3}$\\
+\hline
+\hline
+$PM$ & $65^{\circ}$ & $55,3^{\circ}$ & $58,2^{\circ}$ & $58,3^{\circ}$\\
+\hline
+ 
+$BW$ & $200$~Hz & $265$~Hz & $196$~Hz & $197$~Hz \\
+\hline
+
+$\xi$ & $0,700$ & $0,663$ & $0,698$ & $0,700$ \\
+\hline
+
+$\omega_n$ & $1239$~rad/s & $1620$~rad/s & $1240$~rad/s & $1240$~rad/s \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Técnicas de Controle da Potência} {\label{sec:dq0-potencia}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle de Torque}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Considera-se que o controle de torque no eixo do gerador é feito apenas a partir da estimação do torque elétrico, uma vez que sensores capazes de medir o torque mecânico com precisão são caros. Como o torque elétrico pode ser calculado a partir de (\ref{eq:Tedq01}), pode-se desenvolver um modelo que leve em consideração os efeitos da parcela do torque de relutância no controle de torque\footnote{Caso a referência de torque seja gerada por uma malha externa que garanta erro nulo e os efeitos do torque de reluntância não forem suficientemente grandes, pode-se considerar a metodologia apresentada, em que o torque de relutância deve ser considerado como uma perturbação a ser rejeitada por essa malha externa.}. No entanto, como neste trabalho será aplicada apenas a técnica ZADC, é possível se favorecer da relação direta entre o torque e a corrente de eixo em quadratura. Assim, uma vez definida uma referência de torque $T_e^*$, pode-se calcular a referência da corrente de eixo em quadratura por (\ref{eq:iqref}). 
+
+\begin{equation}
+\label{eq:iqref}
+i_{q,s}^{r*}=\dfrac{T_e^*}{\left(\dfrac{3}{2}\right)\left(\dfrac{P}{2}\right)\lambda'^r_m}=k_{T_e}T_e^*
+\end{equation}
+
+Caso se utilize uma malha externa (por exemplo de controle em cascata) para geração da referência de torque, pode-se utilizar a função de transferência de malha fechada da corrente para analisar o comportamento dinâmico dessa malha externa. Como, em geral, utilizam-se condições de projeto para que essas malhas tenham dinâmicas desacopladas\footnote{O projeto da malha externa deve ter uma largura de banda de pelo menos uma década abaixo da largura de banda da malha de corrente.} pode-se considerar a relação de transferência $i_{q,s}^{r*}/i_{q,s}^{r}$ unitária.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle de Velocidade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O comportamento dinâmico da velocidade do GSIP no sistema eólico é descrito por (\ref{eq:turbina-gerador}). Do ponto de vista de um sistema de controle, pode-se representar a malha de velocidade pelo diagrama de blocos da Fig.~\ref{ctrl:w-ftmf}. Neste sistema, o torque elétrico é utilizado como uma variável de controle e o torque de carga é visto como uma perturbação a ser rejeitada. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/w_ftmf.eps}
+	\caption{Diagrama de blocos para controle de velocidade.}
+	\label{ctrl:w-ftmf}
+\end{figure}
+
+A estrutura de controle considerada têm dois graus de liberdade, sendo esta composta de um filtro de referência $F_\omega\!=\!N_{F}/N_{C}$ e de um controlador $C_\omega\!=\!k_{C}N_{C}/D_{C}$. Dessa forma, considerando as dinâmicas da malha de corrente e do sensor $M_\omega$ (ou estimador de velocidade) são muito mais rápidas que a dinâmica da malha de velocidade, as funções de transferência da saída para a entrada $\omega_r/\omega_r^*$ e da saída para a perturbação $\omega_r/T_{L,eq}$ são, respectivamente, dadas por (\ref{eq:Yr-wr}) e por (\ref{eq:Yq-wr}). 
+
+\begin{equation}
+\label{eq:Yr-wr}
+\dfrac{\omega_r(s)}{\omega_r^*(s)}=\dfrac{k_{C} N_{F} (P/2)} {J_{eq} s D_{C}+k_{C} N_{C} (P/2)}
+\end{equation}
+
+\begin{equation}
+\label{eq:Yq-wr}
+\dfrac{\omega_r(s)}{T_{L,eq}(s)}=\dfrac{ -D_{C}(P/2)} {J_{eq} s D_{C}+k_{C} N_{C} (P/2)}
+\end{equation}
+
+De (\ref{eq:Yq-wr}) observa-se que para garantir rejeição de perturbações do tipo degrau o controlador deve possuir uma parcela integradora. Dessa forma, escolhe-se um controlador PI do tipo (\ref{eq:pi}) e um filtro de referência do tipo (\ref{eq:fr-s}). Assim, garante-se também seguimento de referência. As funções de transferência resultantes são dadas por (\ref{eq:Yr-wr2}) e por (\ref{eq:Yq-wr2}).
+
+\begin{equation}
+\label{eq:Yr-wr2}
+\dfrac{\omega_r(s)}{\omega_r^*(s)}=\dfrac{[k_{C}/(J_{eq}T_{i})](P/2)(1+sbT_{i})}{s^2+(k_{C}/J_{eq})(P/2)s+[k_{C}/(J_{eq}T_{i})](P/2)}
+\end{equation}
+
+\begin{equation}
+\label{eq:Yq-wr2}
+\dfrac{\omega_r(s)}{T_{L,eq}(s)}=\dfrac{-(P/2) T_{i}s} {s^2+(k_{C}/J_{eq})(P/2)s+[k_{C}/(J_{eq}T_{i})](P/2)}
+\end{equation}
+
+No caso da malha de velocidade para sintonia dos parâmetros do controlador considera-se um sistema de primeira ordem padrão (\ref{eq:1st-std-ftmf}). Como parte dos requisitos da resposta de velocidade assume-se que não há sobressinal, isto é, que o fator de amortecimento é unitário (margem de fase de $76^\circ$). E, como pode-se utilizar o zero do filtro para acelerar a resposta do sistema, é possível cancelar o efeito do pólo projetado. Comparando (\ref{eq:Yq-wr2}) com (\ref{eq:1st-std-ftmf}), obtêm-se os parâmetros do controlador em função dos parâmetros de projeto. Dessa forma, o ganho do controlador é dado por (\ref{eq:w_kc}), a constante de tempo por (\ref{eq:w_Ti}) e $b$ é igual a $1/2$.
+
+\begin{equation}
+\label{eq:1st-std-ftmf}
+H(s)=\dfrac{\omega_n}{s+\omega_n}
+\end{equation}
+
+\begin{equation}
+\label{eq:w_kc}
+k_{C}=\dfrac{2\omega_{n}J_{eq}}{(P/2)}
+\end{equation}
+
+\begin{equation}
+\label{eq:w_Ti}
+T_i=\dfrac{2}{\omega_{n}}
+\end{equation}
+
+Para selecionar a largura de banda do sistema em malha fechada, utilizou-se como critério não acelerar a dinâmica da malha de velocidade e utilizar o controlador para garantir seguimento de referência e rejeição de perturbações, ambas do tipo degrau. Isto significa que será evitado que durante a operação do WECS ocorram variações bruscas de velocidade, de forma a prevenir que sejam causadas vibrações indesejadas no eixo da turbina eólica. A largura de banda do sistema em malha aberta foi determinada para o ponto em que o ganho é igual a $1/\sqrt{2}$, resultando no valor de 85~mHz. Para o caso em que deseja-se um comportamento de primeira ordem, a largura de banda do sistema em malha fechada é igual à frequência natural. Assim, os parâmetros do controlador projetado são apresentados na Tabela~\ref{tab:wC_par}. 
+
+\begin{table}[!htb]
+\caption{Parâmetros do controlador de velocidade}
+\label{tab:wC_par}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  }
+\hline
+ $k_{C}$ & $T_{i}$ & $b$\\
+\hline
+\hline
+
+$2,9$ N$\cdot$m/(rad/s) & $3,7$ s & $0,5$ \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Os diagramas de respostas em frequência das funções de transferência $\omega^*_r/\omega_r$ e $\omega^*_r/T_{L,eq}$ estão ilustradas na Fig.\ref{ctrl:w-bodes}. Essas foram discretizadas pelo método de Tustin utilizando uma frequência de amostragem de 20~Hz. Com esse projeto obteve-se uma margem de fase de 74,8$^{\circ}$ e uma largura de banda de 870~mHz.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/w_bodes.eps}
+	\caption[Diagramas de respostas em frequência do controle de velocidade.]{Diagramas de respostas em frequência de $\omega_r(z)/\omega_r^*(z)$ e $\omega_r(z)/T_{L,eq}(z)$.}
+	\label{ctrl:w-bodes}
+\end{figure}
+
+A resposta ao degrau de referência $\omega_r(kT_a)$ está ilustrada na Fig. \ref{ctrl:w-steps}(a), em que é também ilustrada a resposta especificada no projeto do controlador $\omega_r$. Na Fig.~\ref{ctrl:w-steps}(b) é apresentada a resposta ao degrau de perturbação $\omega_r(kT_a)$, mostrando que a rejeição de perturbação é obtida.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/w_steps.eps}
+	\caption[Respostas aos degraus na malha de controle de velocidade.]{Respostas aos degraus na malha de controle de velocidade: (a) de referência e (b) de perturbação.}
+	\label{ctrl:w-steps}
+\end{figure}			
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle de Tensão no Barramento CC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Embora neste trabalho não seja considerado o controle de tensão no barramento CC pelo retificador do GSIP, será apresentada a metodologia de projeto para que essa função possa ser contemplada em uma futura implementação ou função do sistema de controle do gerador eólico. Além disso, esse projeto pode ser utilizado para retificadores trifásicos desempenhando outras funções, como por exemplo em aplicações de correção do fator de potência e de inversores conectados à rede. 
+
+Assim como para a velocidade, a tensão no barramento CC está relacionada com as correntes de eixo direto e em quadratura, cuja dinâmica da malha de tensão é dada por (\ref{eq:vdc_eqftma}). Para determinar a função de transferência da malha de tensão deve-se linearizar\footnote{O til indica valores em torno do ponto de equilíbrio e letras maiúsculas ou barras em cima das variáveis indicam valores constantes no ponto de equilíbrio.} (\ref{eq:vdc_eqftma}), conforme apresentado em (\ref{eq:vdc_lin}), em que considerou-se que a corrente de eixo direto é nula. A equação linearizada está escrita em termos da variação de corrente de eixo em quadratura $\tilde{i}_{q,s}^r$ e da pertubação de corrente de carga\footnote{Considera-se que as variações da corrente de carga são pertubações a serem rejeitadas, mas outras abordagens para o projeto da malha de tensão podem ser adotadas \cite{Teses-03-04, Teses-03-05}.} $\tilde{i}_{Lq}$ dada por (\ref{eq:iLq}). Dessa forma, fica evidente a semelhança entre a malha de tensão e a malha de velocidade, conforme evidenciado no diagrama de blocos do controle de tensão da Fig.\ref{ctrl:vdc-ftmf}.
+
+\begin{equation}
+\label{eq:vdc_eqftma}
+C\dfrac{dv_{dc}}{dt}=-\dfrac{3}{2}(d_d^r i_{d,s}^r+d_q^r i_{q,s}^r)-i_{Lo}
+\end{equation}
+
+\begin{equation}
+\label{eq:vdc_lin}
+C\dfrac{d\tilde{v}_{dc}}{dt}=-\dfrac{3}{2}{D}_q^r \tilde{i}_{q,s}^r - \tilde{i}_{Lq}
+\end{equation}
+
+\begin{equation}
+\label{eq:iLq}
+\tilde{i}_{Lq}=\tilde{i}_{Lo}+\dfrac{3}{2}{I}_{q,s}^r\tilde{d}_q^r
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vdc_ftmf.eps}
+	\caption[Diagrama de blocos para controle de tensão.]{Diagrama de blocos para controle de tensão no barramento CC.}
+	\label{ctrl:vdc-ftmf}
+\end{figure}
+
+Desconsiderando a dinâmica do sensor de tensão $M_v$ e a dinâmica da malha de corrente, nota-se que da mesma forma que na malha de velocidade um controlador do tipo PI é suficiente para garantir seguimento de referência e rejeição de perturbações do tipo degrau. Dessa forma, foram obtidas as funções de transferência da saída para a entrada dada por (\ref{eq:v-yr}) e da saída para a perturbação dada por (\ref{eq:v-yq}).  
+
+\begin{equation}
+\label{eq:v-yr}
+\dfrac{\tilde{v}_{dc}}{v_{dc}^*}=\dfrac{-(3/2)[(k_C {D}_{q}^r)/(T_iC)](1+sbT_i)}{s^2-(3/2)[(k_C{D}_q^r)/C]s-(3/2)[(k_C {D}_{q}^r)/(T_iC)]}
+\end{equation}
+
+\begin{equation}
+\label{eq:v-yq}
+\dfrac{\tilde{v}_{dc}}{\tilde{i}_{Lq}}=\dfrac{-s/C}{s^2-(3/2)[(k_C{D}_q^r)/C]s-(3/2)[(k_C {D}_{q}^r)/(T_iC)]}
+\end{equation}
+
+Para a sintonia do controlador foi considerado um comportamento dominante de segunda ordem dado por (\ref{eq:2nd-std-ftmf}). Assim, comparando (\ref{eq:2nd-std-ftmf}) com (\ref{eq:v-yr}), foram obtidos os parâmetros do controlador em função dos parâmetros de projeto. O ganho do controlador é dado por (\ref{eq:v_kc}), a constante de tempo por (\ref{eq:v_Ti}) e parâmetro $b$ do filtro de referência é zero.
+
+\begin{equation}
+\label{eq:v_kc}
+k_{C}=-\dfrac{2\xi\omega_nC}{(3/2){D_q^r}}
+\end{equation}
+
+\begin{equation}
+\label{eq:v_Ti}
+T_i=\dfrac{2\xi}{\omega_{n}}
+\end{equation}
+
+Deve-se notar que, como o sistema foi linearizado, o ganho do controlador é dependente da condições de operação no ponto de equilíbrio considerado. Este é dependente do valor da razão cíclica de eixo em quadratura, cujo valor em função da potência de saída $P_o$ é dado por (\ref{eq:Dqr}). Esta equação foi obtida a partir dos pontos de equilíbrio de (\ref{eq:gsip-de}) e de (\ref{eq:vdc_eqftma}) e considerando que $I_{Lo}=P_o/V_{dc}$. Portanto, deve-se assegurar pela análise da estabilidade de todos os sistemas linearizados, ou do sistema não linear ou por simulação que o sistema será estável para todas as condições de operação. Uma ferramenta simples que serve para esse propósito é o lugar da raízes, cuja metodologia foi empregada no Apêndice~\ref{apendice:pll} para análise da variação do ganho da planta do PLL.
+
+\begin{equation}
+\label{eq:Dqr}
+{D}_q^r=\dfrac{\lambda'^r_m\omega_r}{2V_{dc}}+\dfrac{1}{2} \sqrt{\left(\dfrac{\lambda'^r_m\omega_r}{V_{dc}}\right)^2-\dfrac{4P_or_s}{(3/2)V^2_{dc}}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Métodos de Rastreamento de Máxima Potência} \label{mppt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uma das maiores vantagens de operar o WECS à velocidade variável é a possibilidade de empregar técnicas para rastrear a máxima potência disponível na região~I. Nesse caso, a velocidade do rotor deve variar de acordo com a velocidade do vento, de forma que a máxima potência seja extraída \cite{Artigos-11-24}. Observa-se que, como citado anteriormente no Capítulo~\ref{chapter-gsip-controle}, os métodos de MPPT empregados na literatura são, em geral, utilizados para maximizar a potência extraída no eixo da turbina \cite{Artigos-11-24,Artigos-11-06,Artigos-11-14}. No entanto, conforme discutido em \cite{Artigos-11-19}, o índice de desempenho que deve ser realmente otimizado é a potência elétrica nos terminais do GSIP ou após os estágios retificador e/ou inversor. Isto significa que, mais energia será entregue à rede elétrica, aumentando o aproveitamento de energia e os lucros oriundos do WECS. 
+
+Os métodos de MPPT encontrados na literatura podem ser classificados em basicamente dois grandes grandes grupos \cite{Artigos-11-06}:
+
+\begin{itemize}
+
+\item Métodos baseados no conhecimento da característica da turbina eólica (curva $C_p(\lambda,\beta)$);
+\item Métodos sem conhecimento da característica da turbina.
+
+\end{itemize}  A seguir esses métodos serão explicados brevemente. Observa-se que, neste trabalho não há contribuição significativa no desenvolvimento de novas estratégias de MPPT. No entanto, a revisão bibliográfica e a metodologia para análise empregadas são importantes para trabalhos futuros. Verifica-se também que a maioria dos métodos são aplicados a geradores com um estágio retificador seguido de um estágio CC-CC \cite{Artigos-11-24,Artigos-11-06}, e que a aplicação a geradores conectados a outras arquitetura de sistema é díficil de ser encontrada na literatura \cite{Artigos-11-02,Artigos-11-04}. Em \cite{Artigos-CELESC} foi proposta uma nova estratégia para melhorar o desempenho de um algoritmo já existente, mas, como será explicado a seguir, ao contrário do que se esperava houve um aproveitamento menor da potência média entregue à rede elétrica. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Métodos Baseados no Conhecimento de $C_{p}(\lambda,\beta)$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Todos os métodos baseado na característica da turbina eólica têm como objetivo maximizar a potência extraída no eixo da turbina \cite{Artigos-11-06,Artigos-11-19}, pois o princípio de funcionamento é baseado nos coeficientes $C_{p,max}$ e $\lambda_{opt}$, que são os coeficientes ótimos da característica $C_p(\lambda,\beta)$. Dentre as formas de implementação destes métodos, pode-se citar \cite{Artigos-11-06,Artigos-01-02,Artigos-11-07}:
+
+\begin{itemize}
+
+\item \textit{Medição do vento}: o vento medido por meio de um anemômetro é utilizado para calcular a máxima potência a partir de (\ref{eq:pv-cpmax}) ou a partir de tabelas calculadas previamente. Dessa forma, pode-se atingir o ponto de máxima potência (MPP $-$ \textit{maximum power point}) pelo controle de torque ou velocidade do GSIP;
+
+\item \textit{Controle de velocidade pela estimação da velocidade do vento}: a determinação do MPP acontece a partir de um processo iterativo, em que a velocidade do vento é estimada por (\ref{eq:vw_est}). A velocidade de referência da próxima iteração é determinada substituindo (\ref{eq:vw_est}) em (\ref{eq:pv-cpmax}), cujo resultado é dado por (\ref{eq:pwemax_k}). E, isolando a velocidade mecânica resultando em (\ref{eq:wm_opt});
+
+\begin{equation}
+\label{eq:vw_est}
+\hat{v}_w[k]=\dfrac{\omega_m[k] R}{\lambda_{opt}}
+\end{equation}
+
+\begin{equation}
+\label{eq:pwemax_k}
+P_{we,max}[k]=\left(\dfrac{\rho \pi R^5 C_{p,max}}{2\lambda_{opt}^3}\right)\omega^3_m[k]=k_{opt}\cdot\omega_m^3[k]
+\end{equation}
+
+\begin{equation}
+\label{eq:wm_opt}
+\omega_m^*[k+1]=\sqrt[3]{\dfrac{P_{we,max}[k]}{k_{opt}}}
+\end{equation}
+
+\item \textit{Controle de torque pela estimação da velocidade do vento}: o princípio é o mesmo do controle de velocidade anterior, mas (\ref{eq:pwemax_k}) é reescrita em termos do torque mecânico. O torque mecânico de referência do GSIP é dado por (\ref{eq:Tm_opt});
+
+\begin{equation}
+\label{eq:Tm_opt}
+T_m^*[k+1]=k_{opt}\cdot\omega^2_m[k]
+\end{equation}
+
+\item \textit{Realimentação do sinal de potência}: é uma variação dos métodos anteriores, pois ao invés de ter malhas de controle de torque ou velocidade é empregado o controle da potência no eixo. Este método é conhecido na literatura como \textit{power signal feedback} (PSF) \textit{control} \cite{Artigos-04-16,Artigos-11-14}.
+
+\end{itemize} 
+
+Observa-se que, as estratégias de controle de velocidade e de torque têm características dinâmicas diferentes. Isso acontece porque a dinâmica do controle de torque depende somente da inércia do sistema, enquanto para o controle de velocidade depende do desempenho e da largura de banda do controlador de velocidade. E, se esta for elevada, os transitórios serão mais bruscos, diminuindo a transferência de energia do sistema pela maior variação da velocidade \cite{Artigos-11-06}. Isso acontece porque a inércia do sistema acumula energia e variações bruscas de velocidade fazem com que, na média, mais energia seja dissipada durante o processo de busca do MPP. Este último resultado foi verificado a partir de outra metodologia em \cite{Artigos-CELESC}, em que se tentou melhorar o desempenho do controle de torque compensando o efeito da inércia da turbina e diminuindo o tempo de resposta. Portanto, o simples controle em malha aberta do torque apresenta-se como uma melhor alternativa para o aumento da transferência de energia do sistema à rede elétrica quando a característica da turbina eólica é conhecida.
+
+Deve-se notar que esses métodos, por serem baseados na característica da turbina, são dependentes do modelo e do fabricante. E, que, em geral, está não é uma informação disponibilizada pelos fabricantes. Além disso, o desempenho dos métodos pode ser deteriorado devido a variações estruturais, de densidade atmosférica e/ou de variações do ângulo de passo da turbina (no caso de turbinas que operam sempre com ângulo de passo variável) \cite{Artigos-11-07,Artigos-11-09}. Portanto, a utilização desses métodos não resulta na extração da máxima potência, mesmo que a mecânica, nas aplicações práticas.
+
+Uma observação adicional que se faz, é que nada impede que baseado no conhecimento das características do sistema eletromecânico, isto é, da característica da turbina e dos parâmetros do gerador elétrico (e/ou conversores), sejam determinadas curvas para rastreamento da máxima potência elétrica nos terminais do gerador. Essas curvas podem ser implementadas tanto por tabelas de busca ou por aproximações polinomiais.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Métodos sem o Conhecimento de $C_{p}(\lambda,\beta)$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uma vez que a curva característica da turbina não é conhecida, os algoritmos de rastreamento do MPP têm que ser implementados por métodos de busca baseados nas variações de potência, velocidade \cite{Artigos-11-06,Artigos-11-09,Artigos-04-16} e/ou torque. Esses métodos são bastantes similares ao métodos de perturba e observa (P\&O) em sistemas foltovoltaicos. No entanto, são conhecidos na literatura de energia eólica por ``métodos de busca por escalada'' (HCS $-$ \textit{hill climbing searching}) \cite{Artigos-11-09}. Isso se deve à característica do processo de convergência do método, que realiza uma ``escalada'' na curva de potência por velocidade da turbina eólica. 
+
+Diversas metodologias para implementação desses métodos podem ser encontradas na literatura, que vão desde a implementação de simples regras \cite{Artigos-11-06,Artigos-11-19,Artigos-11-07} ao treinamento de algoritmos por redes neurais \cite{Artigos-11-06}. A maior dificuldade desses métodos é que, ao contrário dos sistemas fotovoltaicos, a inércia da turbina eólica tem um efeito preponderante sobre o desempenho do método \cite{Artigos-11-14}. Para sistemas com pouca inércia, que em geral são sistemas de baixa potência, a eficácia do método é melhor, pois o tempo de resposta é menor. Em sistemas com grandes inércias, a resposta não é suficientemente rápida e o sistema não consegue rastrear as variações de vento \cite{Artigos-11-14}.
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Simulação da Operação do WECS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inicialmente é apresentada a configuração para simulação e análise do comportamento completo do WECS utilizando o  modelo de grandes sinais do VSR$_\Delta$. Em seguida, são comparados os resultados obtidos desse modelo com os resultados teóricos obtidos no Capítulo~\ref{chapter-gsip-controle}. Adicionalmente, são apresentados resultados de simulação do circuito comutado do VSR$_\Delta$, considerando o modelo elétrico do GSIP em regime permanente. Estes são comparados com os resultados teóricos e de simulação do modelo de grandes sinais. Por fim, o sistema é analisado frente a variações de vento e foi empregado um perfil de ventos que visa reproduzir os efeitos dos principais distúrbios contidos no vento. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Configuração do WECS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O diagrama de blocos dos modelos e dos sistemas de controle utilizados para simulação do WECS deste trabalho estão apresentados na Fig.~\ref{ctrl:emu-foc}. Este sistema foi simulado no ambiente \textit{Simulink} do MATLAB\textregistered, pois é possível simular com passo de cálculo variável. Isso faz com que a simulação do sistema eletromecânico seja muito mais rápida do que em programas com passo de cálculo fixo, com por exemplo o PSIM\textregistered. No entanto, a malhas de corrente devem ser implementadas por controladores analógicos, pois senão o máximo passo de cálculo fica limitado ao período de amostragem, que é muito pequeno frente aos tempos necessários para observar as dinâmicas da malha de velocidade. Para a malha de controle de velocidade e para a estratégia de MPPT foram realizadas implementações digitais com mesma taxa de amostragem (20~Hz). %Um resumo dos parâmetros do sistema é dado na Tabela~\ref{tab:emu-foc}.
+
+\begin{landscape}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[angle=270,scale=\escalafig]{Figuras/controles/emu-foc.eps}
+	\caption{Diagrama de blocos dos modelos e dos sistemas de controle utilizados para simulação do WECS.}
+	\label{ctrl:emu-foc}
+\end{figure}
+\end{landscape}
+
+%\begin{table}[!htb]
+%\caption{Parâmetros do controlador PI$_{1}$}
+%\label{tab:emu-foc}
+%
+%\centering
+%
+%\begin{center}
+%\begin{tabular}{c  | c  | c  }
+%\hline
+% $k_{C}$ & $T_{i}$ & $b$\\
+%\hline
+%\hline
+%
+%$20\cdot10^{-3}$ 1/A & $1,06$ ms & 0 \\
+%
+%\hline
+%
+%\end{tabular}
+%\end{center}
+%\end{table}
+
+Na Fig.~\ref{ctrl:emu-foc} observa-se que, o modelo da turbina eólica foi implementado com os modelos dinâmicos e estáticos apresentados no Capítulo~\ref{chapter-modelagem}, em que a resposta estática do controle aerodinâmico foi produzida por uma limitação do torque gerado pela turbina. Para o acionamento do MSIP, foi considerado que a sua velocidade é controlada, pois dessa forma é possível compensar as perdas eletromecânicas desse estágio pela garantia de seguimento de referência de velocidade. A velocidade de referência para o controle é obtida a partir do modelo dinâmico da turbina, em que o torque elétrico do gerador é calculado pela informação da corrente de eixo em quadratura do GSIP. Caso, a resposta do controle de velocidade do MSIP seja muito mais rápida do que a dinâmica emulada pela turbina, pode-se desconsiderá-la, isto é, a função de transferência $\omega_{rm}^*/\omega_{rm}$ é unitária. Neste modelo não há necessidade de considerar os efeitos da corrente de eixo direto para determinar o torque elétrico, pois $L_d\!=\!L_q$. O retificador foi emulado pelo seu modelo CA, pois considera-se que a tensão do barramento CC é mantida constante pelo estágio inversor. A estratégia ZADC para FOC é ilustrada com a estrutura para controle de corrente\footnote{Os parâmetros do controlador foram determinados pelo projeto PI$_1$.} implementada neste capítulo. Considera-se que a tensão de modo comum é nula na etapa de gerar os comandos para o modelo do retificador, pois o seu valor depende da técnica de modulação empregada e a sua presença não faz diferença para a operação do sistema. O gerenciamento do controle da potência é realizado por meio de uma máquina de estados, em que a mesma é responsável por trocar entre o MPPT aplicado na região I e o controle de velocidade aplicado nas regiões II e III. Ainda deve-se notar que, na implementação de todos os controladores PI foram consideradas estruturas anti-\textit{windup}, cuja descrição e projeto da configurações empregadas são apresentadas no Apêndice~\ref{apendice:anti-windup}. 
+
+O método de MPPT empregado nas simulações foi o controle de torque pela estimação da velocidade do vento discutido na seção~\ref{mppt}. Para atualização do método foi considerada uma frequência de amostragem dez vezes menor que largura de banda das malhas de corrente, isto é, 20~Hz. Dessa forma, há tempo suficiente para estabilização das malhas de correntes a cada atualização do algoritmo de MPPT.
+
+A lógica empregada na máquina de estados deve ser baseada tanto na velocidade quanto no torque ou potência do GSIP, pois estas determinam os pontos de transição na curva de operação nominal da turbina eólica. Neste trabalho foi empregada uma lógica simplificada, pois como comentado anteriormente, é necessário um estudo mais detalhado das técnicas de rastreamento, bem como das lógicas de transição entre regiões de operação da turbina \cite{Artigos-04-29}. Esses tópicos estão fora do escopo deste trabalho. Portanto, a lógica utilizada é da seguinte forma: 
+
+\begin{itemize}
+
+\item Se $T_e$ é maior que $T_{e,B}$ e $\omega_{rm}$ é menor que $\omega_{rm,max}$, o MPPT é acionado. O torque $T_{e,B}$ é o torque elétrico quando sistema atinge o limite da região~I (ver Fig.~\ref{dimensionamento:metodologia}). Este foi determinado a partir dos pontos de operação obtidos no Capítulo~\ref{chapter-gsip-controle}, cujo valor é igual a -90~N$\cdot$m;
+
+\item Caso a condição anterior não seja atendida, o controle de velocidade é acionado.
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise do Desempenho Estático}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A comparação dos resultados teóricos com os resultados de simulação do WECS em estudo foi realizada em \cite{Artigos-Collier}, em que demonstrou-se que os resultados teóricos estão de acordo com os obtidos pela simulação do sistema da Fig.~\ref{ctrl:emu-foc}. Neste trabalho serão apresentados apenas os resultados referentes a algumas variáveis, de forma a simplificar a apresentação dos resultados, procurando reproduzir as principais informações e acrescentar outras. 
+
+As velocidades de vento para as quais foram obtidos resultados são apresentadas na Tabela~\ref{tab:res-foc}, em que também são mostrados os resultados teóricos obtidos e os obtidos por simulação do modelo de grandes sinais da Fig.~\ref{ctrl:emu-foc}. São comparados os valores da corrente de eixo em quadratura, da potência elétrica no eixo, da potência elétrica nos terminais e da frequência elétrica do rotor. Verifica-se que, de fato, os resultados de simulação estão de acordo com os obtidos teoricamente.
+ 
+\begin{table}[!htb]
+\caption{Comparação dos resultados teóricos e de simulação do WECS}
+\label{tab:res-foc}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  || c  | c | c  | c | c  }
+\hline
+ $v_w$ [m/s] & 3 & 6 & 9 & 12 & Tipo\\
+\hline
+\hline
+ \multirow{2}{*}{$I_{q,s}^r$ [A]}  & -2,49 & -9,97 & -24,18 & -38,11 & Teórico\\
+\cline{2-6}
+ & -2,49 & -9,97 & -24,18 & -38,11 & Simulado\\
+\hline
+\hline
+ \multirow{2}{*}{$P_e$ [W]}  & -121,30 & -970,10 & -3145,00 & -4957,00  & Teórico\\
+\cline{2-6}
+ & -121,26 & -970,07 & -3144,55 & -4957,08 & Simulado\\
+\hline
+\hline
+ \multirow{2}{*}{$P_t$ [W]}  & -118,50 & -925,30 & -2882,00 & -4303,00  & Teórico\\
+\cline{2-6}
+ & -118,51 & -925,31 & -2881,53 & -4303,46 & Simulado \\
+\hline
+\hline
+ \multirow{2}{*}{$f_r$ [Hz]}  & 22,44 & 44,88 & 60,00 & 60,00  & Teórico\\
+\cline{2-6}
+ &  22,44 & 44,88 & 60,00 & 60,00 & Simulado\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Para verificar que a modelagem desenvolvida está de acordo com o circuito comutado do VSR$_\Delta$, este também foi avaliado utilizando o programa PSIM\textregistered. O modelo utilizado do GSIP para essa simulação foi o seu circuito elétrico equivalente em regime permanente ilustrado na Fig.~\ref{msip:regime}. A simulação foi feita considerando as condições teóricas de frequência elétrica do rotor e de referência do controle de corrente de eixo em quadratura dadas na Tabela~\ref{tab:res-foc}. Além disso, a modulação empregada no VSR$_\Delta$ é a estratégia SVM~II com a identificação dos setores de corrente utilizando o algoritmo de PLL$_\textrm{N}$, com a compensação dos atrasos digitais na modulação e controle de corrente digital com os parâmetros obtidos com o critério de projeto PI$_3$. Os resultados obtidos são apresentados na Tabela~\ref{tab:resII-foc}, em que observa-se que estes estão de acordo com os valores teóricos apresentados anteriormente. Nota-se que apenas para baixas condições de carga há uma divergência entre os resultados, mas essa é pequena e é devida à baixa qualidade de corrente em condições de baixa carga. 
+
+\begin{table}[!htb]
+\caption{Resultados de simulação do WECS}
+\label{tab:resII-foc}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  || c  | c | c  | c   }
+\hline
+ $v_w$ [m/s] & 3 & 6 & 9 & 12 \\
+\hline
+{$I_{q,s}^r$ [A]}  & -2,35 & -9,91 & -24,19 & -38,11 \\
+\hline
+{$P_e$ [W]}  & -114,74 & -964,47 & -3147,10 & -4957,21 \\
+\hline
+{$P_t$ [W]}  & -112,09 & -919,25 & -2884,13 & -4305,51 \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+As correntes de fase do estator para a condição de carga mínima ($v_w\!=\!3$~m/s) estão ilustradas\footnote{$T_r\!=\!1/f_r$, em que $f_r$ é a frequência elétrica do rotor na condição de vento simulada. A frequência elétrica é apresentada na Tabela~\ref{tab:res-foc}.} na Fig.~\ref{ctrl:pmin-foc}, em que se observa que as mesmas estão em fase com a onda\footnote{É apresentado o valor negativo do $\cos(\theta_r)$ porque foi utilizada a conveção motor.} de força magnetomotriz do rotor, $-\cos(\theta_r)$, e que a THD dessas correntes é igual a 6,80\%. Para a condição de carga nominal ($v_w\!=\!12$~m/s) ilustrada na Fig.~\ref{ctrl:pmax-foc}, as correntes estão também alinhadas ao campo magnético do rotor e a THD é igual a 0,36\%.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/pmin-foc.eps}
+	\caption[Correntes do GSIP na condição de potência mínima.]{Correntes do GSIP obtidas por simulação na condição de potência mínima ($v_w\!=\!3$~m/s).}
+	\label{ctrl:pmin-foc}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/pmax-foc.eps}
+	\caption[Correntes do GSIP na condição de potência nominal.]{Correntes do GSIP obtidas por simulação na condição de potência nominal ($v_w\!=\!12$~m/s).}
+	\label{ctrl:pmax-foc}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Análise do Desempenho Dinâmico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para a análise do desempenho dinâmico do WECS, considera-se uma situação em que há variações de vento. Essas variações, para que reproduzam efeitos encontrados na prática, devem conter além da componente média de velocidade do vento, turbulências e ruídos \cite{Artigos-11-18,Artigos-12-01}. O perfil de vento empregado neste trabalho é uma modificação do perfil apresentado em \cite{Artigos-11-06}, para que seja possível testar a operação do sistema eólico nas regiões I e II sem que haja troca no modo em que é controlada a potência, isto é, não haja troca entre as regiões I e II. Esse perfil é dado por (\ref{eq:vento}), em que $V_{w,avg}$ é a velocidade média do vento, $\omega_w\!=\!2\pi/T_w$ e $T_w\!=\!60$~s.
+
+\begin{flalign}
+\label{eq:vento}
+v_w(t)=&V_{w,avg}\!+\!\dfrac{V_{w,avg}}{10}\textrm{sen}(\omega_w t) +\! \dfrac{V_{w,avg}}{10}V_{w,avg}\textrm{sen}(3,5\omega_w t)\!+ \nonumber\\
+&+\dfrac{V_{w,avg}}{20}\textrm{sen}(12,35\omega_w t)\!+\!\dfrac{V_{w,avg}}{100}\textrm{sen}(35\omega_w t) 
+\end{flalign}
+
+A seguir são apresentados resultados de simulação nas regiões I e II, em que considerou-se a operação do sistema durante três minutos. A região III não foi avaliada, pois como deseja-se observar o comportamento dinâmico do sistema eólico sob variações de vento, a simplificação do controle aerodinâmico por uma limitação estática de torque não é representativa para análises em condições transitórias. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Operação na Região I}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O perfil de vento para avaliar a operação na região I está ilustrado na Fig.~\ref{ctrl:vento-I}, em que este foi obtido a partir de (\ref{eq:vento}) com $V_{w,avg}\!=\!6$~m/s. Nessa figura está também ilustrado o valor da velocidade de vento estimada ($\hat{v}_w$) pelo algoritmo de MPPT a partir de (\ref{eq:vw_est}). Observa-se que, devido à inércia da turbina eólica a velocidade do vento não pode ser rastreada instantaneamente, pois a inércia funciona como um filtro passa-baixas para as variações bruscas da velocidade do vento. Isso faz com que as variações de velocidade angular da turbina sejam lentas. Na Fig.~\ref{ctrl:wm-I} está ilustrada a velocidade mecânica do gerador, em que nota-se claramente que a velocidade do vento estimada é uma imagem da velocidade mecânica.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vento-I.eps}
+	\caption{Perfil de vento para simulação da operação na região I. E, vento estimado pelo algoritmo de MPPT.}
+	\label{ctrl:vento-I}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/wm-I.eps}
+	\caption{Velocidade mecânica da turbina eólica na operação da região I.}
+	\label{ctrl:wm-I}
+\end{figure}
+
+O coeficiente de potência instantâneo da turbina eólica está ilustrado na Fig.~\ref{ctrl:cp-I}. Nota-se que este se mantém próximo ao valor ótimo de 44\% e o seu valor médio é igual a 43,24\%. Esse resultado demonstra que o método de MPPT empregado, de fato, está rastreando a máxima potência (mecânica).  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/cp-I.eps}
+	\caption{Coeficiente de potência da turbina na operação da região I.}
+	\label{ctrl:cp-I}
+\end{figure}
+
+% P_{w,avg}=2303,4 W
+
+Na Fig.~\ref{ctrl:potencias-I} são mostradas as curvas das potências instantâneas resultantes. Verifica-se que, a referência de potência elétrica no eixo ($P_e^{*}$) é uma versão filtrada da potência instantânea extraída do vento ($P_{we}$). A potência elétrica nos terminais do GSIP ($P_t$) é uma imagem da referência de potência elétrica no eixo, em que o descréscimo de potência se deve às perdas nas resistências do estator. Para a condição simulada, a potência média disponível no vento foi de 2303,4~W, a potência média no eixo da turbina, isto é, a potência extraída do vento, foi de 996,04~W (rendimento aerodinâmico médio de 43,24\%) e o módulo da potência elétrica média disponível nos terminais do GSIP de 959,64~W.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/potencias-I.eps}
+	\caption{Curvas de potências resultantes na operação da região I.}
+	\label{ctrl:potencias-I}
+\end{figure}
+
+Para calcular as perdas no estágio de retificação, isto é, no VSR$_\Delta$, foram aplicadas as fórmulas de perdas derivadas no Apêndice~\ref{apendice:vsr-delta} considerando a operação com a estratégia de modulação SVM~II. O índice de modulação e a corrente eficaz são necessários para realizar o cálculo das perdas e estes estão ilustrados na Fig.~\ref{ctrl:vsr-I}. Dessa forma, do cálculo das perdas obtém-se que o valor médio destas é de 17,78~W. Isto representa um rendimento médio do VSR$_\Delta$ de 98,15\% para a condição simulada. 
+
+% PDcond = 9,2857 W
+% PScond = 7,1076 W
+% PSsw   = 1,3886 W
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{ctrl:M-I}
+	\includegraphics[scale=\escalafig]{Figuras/controles/M-I.eps}}
+	
+	\subfigure[]{
+	\label{ctrl:irms-I}
+	\includegraphics[scale=\escalafig]{Figuras/controles/irms-I.eps}}
+	}
+	\caption[Parâmetros adicionais do sistema na operação da região I.]{Parâmetros adicionais do sistema na operação da região I: (a) índice de modulação e (b) valor eficaz da corrente de fase.}
+	\label{ctrl:vsr-I}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Operação na Região II}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta região é empregado o perfil de vento mostrado na Fig.\ref{ctrl:vento-II}. Este foi obtido a partir de (\ref{eq:vento}) com $V_{w,avg}\!=\!10$~m/s. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/vento-II.eps}
+	\caption{Perfil de vento para simulação da operação na região II.}
+	\label{ctrl:vento-II}
+\end{figure}
+
+O objetivo da operação na região II é manter a velocidade angular mecânica da turbina eólica no valor nominal de 240~rpm. A referência de velocidade e a velocidade instantânea da turbina estão ilustradas na Fig.~\ref{ctrl:wm-II}. Observa-se que, devido às grandes variações da velocidade do vento e à especificação de dinâmica lenta empregada no controle de velocidade, a regulação de velocidade não é capaz de rejeitar os distúrbios rapidamente. No entanto, nota-se que a operação se dá em torno do valor nominal e está dentro dos limites especificados para a operação do GSIP. Portanto, é possível operar a turbina nesta condição.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/wm-II.eps}
+	\caption[Velocidade mecânica da turbina eólica na região II.]{Velocidade mecânica da turbina eólica na operação da região II.}
+	\label{ctrl:wm-II}
+\end{figure}
+
+Assim como na operação da região I, a referência de potência elétrica no eixo é uma versão filtrada da potência instantânea extraída do vento, conforme ilustrado na Fig.~\ref{ctrl:potencias-II}. Para esta condição simulada, a potência média extraída do vento foi de 3847,1~W e o módulo da potência elétrica média disponível nos terminais do GSIP foi de 3449,0~W. O coeficiente de potência instantâneo está ilustrado na Fig.~\ref{ctrl:cp-II}, o seu valor médio é de 36,57\%. Assim, como no caso anterior, é feito o cálculo das perdas para a estratégia de modulação SVM~II a partir do índice de modulação (Fig.~\ref{ctrl:M-II}) e do valor eficaz da corrente (Fig.~\ref{ctrl:irms-II}).  Obtém-se como resultado um valor médio das perdas de 80,78~W, o que representa um rendimento médio do VSR$_\Delta$ de 97,65\% para a condição simulada. 
+
+%P_{w,avg}=10520 W
+
+% PDcond = 43,5356 W
+% PScond = 33,1096 W
+% PSsw   =  4,1364 W
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/controles/potencias-II.eps}
+	\caption{Curvas de potências resultantes na operação da região II.}
+	\label{ctrl:potencias-II}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{ctrl:cp-II}
+	\includegraphics[scale=\escalafig]{Figuras/controles/cp-II.eps}}
+	
+	\subfigure[]{
+	\label{ctrl:irms-II}
+	\includegraphics[scale=\escalafig]{Figuras/controles/irms-II.eps}}
+	}
+	
+		\mbox{
+	\subfigure[]{
+	\label{ctrl:M-II}
+	\includegraphics[scale=\escalafig]{Figuras/controles/M-II.eps}}
+	
+	\subfigure[]{
+	\label{ctrl:deltai-II}
+	\includegraphics[scale=\escalafig]{Figuras/controles/deltai-II.eps}}
+	}
+	
+	\caption[Parâmetros adicionais do sistema na operação da região I.]{Parâmetros adicionais do sistema na operação da região I: (a) coeficiente de potência, (b) índice de modulação, (c) valor eficaz da corrente de fase e (d) ângulo de entrada do retificador.}
+	
+\end{figure}
+
+Por fim, verifica-se na Fig.~\ref{ctrl:deltai-II} o ângulo de entrada do retificador ($\delta_i$) é mantindo dentre dos seus limites ($-30^\circ\!\leq\!\delta_i\!\leq\!30^\circ$). Dessa forma, confirma-se a viabilidade do emprego do VSR$_\Delta$ para controle de corrente com alta qualidade sob condições de ventos turbulentos. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo foram analisados os sistemas de controle que influenciam diretamente a operação do retificador ativo trifásico empregado neste trabalho. Para todos os casos, foram apresentadas metodologias de projeto, em que o critério de projeto pode ser tanto a frequência natural e o amortecimento desejados, quanto a largura de banda e a margem de fase.
+
+Inicialmente, foi apresentado o projeto de controladores de corrente no plano $dq0$ considerando tanto a implementação analógica quanto a implementação digital. Em seguida, foram apresentadas técnicas para o controle da potência do GSIP, isto é, controle de torque, de velocidade e de tensão do barramento CC.  Para os métodos de rastreamento de potência foi realizada uma revisão bibliográfica dos principais métodos encontrados na literatura. 
+
+Por fim, foi considerado o funcionamento completo do WECS. Foram comparados os resultados téoricos obtidos nas análises do Capítulo~\ref{chapter-gsip-controle}, em que verificou-se que o modelo de simulação desenvolvido e os controladores empregados estão de acordo com a análise teórica.  O comportamento do WECS frente a variações da velocidade do vento foi analisado, em que foram verificados os resultados da operação na região de rastreamento de máxima potência (região~I) e na região em que a velocidade da turbina deve ser limitada no seu valor nominal (a partir da região II). Como resultado final, confirma-se a viabilidade do emprego do VSR$_\Delta$ para controle de corrente com alta qualidade no WECS deste trabalho.
+

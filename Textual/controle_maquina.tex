@@ -1,0 +1,467 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Estratégias de Controle do GSIP e Pontos de Operação do WECS]{Estratégias de Controle do GSIP e Análise dos Pontos de Operação do WECS} \label{chapter-gsip-controle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/chapter-gsip.eps}
+	\caption{Inserção do controle do GSIP no WECS.}
+	\label{gsip:gsip-controle}
+\end{figure}
+
+A aplicação do VSR$_{\Delta}$ para o controle do GSIP permite o emprego de técnicas avançadas de controle e como resultado pode-se ter um alto desempenho no gerador elétrico. As técnicas de controle que podem ser empregadas são derivadas das vastas aplicações de controle de motores já consolidadas na indústria. Dessas técnicas de alto desempenho destacam-se duas \cite{Artigos-04-21,Artigos-01-31}: o controle por orientação de campo (FOC $-$ \textit{field oriented control}) e o controle direto de torque (DTC $-$ \textit{direct torque control}). Ambas as técnicas são adaptações das técnicas empregadas para controle do motor de indução \cite{Livros-02}. 
+
+As duas técnicas de controle podem ser utilizadas neste trabalho e se encaixam no WECS conforme apresentado na Fig.~\ref{gsip:gsip-controle}.  O controle do GSIP deve ser capaz de gerar os comandos para a modulação vetorial e tem como principais parâmetros de entrada as variáveis para o controle da potência. Estas  podem ser: o torque e/ou a velocidade angular e/ou a tensão no barramento CC. Embora sejam possíveis utilizar as duas técnicas de controle será dado enfoque ao FOC, visto que esta é uma técnica bem consolidada e permite controle completo do sistema com alto desempenho e robustez. As técnicas de DTC são mais recentes que as de FOC, tendo essa sido proposta por I. Takahashi em 1984 e por M. Depenbrock em 1985 \cite{Artigos-01-08}. Aplicações ao controle do GSIP conectado à turbinas eólicas ainda são poucas tendo sido a primeira proposta em \cite{Artigos-01-19}.
+
+Após analisar as estratégias de controle das correntes do GSIP com FOC, serão determinados os pontos de operação do WECS para cada estratégia de controle escolhida. Será realizada uma comparação entre essas estratégias. Uma vez definidas quais estratégias são as mais vantajosas para a aplicação ao WECS, serão calculados os esforços de corrente nos semicondutores e as suas respectivas perdas. A determinação dos pontos de operação será feita utilizando técnicas de otimização não linear na região de maximização de potência e analiticamente nas outras regiões para a maioria das estratégias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Controle por Orientação de Campo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Histórico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O controle por orientação de campo (FOC) ou controle vetorial foi proposto por F. Blaschke em 1971 para o controle do motor de indução trifásico \cite{Blaschke,Artigos-01-08,Artigos-01-30}. A idéia básica do controle é que os campos do estator e do rotor encontram-se orientados de forma que o fluxo do rotor e o torque possam ser controlados independentemente, como em uma máquina CC com excitação independente. A situação em que os campos encontram-se orientados é quando estes mantêm uma defasagem espacial de $90^{\circ}$. 
+
+O termo controle vetorial deve-se ao fato de que é controlada a fase e a amplitude das variáveis de controle (tensão ou corrente) \cite{Livros-01,Livros-02}. E, para tornar fácil a compreensão dos conceitos de FOC será recapitulado o controle de torque em uma máquina CC com excitação independente.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{FOC da Máquina CC com Excitação Independente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seja uma máquina CC com excitação independente cujo modelo está ilustrado na Fig.~\ref{gsip:cc-maquina}. Ela é composta de um enrolamento de campo, de um enrolamento de armadura e de um comutador. O sobrescrito $a$ é utilizado para denotar variáveis do enrolamento de armadura e $f$ para denotar o enrolamento de campo. O enrolamento de armadura é girante, mas o comutador é responsável por manter a distribuição espacial do fluxo de armadura perpendicular ao fluxo de campo seja qual for a velocidade. O enrolamento de campo é estacionário com excitação independente ou a ímãs permanentes. Os campos ($\psi$) estão ilustrados na Fig.~\ref{gsip:cc-campo}, mostrando a orientação também das correntes que estão alinhadas aos respectivos campos.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/cc-maquina.eps}
+	\caption{Modelo da máquina CC.}
+	\label{gsip:cc-maquina}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/cc-campo.eps}
+	\caption{Orientação dos campos na máquina CC.}
+	\label{gsip:cc-campo}
+\end{figure}
+
+Essa perpendicularidade entre os campos faz com que variações de campo em um enrolamento não afetem o campo do outro enrolamento (exceto por efeitos de segunda ordem e não lineares). Então, observando o torque da máquina em (\ref{eq:Tcc}),  nota-se que a variação de uma das correntes irá gerar uma variação de torque instantânea e diretamente proporcional a ela. Esse resultado pode ser utilizado para desenvolver uma estratégia de controle simples e robusta como ilustrado na Fig.~\ref{gsip:cc-foc} \cite{Livros-02}. 
+
+\begin{equation}
+\label{eq:Tcc}
+T_e=\left(\dfrac{P}{2}\right)L_{af}\cdot i_f \cdot i_a
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$L_{af}$: é a indutância mútua entre os enrolamentos de campo e de armadura;
+
+$i_f$: é a corrente de campo;
+
+$i_a$: é a corrente de armadura.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/cc-foc.eps}
+	\caption{Exemplo de sistema de controle de torque para a máquina CC.}
+	\label{gsip:cc-foc}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FOC no GSIP}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No caso de máquinas CA, como a máquina de indução ou síncrona, a relação de torque em variáveis do estator e do rotor é fortemente não linear, devido aos acoplamentos magnéticos existentes e a dependência destes com a posição do rotor. A expressão do torque no GSIP é reescrita em (\ref{eq:Te1MSIP}) para demonstrar essas não linearidades, observa-se que seria muito difícil trabalhar diretamente com esta expressão.  
+
+\begin{flalign}
+\label{eq:Te1MSIP}
+&T_e(\vec{i}_{abc,s},\theta_r) = \left(\dfrac{P}{2}\right)\Bigg\{\dfrac{(L_{m,d}-L_{m,q})}{3}\Bigg[\nonumber\\
+&\sin(2\theta_r)\left(i_{a,s}^2-\dfrac{1}{2}i_{b,s}^2-\dfrac{1}{2}i_{c,s}^2-i_{a,s}i_{b,s}-i_{a,s}i_{c,s}-i_{b,s}i_{c,s}\right)+ \nonumber\\
+&\dfrac{\sqrt{3}}{2}\cos(2\theta_r)(i_{b,s}^2-i_{c,s}^2-2i_{a,s}i_{b,s}+2i_{a,s}i_{c,s})\Bigg]+ \nonumber\\
+& \lambda_m'\Bigg[\cos(\theta_r)\left(i_{a,s}-\dfrac{1}{2}i_{b,s}-\dfrac{1}{2}i_{c,s}\right) + \dfrac{\sqrt{3}}{2}\sin(\theta_r)(i_{b,s}-i_{c,s})\Bigg]\Bigg\}\end{flalign}
+
+A expressão (\ref{eq:Te1MSIP}) pode ser comparada com a obtida pela modelagem no sistema de referência do rotor, reescrita em (\ref{eq:Te2MSIP}). Observa-se que a dependência da posição do rotor é eliminada e essa se torna muito similar a (\ref{eq:Tcc}). Em (\ref{eq:Te2MSIP}) identificam-se duas parcelas de torque: o torque de reação e o torque de relutância. De fato, o interesse está nas semelhanças entre o torque de reação e o torque na máquina CC, pois em ambas identificam-se três termos: um relativo aos parâmetros da máquina, um devido à excitação e um relacionado às correntes nos enrolamentos de armadura (estator). No entanto, a parcela de torque de relutância adiciona uma variação não linear de torque para variações de corrente no estator. Para eliminar essa variação deve-se controlar a corrente de eixo direto para que esta seja nula. Dessa forma, obtém-se  um controle por orientação de campo devido à orientação das correntes no estator.
+
+\begin{equation}
+\label{eq:Te2MSIP}
+T_e=\left(\dfrac{3}{2}\right)\left(\dfrac{P}{2}\right)\cdot\lambda'^r_{m}\cdot i^r_{q,s}+\left(\dfrac{3}{2}\right)\left(\dfrac{P}{2}\right)(L_d-L_q)i^r_{d,s}i^r_{q,s}
+\end{equation}
+
+Na Fig.~\ref{gsip:campo} estão ilustrados o vetor de corrente e o enlace de fluxo (associado ao campo) dos ímãs (rotor). Nota-se que, o vetor de corrente no plano $dq$ está orientado com o eixo em quadratura quando $i^r_{d,s}=0$ e o enlace de fluxo dos ímãs está alinhado com o eixo direto, ou seja, perpendicular à parcela de corrente (campo) do estator que produz torque. Como mostrado, é possível obter para o GSIP um controle independente entre o torque e o campo do rotor. Observa-se que foram necessárias as seguintes condições:
+
+\begin{itemize}
+\item \textit{Conhecimento da posição do rotor}: para realizar o desacoplamento das indutâncias da máquina com a posição do rotor por meio da transformada de Park;
+\item \textit{Controle independente das amplitudes e fases das correntes do estator}: esta tarefa pode ser realizada por conversores estáticos tanto do tipo fonte de tensão quanto do tipo fonte de corrente;
+\item \textit{Controle da corrente de eixo direto em zero}: condição necessária para que o desacoplamento seja alcançado.
+\end{itemize}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/gsip-campo.eps}
+	\caption{Orientação das correntes e fluxos no plano $dq$.}
+	\label{gsip:campo}
+\end{figure}
+
+Na Fig.~\ref{gsip:gsip-foc} está ilustrado o diagrama de blocos do FOC para o GSIP, em que o controle das correntes é feito no plano $dq0$ por meio de controladores independentes. A análise de técnicas de controle de corrente e projeto dos controladores será feita no Capítulo~\ref{chapter-controles}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/gsip-foc.eps}
+	\caption{Diagrama de blocos do FOC para o GSIP.}
+	\label{gsip:gsip-foc}
+\end{figure}
+
+Observa-se que a operação com FOC só é válida na região de torque constante da máquina e para a região de enfraquecimento de campo outras estratégias devem ser utilizadas \cite{Teses-01-12}. E, o que foi apresentado até o momento sobre o FOC é a maneira intuitiva de se obter o desacoplamento para o controle de torque. No entanto, pode-se mostrar que outras estratégias com $i_{d,s}^{r}\neq0$ podem ser implementadas para o GSIP, em que estas ainda preservam as características do controle por orientação de campo \cite{Livros-01, Livros-02}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estratégias de Controle das Correntes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As estratégias de controle das correntes definem como serão geradas as referências para o controle de corrente do GSIP. O que por sua vez determina a forma como as correntes serão drenadas do GSIP. Estas podem ser divididas quanto à região de operação de torque constante (abaixo da velocidade base) e de enfraquecimento de campo (acima da velocidade base) \cite{Teses-01-12, Artigos-01-13, Artigos-01-15, Teses-Voltoni}. Segundo as referências bibliográficas, os principais métodos para a região abaixo da velocidade base são:
+
+\begin{enumerate}
+\item Corrente de eixo direto igual a zero (ZADC $-$ \textit{zero d-axis current});
+\item Máximo torque por ampère (MTPC $-$ \textit{maximum torque per unit current});
+\item Operação com fator de potência unitário (UPF $-$ \textit{unity power factor});
+\item Máxima eficiência (ME $-$ \textit{maximum efficiency});
+\item Operação com fluxo constante (CMFL $-$ \textit{constant mutual flux linkages}).
+\end{enumerate}
+
+Na região acima da velocidade base as principais técnicas são:
+
+\begin{enumerate}
+\item Força eletromotriz constante (CBE $-$ \textit{constant back} EMF);
+\item Operação com seis pulsos de tensão (SSV $-$ \textit{six-step voltage}).
+\end{enumerate}
+
+Cada uma dessas estratégias será explicada a seguir, mostrando os procedimentos para se obter as correntes de eixo direto e em quadratura em função do torque e da velocidade. Em seguida, as estratégias pertinentes à aplicação no WECS serão analisadas para todos os pontos de operação de regime permanente, de modo a determinar quais são as melhores para a aplicação no WECS deste trabalho. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle Abaixo da Velocidade Base}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle ZADC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Essa estratégia é a mais utilizada pela indústria \cite{Artigos-01-31}. Seu princípio de funcionamento já foi explicado anteriormente. Esta é a única estratégia que realmente faz com que o GSIP opere como uma máquina CC, devido à linearidade do torque com a corrente de eixo em quadratura. 
+
+A maior desvantagem dessa técnica aparece em máquinas do tipo \textit{inset} e \textit{buried}, pois correntes de eixo direto não nulas tem a vantagem de reduzir a amplitude do fluxo concatenado de eixo direto. Isso  serve para gerar torque adicional para a máquina e reduzir a amplitude do enlace de fluxo no entreferro. Amplitudes de enlace de fluxo reduzidas fazem com que os requisitos de tensão sejam menores. Essa estratégia é a que resulta nas maiores amplitudes de enlace de fluxo e de força eletromotriz \cite{Teses-01-12}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle MTPC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Esta técnica é uma das mais pesquisadas em acionamentos elétricos \cite{Teses-01-12}. Com ela é possível maximizar o torque para uma dada corrente ou, em outras palavras, minimizar a corrente para um dado torque. O que consequentemente minimiza as perdas no cobre. Observa-se que, para máquinas de pólos não-salientes esta estratégia é equivalente ao controle ZADC, pois não é possível gerar torque adicional nessas máquinas pela corrente de eixo direto ($L_d\!=\!L_q$). Essa estratégia é que resulta na máxima utilização do conversor para uma dada corrente, devido à maximização do torque \cite{Teses-01-12}. 
+
+A relação entre as correntes de eixo direto e em quadratura para esta técnica pode ser obtida substituindo o valor eficaz da corrente de fase obtido a partir de (\ref{eq:Iascomp}) em (\ref{eq:idsr}), cujo resultado é apresentado em (\ref{eq:i_mptc}).
+
+\begin{equation}
+\label{eq:i_mptc}
+(L_d-L_q)I^{r2}_{d,s}+\lambda'^r_mI^{r}_{d,s}-(L_d-L_q)I^{r2}_{q,s}=0
+\end{equation}
+
+Como para o GSIP utilizado neste trabalho esse método é equivalente ao controle ZADC não serão apresentados aspectos de implementação desse método, podendo maiores informações serem obtidas em \cite{Teses-01-12, Teses-01-14}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle UPF}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A operação com UPF nos terminais do GSIP é única estratégia que permite retirar a máxima potência ativa, isto é, a potência nominal dos terminais da máquina e, portanto, fazer com que o conversor trifásico processe somente potência ativa. No entanto, há o custo de perdas adicionais pela circulação de corrente de eixo direto, isto é, aumento da circulação de potência reativa na máquina. A relação entre as correntes pode ser obtida igualando a potência reativa (\ref{eq:qt}) no terminais do gerador a zero (\ref{eq:i_upf}).
+
+\begin{equation}
+\label{eq:i_upf}
+L_d I^{r2}_{d,s}+\lambda'^r_m I^{r}_{d,s} + L_q I^{r2}_{q,s}=0
+\end{equation}
+
+No entanto, para implementação prática deste método a utilização de (\ref{eq:i_upf}) não é recomendada devido à dependência paramétrica. Em \cite{Artigos-01-13}, mostra-se que é possível determinar a corrente de eixo direto a partir das funções de razão cíclica de eixo direto e em quadratura, em que a potência reativa é calculada a partir da definição em (\ref{eq:st}) que resulta em (\ref{eq:i_upf2}).
+
+\begin{equation}
+\label{eq:qt_2}
+Q_{t}=\dfrac{3}{2}(V^r_{q,s} I^r_{d,s} - V^r_{d,s} I^r_{q,s})
+\end{equation}
+
+\begin{equation}
+\label{eq:i_upf2}
+I^r_{d,s}= \dfrac{V^r_{d,s} I^r_{q,s} } {V^r_{q,s}} = \dfrac{D^r_{d} I^r_{q,s} } {D^r_{q}}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle ME}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As correntes nessa estratégia são obtidas pela minimização das perdas e requer a determinação prévia (\textit{off-line}) das correntes. Portanto, para implementar essa estratégia é necessária a utilização de tabelas ou polinômios aproximados, o que é a maior desvantagem desse método. Observa-se que é necessário determinar a solução para todas as condições de torque e velocidade possíveis, o que aumenta ainda mais o custo computacional do método \cite{Teses-01-12}.
+
+No problema de minimização, além das perdas no GSIP, podem ser incluídas as perdas mecânicas do sistema e as perdas dos conversores estáticos \cite{Teses-01-12}. Outro problema desse método são as variações paramétricas e, portanto, é necessário um bom detalhamento dessas variações também, o que em geral não é feito \cite{Teses-01-12, Artigos-01-02, Teses-01-10}. 
+
+Essa estratégia será utilizada neste trabalho apenas como um comparativo com as outras estratégias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle CMFL}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Essa estratégia é utilizada para garantir a proteção dos ímãs contra a saturação magnética. Em geral, o enlace de fluxo no entreferro é mantido constante e determina-se a solução das equações do GSIP dados o torque e a velocidade angular \cite{Teses-01-12}. 
+
+Sua aplicação é interessante apenas quando a proteção dos ímãs é um ponto crítico do projeto, pois para manter o fluxo constante a corrente cresce rapidamente e as perdas são excessivas \cite{Teses-01-12, Artigos-01-13, Artigos-01-15}. 
+
+Como os ímãs do gerador são de ótima qualidade (NdFeB), não há relatos do fabricante de problemas oriundos da utilização dos ímãs e as perdas ao utilizar esta técnica são altas, essa estratégia não será empregada neste trabalho.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle Acima da Velocidade Base}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os métodos de controle de corrente acima da velocidade base serão apenas apresentados sem entrar em detalhes de implementação, uma vez que não é possível a operação do GSIP empregado neste trabalho acima da velocidade base. Aspectos de implementação podem ser verificados nas referências bibliográficas citadas ou em literatura específica.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle CBE}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Esta técnica visa manter a tensão eletromotriz no entreferro constante e menor que o máximo valor possível das tensões terminais. Isso possibilita alguma margem para o controle instantâneo das correntes. A técnica é geralmente empregada em aplicações que requerem alta qualidade no controle de torque acima da velocidade base \cite{Teses-01-12}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle SSV}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na operação com seis pulsos aplica-se a máxima tensão nos terminais. O que faz com que somente o torque médio possa ser controlado e há uma considerável ondulação (\textit{ripple}) de torque, pois não há margem de tensão para o controle instantâneo das correntes \cite{Teses-01-12}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pontos de Operação do WECS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metodologia Empregada}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para determinar os pontos de operação do WECS deve-se recapitular que há três regiões de operação da turbina eólica e, portanto, diferentes procedimentos podem ser aplicados. Na região I, em que o objetivo é maximizar a potência, a solução deve ser determinada por algum procedimento de otimização numérica. Nas regiões II e III  a solução pode ser determinada analiticamente para a maioria das estratégias de controle das correntes apresentadas, em que apenas para o controle ME aplica-se um procedimento de otimização para determinar as correntes. Isso se deve à sua característica de maximização de eficiência, por meio da determinação das correntes ótimas dado um ponto de torque e de velocidade do GSIP. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Operação na Região I}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesta região o objetivo é maximizar a potência dada uma condição de operação que irá depender da velocidade de vento. Vários trabalhos \cite{Artigos-11-06, Artigos-11-24} maximizam a potência extraída do vento (a potência no eixo do rotor) baseada na característica de potência $C_p(\lambda,\beta)$, mas este objetivo pode ser reformulado uma vez que a máxima potência elétrica extraída não é obtida quando a máxima potência no eixo é obtida. A maximização da potência elétrica é um problema de interesse prático, pois técnicas de rastreamento do ponto de máxima potência (MPPT $-$ \textit{maximum power point tracking}) baseadas em perturbação e observação (P\&O) da potência elétrica nos terminais do gerador ou do barramento CC estão, de fato, otimizando esta potência \cite{Artigos-11-19}. Assim, será formulado um problema geral de otimização e serão discutidas quais mudanças devem ser realizadas para cada método de maximização. 
+
+O problema de otimização é formulado como uma minimização com restrições não lineares \cite{Nocedal-1999} como mostrado em (\ref{eq:f-optim}). Para uma dada velocidade de vento resolve-se o problema (\ref{eq:f-optim}), em que $F(\vec{x})$ é a função custo, $\vec{x}$ é o vetor composto com as variáveis a serem otimizadas, $c_i(\vec{x})$ são restrições que podem ser de igualdade $i\in E$ ou de desigualdade $i\in I$.
+
+\begin{flalign}
+\label{eq:f-optim}
+\textrm{min } F(\vec{x})   &                      \textrm{, com } \vec{x} \in \Re^n        \\ 
+\textrm{sujeito a}:  &                                                \nonumber \\
+                     & \quad c_i(\vec{x}) = 0     \textrm{, com } i \in E \nonumber  \\
+                     & \quad c_i(\vec{x}) \leq 0  \textrm{, com } i \in I \nonumber 
+\end{flalign}
+
+A função custo é a potência que será maximizada. E, como a potência elétrica na convenção adotada é negativa, de fato está se realizando uma minimização. Se a potência mecânica extraída do vento ($P_{we}$) é otimizada utiliza-se a expressão da potência elétrica no eixo ($P_e$) do rotor, pois ambas devem ser iguais em módulo\footnote{Considera-se que o processo de conversão eletromecânica de energia é sem perdas.}. Caso a função custo seja a potência elétrica nos terminais do GSIP, devem ser incluídas as perdas nos enrolamentos e outras perdas adicionais do gerador, caso estas sejam expressivas. Para o caso em que a função custo é a potência no barramento CC, devem ser incluídas as perdas no estágio retificador. No entanto, se um retificador de alto rendimento é utilizado, a contribuição nas perdas do WECS será pouco significativa. O diagrama de fluxo do potência do WECS está ilustrado na Fig.~\ref{gsip:perdas-modelagem}, em que se observa o processo de conversão de energia desde o vento até o barramento CC. As potências e as perdas modeladas estão representadas por traços contínuos, em que neste estudo consideraram-se as perdas no processo de extração do vento (dado por $C_p$), as perdas no cobre e as perdas no conversor. As perdas não modeladas estão representadas em linhas tracejadas, em que as perdas por atrito são desprezíveis no WECS em estudo, pois o sistema é a acionamento direto. As perdas no ferro do GSIP e outras perdas adicionais não foram modeladas. Ressalta-se que é possível contemplar neste fluxo de potência as perdas no estágio inversor.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/perdas_modelagem.eps}
+	\caption{Diagrama de fluxo de potência do WECS.}
+	\label{gsip:perdas-modelagem}
+\end{figure}
+
+As variáveis a serem otimizadas são a corrente de eixo em quadratura e a velocidade angular, em que a corrente de eixo direto pode ser incluída caso ela não seja uma variável dependente na estratégia de controle das correntes adotada. Para as estratégias implementadas, essa situação ocorre apenas no controle ME. Esta estratégia de controle é ainda composta de um problema de otimização intrínseco à estratégia, que é a minimização das perdas do gerador. Mais adiante será apresentada a formulação do problema de otimização para esse caso particular.
+
+A única restrição de igualdade é o balanço de potência no eixo do rotor dado por (\ref{eq:balance}). Isso significa que a potência extraída pelo vento está impondo o formato da potência elétrica gerada.
+
+\begin{equation}
+\label{eq:balance}
+c_1(\vec{x})=P_{we}+P_e
+\end{equation}
+
+As restrições de desigualdade são compostas pelos limites de torque nominal e velocidade nominal da turbina eólica\footnote{Essas restrições são garantidas pela atuação do controle aerodinâmico.}, pois deseja-se operá-la dentro desses limites. Adicionalmente, pode-se considerar uma restrição de velocidade mínima ($\omega_{m,min}$) para a operação da turbina. Esses limites são dados de acordo com (\ref{eq:inequality-turbina}). Observa-se que o limite de torque pode ser substituído ou por um limite de potência no eixo ou por um limite de potência nos terminais do gerador, de forma a explicitar a ação do controle aerodinâmico. Ambos os limites podem ser retraduzidos para o limite de torque. O limite de potência no eixo é diretamente equivalente ao torque, visto que a potência no eixo é o produto do torque pela velocidade. O limite de potência nos terminais é dependente da estratégia de controle de corrente e deve ser cuidadosamente analisado.
+
+\begin{flalign}
+ & c_2(x)=|T_L|-T_{N}=T_e+T_N   \\
+\label{eq:inequality-turbina} & c_3(x)=\omega_{m}-\omega_{N} \\
+ & c_4(x)=\omega_{m,min}-\omega_{m}  
+\end{flalign}
+
+Para o gerador, os limites são os valores nominais (ou máximos) de tensão e corrente dados por (\ref{eq:inequality-gsip}). Não é necessário aplicar limites de torque e velocidade no gerador, pois estes estão implícitos nos limites de tensão e corrente. Supõe-se que o conversor tenha sido projetado para atender as especificações do gerador e, portanto, não são empregados limites para o mesmo. Caso contrário, devem ser empregados os limites de tensão e/ou corrente do conversor para limitar a operação do gerador. Observa-se que, caso seja empregada a metodologia de dimensionamento proposta no Capítulo~\ref{chapter-modelagem}, os limites de tensão e corrente do gerador não devem ser alcançados ao otimizar o sistema para a estratégia de controle de corrente utilizada para dimensionar o WECS. 
+
+\begin{flalign}
+\label{eq:inequality-gsip} & c_5(x) = |\dot{V}_{a,s}|-V_{L,max}/\sqrt{3} \\
+&  c_6(x)=|\dot{I}_{a,s}|-I_{s,max} \\
+\end{flalign}
+
+Observa-se que o procedimento de otimização da potência só precisa ser realizado na região I, pois nas regiões II e III a potência extraída do vento pode ser determinada analiticamente. Essa solução é possível uma vez que ou o limite de velocidade angular é alcançado no final da região I ou o limite de potência é atingido caso a região II não exista. Para solução dos problemas de otimização foi utilizado o pacote \textit{Optimtool} do MATLAB\textregistered.
+
+O problema de otimização para o caso em que se aplica a estratégia ME, recai sobre o caso de uma otimização multiobjetivo. Nessa otimização o objetivo de maximizar a potência é conflitante com a minimização das perdas. A formulação do problema é apresentada em (\ref{eq:PME-optim}) e está escrita em função das restrições apresentadas. 
+
+\begin{flalign}
+\label{eq:PME-optim}
+\textrm{min } F(\vec{x}) \textrm{ e } \textrm{Perdas}(\vec{x})   &  \textrm{, com } \vec{x}=[\begin{matrix} I_{d,s}^r & I_{q,s}^r & \omega_r \end{matrix}]^T         \\ 
+\textrm{sujeito a}:  &                            \nonumber  \\                 
+                     & \quad c_1(\vec{x}) = 0     \nonumber  \\
+                     & \quad c_2(\vec{x}) \leq 0  \nonumber  \\
+                     & \quad c_3(\vec{x}) \leq 0  \nonumber  \\                     
+                     & \quad c_4(\vec{x}) \leq 0  \nonumber  \\
+                     & \quad c_5(\vec{x}) \leq 0  \nonumber  \\
+                     & \quad c_6(\vec{x}) \leq 0  \nonumber  
+\end{flalign}
+
+No entanto, o problema pode ser simplificado para o caso em que o objetivo é maximizar a potência no eixo, pois nesse caso a potência a ser otimizada pode ser escrita em função apenas da velocidade. A velocidade é determinada no ponto que o coeficiente de potência tem máximo rendimento, conforme apresentado no Capítulo~\ref{chapter-modelagem}. Esse procedimento é realizado até a velocidade nominal da turbina e, após, a solução é determinada apenas em função da condição de vento, conforme será discutido na próxima seção. Dado um ponto de operação de potência no eixo e velocidade angular, o problema de minimização das perdas é dado por (\ref{eq:ME-optim}). Observa-se que, para o gerador em questão ($L_d\!=\!L_q$), se forem consideradas somente às perdas nos enrolamentos, a solução do problema de minimização de perdas é obtido com corrente de eixo direto nula, isto é, a estratégia ME é equivalente à ZADC.
+
+\begin{flalign}
+\label{eq:ME-optim}
+\textrm{min } \textrm{Perdas}(\vec{x})   &  \textrm{, com } \vec{x}=[\begin{matrix} I_{d,s}^r & I_{q,s}^r \end{matrix}]^T         \\ 
+\textrm{sujeito a}:  &                            \nonumber  \\                 
+                     & \quad c_1(\vec{x}) = 0     \nonumber  \\
+                     & \quad c_5(\vec{x}) \leq 0  \nonumber  \\
+                     & \quad c_6(\vec{x}) \leq 0  \nonumber  
+\end{flalign}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Operação nas Regiões II e III}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nessas regiões, para uma dada condição de vento, é determinada a potência extraída do vento a partir de (\ref{eq:Pvento02}) aplicando o limite alcançado de velocidade angular. Caso a potência extraída ou torque seja maior que o valor nominal, aplica-se esse limite alcançado. Observa-se que pode ser necessária a determinação numérica das correntes quando as expressões analíticas resultam em equações transcendentais. Para a estratégia ME é ainda necessário determinar as correntes pela minimização das perdas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultados Obtidos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A metodologia apresentada para análise do WECS foi aplicada no sistema dimensionado no Capítulo~\ref{chapter-modelagem}, cujos resultados obtidos são analisados nesta seção. Inicialmente, é realizada uma comparação das estratégias de controle das correntes abaixo da velocidade base para verificar qual é a mais conveniente para o acionamento do GSIP. Em seguida, são comparados os resultados da otimização da potência mecânica e da potência elétrica. Por fim, calculam-se os esforços e perdas nos semicondutores em função dos pontos de operação do WECS. Dessa forma, quantifica-se por meio das perdas qual estratégia de modulação vetorial é melhor para ser aplicada no WECS deste trabalho.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Comparação das Estratégias de Controle de Corrente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Foram comparadas as estratégias ZADC, UPF e ME operando com maximização da potência mecânica e com controle aerodinâmico limitando o torque mecânico. Para o controle ME foram consideradas as perdas no retificador para estratégia de modulação SVM~II, pois esta é a estratégia proposta e como será visto é a que gera as menores perdas.
+
+Os resultados obtidos são apresentados na Fig.~\ref{gsip:comparativo}, em que podem ser observadas as principais grandezas (potência mecânica no eixo, potência elétrica nos terminais, valor eficaz da corrente de fase, velocidade angular, ângulo de entrada do retificador e valor eficaz da tensão de linha) do WECS nas suas regiões de operação. Observa-se que o torque mecânico na estratégia UPF teve que ser limitado em um valor inferior ao valor nominal (em 190~N$\cdot$m) para que fosse possível operar o sistema com essa estratégia. Isso se deve ao limite de corrente ter sido atingido antes do limite de torque. Essa é umas das modificações necessárias para aplicar essa estratégia no WECS deste trabalho. 
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/comparativo.eps}
+	\caption{Principais grandezas do WECS com controle ZADC, UPF e ME.}
+	\label{gsip:comparativo}
+\end{figure}
+
+Nota-se da Fig.~\ref{gsip:comparativo} que os resultados das estratégias ZADC e ME são praticamente os mesmos. Isso se deve ao fato que o controle ZADC minimiza as perdas no cobre no caso de máquinas do tipo Torus ($L_d\!=\!L_q$). Como essas perdas são predominantes frente às perdas no retificador, a solução do controle ME é praticamente igual a do controle ZADC. O controle ZADC satisfaz o requisito do ângulo de entrada do retificador operando com um valor máximo de $28^{\circ}$. Com relação ao controle UPF, observa-se que o valor eficaz da corrente na Fig.~\ref{gsip:comparativo}~(c) é sempre maior do que nas outras estratégias, principalmente a partir da região~II. Devido à esse aumento da corrente, o máximo valor eficaz é atingido, limitando a potência nos terminais em um valor 10\% menor do que o das estratégias ZADC e ME. Portanto, conclui-se que a melhor opção para o acionamento do GSIP no WECS deste trabalho é o controle ZADC. Na Fig.~\ref{gsip:zadc} estão ilustradas as demais variáveis de interesse do WECS com o controle ZADC, em que pode-se observar as potências no eixo e nos terminais, o torque elétrico, o coeficiente de potência e o índice de modulação.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/zadc.eps}
+	\caption{Pontos de operação utilizando o controle ZADC.}
+	\label{gsip:zadc}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Comparação dos Métodos de Maximização}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para comparar os métodos foi utilizado o controle ZADC, visto que este se mostrou mais vantajoso pela análise anterior. A potência elétrica nos terminais e a potência mecânica obtidas a partir da maximização da potência estão ilustradas na Fig.~\ref{gsip:otimizacao-p}. Os resultados da maximização da potência mecânica no eixo são referidas pelo subscrito $mec$ e da potência elétrica nos terminais pelo subscrito $ele$. Nessa figura observa-se que a região I tem início com velocidade de vento de 3~m/s e término com 8~m/s. Verifica-se  que os resultados são praticamente iguais. De fato, a região I é pequena e a variação no coeficiente de potência é muito pouca para se perceber o acréscimo de potência nos terminais do GSIP oriundos da maximização da potência elétrica nos terminais. Na Fig.~\ref{gsip:otimizacao-cp} estão ilustrados os coeficientes de potência para os dois casos, em que se observa essa pequena variação. Portanto, neste WECS a aplicação de diferentes princípios nas técnicas de MPPT irá gerar resultados muito semelhantes.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/otimizacao-p.eps}
+	\caption{Potências para os métodos de otimização investigados.}
+	\label{gsip:otimizacao-p}
+\end{figure}
+
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/otimizacao-cp.eps}
+	\caption{Coeficiente de potência para os métodos de otimização investigados.}
+	\label{gsip:otimizacao-cp}
+\end{figure}
+
+Com intuito de ilustrar os resultados da otimização com outras perspectivas, foram traçadas mais duas curvas. A primeira é a curva da potência no eixo em função da velocidade mecânica, conforme ilustrado na Fig.~\ref{gsip:potencia-2d}. Nesta, também estão ilustradas as curvas da potência no eixo para diferentes condições de vento. Observa-se que a curva de máxima potência passa pelo máximo dessas curvas até o término da região I. Na Fig.~\ref{gsip:potencia-3d} está ilustrada a curva da potência elétrica nos terminais do GSIP em função da frequência e do valor eficaz da corrente de fase. Estão também ilustradas as curvas obtidas com a aplicação do controle ZADC para diversas condições de vento e para o resultado obtido da análise dos pontos de operação do WECS.
+
+\begin{figure}[!htb]
+	\centering 
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/potencia-2d.eps}
+	\caption{Potência mecânica no WECS em estudo.}
+	\label{gsip:potencia-2d}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering 
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/potencia-3d.pdf}
+	\caption{Potência elétrica nos terminais no WECS em estudo.}
+	\label{gsip:potencia-3d}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Esforços de Corrente e Perdas nos Semicondutores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os esforços de corrente nos semicondutores e as perdas no VSR$_{\Delta}$ são analisados aplicando o controle ZADC e otimizando a potência mecânica. Dessa forma, são comparadas as estratégias de modulação vetorial SVM~I e SVM~II. A  formulação dos esforços de corrente, das perdas e os parâmetros dos semicondutores são apresentadas no Apêndice~\ref{apendice:vsr-delta}. 
+
+Os esforços de corrente nos semicondutores são apresentados na Fig.~\ref{gsip:semicondutores-esforcos}, em que se observa que os componentes que possuem maiores níveis de corrente são os diodos de retificação. Isso se deve ao fato de que a corrente entregue ao barramento CC deve ser processada por esses semicondutores e de que os interruptores são utilizados nas etapas de acumulação de energia, isto é, um processamento intermediador que não visa processar toda a energia do conversor. E, como esperado pela análise das estratégias de modulação, os valores eficazes da corrente são menores com a estratégia SVM~II.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/semicondutores-esforcos.eps}
+	\caption{Esforços de corrente nos semicondutores no WECS em estudo.}
+	\label{gsip:semicondutores-esforcos}
+\end{figure}
+ 
+As perdas em comutação são praticamente iguais durante a operação do WECS, conforme ilustrado na Fig.~\ref{gsip:semicondutores-psw}. Observa-se que para velocidades de vento menores, isto é, baixa carga, as perdas são maiores para a modulação SVM~II. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/semicondutores-psw.eps}
+	\caption{Perdas em comutação no WECS em estudo.}
+	\label{gsip:semicondutores-psw}
+\end{figure}
+
+A partir da visualização das perdas em condução dos semicondutores na Fig.~\ref{gsip:semicondutores-pcond} e das perdas totais do retificador $P_{r,loss}$ na Fig.~\ref{gsip:semicondutores-perdas}, fica evidente a diminuição das perdas com a modulação SVM~II.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/semicondutores-pcond.eps}
+	\caption{Perdas em condução no WECS em estudo.}
+	\label{gsip:semicondutores-pcond}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/semicondutores-perdas.eps}
+	\caption{Perdas totais do VSR$_\Delta$ no WECS em estudo.}
+	\label{gsip:semicondutores-perdas}
+\end{figure}
+
+O ganho percentual da modulação SVM~II com relação à SVM~I está ilustrado na Fig.~\ref{gsip:semicondutores-perdas_perc}. Observa-se que, a partir do ponto em que o ganho se torna negativo, isto é, quando as perdas da estratégia SVM~II são menores que a da modulação SVM~I, a estratégia SVM~II se torna a mais vantajosa. No entanto, em termos de valores brutos, observa-se na Fig.~\ref{gsip:semicondutores-perdas2} que as diferenças mais significativas ocorrem à medida que a potência processada pelo VSR$_\Delta$ aumenta. Para a condição de potência terminal nominal (4,3~kW), há para a modulação SVM~II com relação a modulação SVM~I uma redução de 9,4\% das perdas nos interruptores bidirecionais. Isto significa uma redução de 4,9\% das perdas totais e, considerando que o redimento é de 97,3\%, isto representa um ganho de rendimento de 0,15\%. Embora o ganho de rendimento seja pequeno, o percentual da redução das perdas totais está associado ao percentual de diminuição do volume dos dissipadores de calor. Portanto, é possível atingir uma redução de volume de cerca de 5\% com a modulação SVM~II.
+
+\begin{figure}[!htbp]
+	\centering 
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/ploss_perc.eps}
+	\caption{Divisão das perdas no WECS em estudo.}
+	\label{gsip:semicondutores-perdas_perc}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering 
+	\includegraphics[scale=\escalafig]{Figuras/gsip-controle/semicondutores-perdas2.eps}
+	\caption{Divisão detalhada das perdas no WECS em estudo.}
+	\label{gsip:semicondutores-perdas2}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A partir do modelo $dq0$ do GSIP foi possível fazer a analogia do controle de uma máquina CC e demonstraram-se os conceitos para se realizar o FOC. Além da técnica tradicional, foram apresentadas estratégias de controle das correntes do GSIP com funcionamento abaixo e acima da velocidade base para se atingir diferentes índices de desempenho do gerador. Dentre as quais se destacam, neste trabalho, a ZADC, UPF e ME.
+
+Utilizando técnicas de otimização foi possível determinar os pontos de operação do WECS com a aplicação das técnicas de controle destacadas. A técnica de controle ZADC mostrou-se como uma excelente opção, visto que para o sistema em questão tem desempenho similar ao controle ME. Para o controle UPF ficou claro que embora seja possível utilizar toda a potência ativa nos terminais, não é possível elevar a potência ao valor máximo devido às restrições torque/corrente do sistema. 
+
+Foram comparados também os métodos de otimização da potência mecânica no eixo e elétrica nos terminais do GSIP. Devido à baixa variação de potência na região~I e a utilização de uma técnica de controle das correntes que gera baixas perdas, não foi possível verificar diferenças significativas entre as técnicas. Mas, mostrou-se que a tendência do coeficiente de potência durante a otimização da potência elétrica é diminuir, enquanto durante a otimização da  potência mecânica é constante.
+
+Por fim, são apresentados os esforços de corrente e as perdas nos semicondutores. Como esperado da análise do Capítulo~\ref{chapter-modulacao}, a estratégia SVM~II é a que apresenta as menores perdas em condução e totais para o WECS deste trabalho.
+
+Observa-se que foi realizado um estudo comparativo adicional no Apêndice~\ref{apendice:vsr} entre o VSR$_\Delta$ e o VSR. Essa comparação foi feita em termos dos esforços de corrente e como resultado verificou-se uma redução significativa destes ao se empregar o VSR$_\Delta$. Estes resultados ressaltam a importância da topologia como estágio retificador em WECSs para melhoria da eficiência do sistema.
+ 
+

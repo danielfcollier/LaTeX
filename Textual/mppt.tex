@@ -1,0 +1,88 @@
+
+\cite{Artigos-11-04}: estratégia de $MPPT$ sem o conhecimento da característica da turbina. $MPPT$ com passo variável do tipo Perturba e Observa.
+
+%
+\section{Métodos Básicos}
+%
+
+\cite{Artigos-11-24}: estratégias de $MPPT$ sensorless.
+
+\cite{Artigos-11-06}: faz uma revisão dos métodos de $MPPT$, mas uma das informações mais importantes desse artigo são o resultados comparativos do controle de torque e do controle de velocidade.
+
+\cite{Artigos-11-07}: estudo falando das estratégias básicas de $MPPT$, publicado em 2009.
+
+\cite{Artigos-11-08}: estudo falando das estratégias básicas de $MPPT$, publicado em 2004 (muito provável que irei descartá-lo).
+
+\cite{Artigos-11-09}: estudo falando das estratégias básicas de $MPPT$ para geração de pequeno porte, publicado em 2009.
+
+\cite{Artigos-11-11}: $MPPT$ sem conhecimento da característica da turbina aplicado ao carregamento de baterias. Conversor buck.
+
+%
+\section{Estratégia de MPPT Implementada}
+%
+
+\cite{Artigos-11-19}: ``o'' artigo direto do forno.
+
+\cite{Artigos-11-22}: direto do forno, reavaliar.
+
+\cite{Artigos-11-23}: direto do forno e com proposta para $MPPT$. Baixa potência.
+
+\cite{Artigos-11-25}: direto do forno, avaliar. $MPPT$ sensorless PMSG 3kW.
+
+
+%%
+
+\cite{Artigos-01-02}: Artigos-01-02 trata da máxima eficiência pelo controle da corrente de eixo direto. Tem malha de velocidade para controle do retificador. Apresenta os esquemas de controle do lado retificador e do lado inversor. $PMSG$ de 3kW.
+
+
+\cite{Artigos-01-12}: Artigos-01-12 faz comparação entre dois modos de controle de corrente de eixo direto. $PMSG$ 1.5kW.
+
+%%
+
+\cite{Artigos-01-10}: Artigos-01-10 faz a comparação entre o controle de tensão do lado retificador e do lado inversor. São apresentados apenas resultados de simulação.
+
+\cite{Artigos-01-14}: Artigos-01-14 faz análise dos modos de operação quanto a $MPPT$, limitação de potência em altas velocidades. Faz comparativo entre controle de velocidade e de torque.
+
+\cite{Artigos-01-16}: Artigos-01-16 determinação da função de transferência para o controle da tensão de saída pelo lado retificador.
+
+\cite{Artigos-11-06}: Artigos-01-06 faz uma revisão dos métodos de $MPPT$, mas uma das informações mais importantes desse artigo são o resultados comparativos do controle de torque e  do controle de velocidade.
+
+\cite{Artigos-11-02}: Artigos-11-02 trata do controle por $FOC$ e com controle de velocidade. Considera a possibilidade para MW.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%\section{Ventos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+%%%%% arrumar
+%%%%\subsection{Perfis de Ventos}
+%%%%
+%%%%\subsection{Modelos de Simulação}
+%%%%
+%%%%Artigos-01-35: usa, mas não apresenta um típico perfil de vento.
+%%%%
+%%%%\cite{Artigos-11-18}: fornece um modelo para simulação do vento dado pela seguinte equação, mas não apresenta valores para os parâmetros.
+%%%%
+%%%%\begin{equation}
+%%%%\label{eq:vento}
+%%%%v_v=v_{v,avg}+A \sin (\omega t)+v_{noise}
+%%%%\end{equation}
+%%%%
+%%%%Onde:
+%%%%\nopagebreak
+%%%%
+%%%%$v_{v,avg}$: é o valor médio da velocidade do vento;
+%%%%
+%%%%$A$ é a amplitude da senóide;
+%%%%
+%%%%$v_{noise}$: é um ruído branco.
+%%%%
+%%%%\cite{Artigos-11-14}: fornece os parâmetros para simulação, mas não fornece o modelo e nem fornece referência!!!!
+%%%%Parâmetros: $V_W=10$ ~m/s, $L=180$~m, $\sigma=2$ e $\tau=0,4$~s.
+%%%%
+%%%%\cite{Artigos-01-18}: finalmente referências!!! No entanto, uma não funcionou e a outra é \cite{Artigos-12-02}. Este trata dos modelos de vento, abordagem bem probabilística (\cite{Artigos-12-02}).
+%%%%
+%%%%\cite{Artigos-01-14}: apresenta equação do modelo do vento. Não cita a referência do modelo.
+%%%%
+%%%%\cite{Artigos-01-37}: apresenta a equação do modelo do vento e da curva $C_p$ e leva ao \cite{Artigos-12-01} que apresenta os modelos e é um dos primeiros artigos da área.
+%%%%
+%%%%\cite{Artigos-12-03}: antes do \cite{Artigos-12-01} e também apresenta o modelo de vento.

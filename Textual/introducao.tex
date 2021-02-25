@@ -1,0 +1,128 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introdução Geral} \label{introducao}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\setcounter{secnumdepth}{6}
+%\pagenumbering{arabic}
+%\Author{Daniel Augusto Figueirêdo Collier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivação para o Tema}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No século XXI, mudanças dramáticas são esperadas nas formas em que a produção de energia elétrica ocorre. São esperadas alterações da infraestrutura física das redes e equipamentos de geração de energia elétrica, bem como da infraestrutura de comunicação e controle dos sistemas de geração, transmissão e distribuição de energia. Ao atual sistema, que concentra geração e armazenamento de energia em grandes centrais e transmite a energia gerada por linhas de alta tensão em corrente alternada por longas distâncias, serão incluídas infraestruturas de geração mais distribuídas	e diversificadas, também com a inclusão de mais linhas de transmissão em corrente contínua. Grande parte das fontes de energia serão renováveis, principalmente solar, hidráulica, geotérmica e eólica. Avanços nas áreas de dispositivos semicondutores de potência e conversores estáticos possibilitam por sua vez, melhores desempenhos, confiabilidade e flexibilidade tanto em aplicações em linhas de transmissão, como em sistemas de geração a partir de fontes renováveis.
+
+Com o desenvolvimento de novas tecnologias, o custo da eletricidade a partir da geração de energia eólica caiu mais de 80\% durante os últimos 20 anos \cite{Artigos-CustokW}. E, comparado com os custos de tecnologias convencionais tem se tornado muito atrativa, além de não haver a necessidade de lidar com equipamentos para controle de emissão de poluentes. A geração eólica irá se tornar uma fonte comum de energia e assim, requisitos convencionais como correção do fator de potência, suprimento de potência reativa para o sistema de transmissão, melhoria da estabilidade, entre outros, vêm crescendo a aplicação em sistemas eólicos \cite{Artigos-04-11,Artigos-04-16,Artigos-04-21}. 
+
+Neste contexto, a geração de energia elétrica através de sistemas de conversão de energia eólica (WECSs $-$ \textit{wind energy conversion systems}) representará uma parcela considerável da energia gerada. As turbinas eólicas equipadas com geradores síncronos a ímãs permanentes (GSIP) apresentam vantagens importantes sobre outros tipos de máquinas e, em grande parte, devem estas vantagens à geração de energia com velocidade variável \cite{Artigos-04-11,Artigos-04-07}. Esta característica exige que estas máquinas precisem ser conectadas a uma rede de distribuição através de conversores estáticos com capacidade nominal, ou seja, através de sistemas de conversores estáticos capazes de processar e controlar apropriadamente 100\% do fluxo de energia proveniente do gerador. Estes conversores permitem que o WECS seja utilizado próximo de seu ponto ideal de operação a todo instante. Além disto, os conversores estáticos modernos garantem a melhoria da qualidade da energia gerada e que esta seja transmitida à rede com alto rendimento de conversão e de maneira confiável e flexível.
+
+A melhoria da qualidade da geração de energia elétrica pode ser traduzida como diminuição de perdas, aumento da vida útil do gerador, diminuição de harmônicos de tensão e corrente, aumento do tempo de conexão com a rede elétrica, garantia de dinâmica rápida em caso de falta da rede elétrica, entre outras \cite{Artigos-04-14,Artigos-04-16,Artigos-04-21}. Requisitos esses fundamentais para a conexão dos WECSs à rede elétrica. Essas melhorias são obtidas a partir da escolha de arquiteturas de sistemas e das técnicas de controle empregadas. As arquiteturas de sistemas são as diferentes configurações de geradores elétricos e conversores estáticos que podem ser empregadas. As topologias de conversores estáticos modernos permitem o aumento da controlabilidade da estrutura e diminuição de harmônicos, dessa forma, é possível otimizar a topologia de gerador empregado. Além disso, as técnicas de controle são utilizadas para rastrear os índices de desempenho desejados para o funcionamento adequado do WECS. 
+
+Os retificadores (conversores CA-CC), tanto monofásicos como trifásicos, são empregados como interface entre sistemas de corrente alternada (CA) e de corrente contínua (CC) em diversas classes de equipamentos. A utilização de tais conversores permite, entre várias características, a operação com alto fator de potência e alta qualidade das correntes drenadas do sistema  CA. A operação com elevado fator de potência está diretamente relacionada ao tipo de topologia e de controle empregado, sendo que diversas metodologias são utilizadas para tal finalidade. 
+
+A aplicação de retificadores trifásicos a diodos seguidos de um estágio elevador CC-CC conectados a um GSIP para a geração de energia eólica garante baixo custo e robustez à retificação e ao controle do barramento CC \cite{Artigos-04-21}. No entanto, a sua aplicação impõe limitações com relação à máxima potência que pode ser drenada do gerador, pois não há controle sobre as componentes de eixo direto e de eixo em quadratura das correntes do GSIP e as mesmas são distorcidas. Outra limitação é que os componentes do conversor CC-CC estão submetidos a grandes esforços de corrente e, portanto, as perdas não estão bem distribuídas. Soluções para este último problema são a aplicação de vários semicondutores em paralelo \cite{Artigos-03-29} ou o emprego de técnicas de \textit{interleaving} \cite{Artigos-03-30}, entretanto essas técnicas não melhoram a qualidade e a controlabilidade das correntes drenadas do GSIP e aumentam os custos, pois as perdas no gerador são elevadas. Com o objetivo de obter correntes senoidais nos terminais do gerador, várias aplicações empregam um retificador bidirecional trifásico do tipo fonte de corrente ou \textit{boost}\footnote{Popularmente conhecido como VSI (\textit{voltage source inverter}).} para obter controle simultâneo das correntes do GSIP e da tensão do barramento CC \cite{Artigos-04-21}, em que o conversor CC-CC não é mais necessário. No entanto, com essa abordagem há um risco que era mínimo na aplicação de retificadores a diodos seguidos de um estágio CC-CC, isto é, o risco de curto-circuito no barramento CC caso haja um mau funcionamento dos comandos dos semicondutores. Além do mais, o retificador bidirecional tipicamente tem altas perdas em condução.  
+
+Na área de controle de corrente para máquinas (isto é, motores ou geradores) elétricas trifásicas se utilizam tipicamente técnicas conhecidas como o controle escalar, também conhecido por controle V/f, e o controle por orientação de campo (controle vetorial) \cite{Livros-01}. É sabido que o desempenho das técnicas de controle por campo orientado é superior ao do controle escalar. Por este motivo, o controle por orientação de campo representa o estado-da-arte no controle de corrente de máquinas trifásicas segundo trabalhos como \cite{Artigos-01-31,Artigos-01-15,Artigos-Sensorless,Artigos-Rotor,Artigos-01-13}. Ainda nestes trabalhos, verifica-se a tendência atual pela busca de técnicas eficientes de controle de corrente que não envolvam a utilização de sensores mecânicos de posição ou velocidade do eixo da máquina. Contudo, verifica-se que grande parte das técnicas de controle que não utilizam sensores mecânicos ou são complexas ou têm seu desempenho deteriorado pela variação de parâmetros internos da máquina. Dentre estes parâmetros, o principal é a resistência elétrica dos enrolamentos, que varia com a temperatura da máquina \cite{Artigos-Sensorless}. 
+
+Mesmo entre algumas técnicas de controle por orientação de campo que utilizam sensores mecânicos no eixo da máquina, há dificuldade de sintonização dos parâmetros dos controladores de corrente devido à variação da resistência. As técnicas de controle por orientação de campo que apresentam desempenho superior utilizam tecnologias complexas, tais como estimadores adaptativos (Luenberger, Kalman, etc), redes neurais, lógica difusa (fuzzy), controle robusto, entre outras. Estas técnicas são eficientes, porém requerem grande capacidade de processamento por parte de um microcontrolador ou microprocessador que seja utilizado para o controle da máquina. 
+
+Tipicamente, conversores com alto fator de potência utilizam tanto as medições das tensões e correntes da fonte de alimentação, bem como a medição da tensão contínua de saída para a execução de um tipo de controle \cite{Artigos-03-08,Artigos-03-09,Teses-03-05}. Como no controle de máquinas elétricas, existem diversas técnicas de controle que possibilitam o controle das correntes do sistema  CA com redução do número de sensores \cite{Artigos-03-04,Artigos-03-08,Teses-03-02}. Por exemplo, diversas técnicas não utilizam sensores para monitorar as tensões do sistema CA, medindo apenas as correntes. Já outras técnicas não utilizam sensores de corrente, realizando sua função somente com sensores de tensão. 
+
+O autocontrole de corrente, apresentado em referências tais como \cite{Artigos-18-01,Artigos-18-03,Artigos-18-04} para retificadores ativos monofásicos e \cite{Teses-03-06} para retificadores ativos trifásicos, permite controlar um retificador ativo de forma que as correntes sigam naturalmente o formato das tensões de entrada da rede elétrica. Neste tipo de controle não é necessário medir as tensões do sistema CA, entretanto, existe sempre um ângulo de defasagem entre as tensões e suas respectivas correntes, o que limita o fator de potência da fonte de alimentação. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objetivos do Trabalho}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os objetivos deste trabalho são: 
+
+\begin{itemize}
+
+\item O estudo de técnicas de controle para a interligação de um GSIP à rede de energia elétrica com alto desempenho; 
+
+\item O estudo de um retificador ativo unidirecional trifásico PWM (\textit{pulse-width modulation}) robusto e com baixas perdas de condução.
+
+\end{itemize}
+
+É proposta e analisada uma nova estratégia de controle de corrente de alto desempenho e elevado fator de potência. Essa estratégia é uma modificação da técnica de autocontrole de corrente apresentada em \cite{Teses-03-06} para que seja possível operar o GSIP com alto desempenho, baixas perdas e capaz de orientar adequadamente as correntes de um GSIP às suas ondas de forças magnetomotrizes, ou seja, desempenho equivalente às técnicas de controle por orientação de campo.  A operação é realizada somente a partir da leitura de duas correntes do gerador, sem a necessidade de sensores mecânicos de posição e de velocidade, o que a torna por definição \textit{sensorless}, pois quase sempre há sensores de corrente nos conversores aplicados a acionamentos elétricos \cite{Artigos-Sensorless}.
+
+Além disto, é empregada uma topologia de retificador de dois níveis que permite o controle do GSIP com alto desempenho e baixas perdas. Esta topologia tem como característica uma grande redução dos esforços de corrente e das perdas nos semicondutores, principalmente quando comparada ao retificador bidirecional trifásico \textit{boost}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estrutura do Trabalho}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na Fig.~\ref{fig:introducao} está ilustrado em destaque o sistema de geração eólica e os sistemas de controle que serão estudados neste trabalho. Estes sistemas são referentes ao controle do lado do gerador. A saída do retificador está conectada a um inversor de tensão trifásico VSI. Considera-se um comportamento ideal para a tensão do barramento CC, em que o inversor é capaz de manter a tensão no seu valor nominal $V_{dc}$.   
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/intro.eps}
+	\caption[Configuração do sistema de geração de energia eólica.]{Configuração do sistema de geração eólica. A área em destaque mostra os elementos do sistema que serão estudados neste trabalho.}
+	\label{fig:introducao}
+\end{figure}
+
+Dessa forma, organizou-se o trabalho da seguinte maneira:
+
+\begin{itemize}
+
+\item Uma revisão sobre os WECSs com o foco nas aplicações encontradas para eletrônica de potência será apresentada no Capítulo~\ref{chapter-introducao};
+
+\item No Capítulo~\ref{chapter-modelagem} serão apresentados os modelos dos principais componentes do WECS, isto é, a turbina eólica, o GSIP e o retificador ativo PWM trifásico. Ao final do capítulo é proposta uma metodologia para dimensionamento e integração desses componentes;
+
+\item O modulador do retificador será implementado utilizando modulação vetorial no Capítulo~\ref{chapter-modulacao}, em que é proposta uma estratégia de modulação otimizada para minimização das perdas em condução do retificador empregado neste trabalho. É dado enfoque na implementação digital da modulação vetorial;
+
+\item As principais estratégias para geração das referências das estratégias de controle de corrente por orientação campo do GSIP são revisadas no Capítulo~\ref{chapter-gsip-controle}. Essas estratégias determinam a forma como as correntes serão drenadas do GSIP. Será também apresentada a metodologia para a determinação otimizada dos pontos de operação do WECS;
+
+\item No Capítulo~\ref{chapter-controles} são projetados os controladores de corrente no plano $dq0$ e da potência do GSIP. São apresentados resultados de simulação do WECS operando com ventos constantes para validação da análise realizada no Capítulo~\ref{chapter-gsip-controle}. E, é analisada a operação do sistema com variações de vento para verificação do desempenho dinâmico do WECS;
+
+\item A técnica de autocontrole de corrente proposta é apresentada no Capítulo~ \ref{chapter-auto}. São revisados os principais conceitos da técnica. A técnica proposta é apresentada e segue-se com uma análise detalhada da estabilidade tanto para a implementação do sistema analógico quanto digital. São apresentados resultados de simulação e experimentais para validar a técnica.
+
+\end{itemize}
+
+O trabalho ainda conta com apêndices necessários para completar os estudos teóricos e implementações desenvolvidas. Estes são:
+
+\begin{itemize}
+
+\item Apêndice~\ref{apendice:vsr-delta}: análises adicionais da topologia de retificador trifásico estudada neste trabalho. São analisadas a tensão de modo comum gerada pelo retificador, os esforços de corrente nos interruptores e no capacitor de saída, as perdas em condução e em comutação, e o espectro harmônico das tensões de linha;
+
+\item Apêndice~\ref{apendice:pll}: análise da malha de captura de fase (PLL $-$ \textit{phase-locked loop}) utilizada para implementar a modulação vetorial do retificador;
+
+\item Apêndice~\ref{apendice:anti-windup}: análise de uma estratégia de controle anti-\textit{windup} e aplicação para limitação das referências no plano $dq0$;
+
+\item Apêndice~\ref{apendice:vsr}: estudo comparativo dos esforços de corrente do retificador bidirecional trifásico do \textit{boost} e do retificador unidirecional utilizado neste trabalho.  
+ 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Contribuições deste Trabalho}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As contribuições\footnote{As contribuições estão organizadas de acordo com a ordem e a temática dos capítulos.} realizadas com o desenvolvimento deste trabalho foram:
+
+\begin{itemize}
+
+\item Publicação e apresentação de um artigo no congresso nacional CITENEL em Fortaleza-CE em agosto de 2011. O título do artigo é ``Interligação de um Gerador Eólico com a Rede Elétrica'' \cite{Artigos-CELESC};
+
+\item Desenvolvimento de uma metodologia sistemática para dimensionamento dos componentes do sistema eólico por meio de curvas de torque-velocidade. Os conceitos de torque e velocidade foram estendidos para o estágio retificador para que seja possível ter um sentimento físico dos requisitos de projeto;
+
+\item Publicação e apresentação de um artigo em congresso internacional COBEP em Natal-RN no Brasil em setembro de 2011. O título do artigo é ``\textit{Modeling and Design of a Micro Wind Energy System with a Variable-Speed Wind Turbine Connected to a Permanent Magnet Synchronous Generator and a PWM Rectifier}'' \cite{Artigos-Collier};
+
+\item Proposta de uma nova estratégia de modulação otimizada para minimização das perdas em condução do retificador ativo unidirecional trifásico com interruptores no lado CA \cite{PCIM};
+
+\item Publicação e apresentação de um artigo em congresso internacional PCIM-Asia em Xangai na China em junho de 2011. O título do artigo é ``\textit{Low Conduction Losses PWM Rectifier for High Efficiency Wind Power Micro-Generation}'' \cite{PCIM};
+
+\item Análise de estratégias de identificação de setores de corrente para modulação vetorial do retificador unidirecional levando em consideração os efeitos da implementação digital;
+
+\item Proposta de uma nova técnica de autocontrole de corrente para obtenção de desempenho equivalente às técnicas de controle por orientação de campo;
+
+\item No dia 31 de maio de 2011 foi realizado o pedido de depósito de Patente de Invenção ou Modelo de Utilidade denominada ``Auto-controle de Corrente para Geradores Elétricos Trifásicos Conectados a Retificadores Auto-comutados'' no Departamento de Inovação Tecnológica DIT/ PRPE/ UFSC \cite{Patente-Autocontrole};
+
+\item 1$^\circ$ colocado no concurso nacional de inovação tecnológica intitulado ``Prêmio WEG de Inovação Tecnológica'' realizado em setembro de 2011. Foi apresentado o trabalho denominado ``Auto-controle de Corrente para Geradores Elétricos Trifásicos Conectados a Retificadores Auto-comutados'', cujo autores são ORTMANN, M.S.; COLLIER, D.A.F. e HELDWEIN, M.L.;
+
+\item Estudo detalhado dos esforços de corrente, das perdas em condução e em comutação, e das componentes harmônicas do retificador ativo unidirecional trifásico com interruptores no lado CA;
+
+\item Proposta de uma nova estratégia para aumento da robustez e melhoria de desempenho dinâmico da malha de captura de fase (PLL) quando submetida a sinais de entrada com grandes variações de amplitude;
+
+\item Estudo comparativo dos esforços de corrente do retificador bidirecional trifásico \textit{boost} e do retificador ativo unidirecional trifásico com interruptores no lado CA aplicado à geração de energia eólica.
+
+\end{itemize}

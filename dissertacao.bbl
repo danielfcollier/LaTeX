@@ -1,0 +1,946 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{1.45.2.1 }
+
+\bibitem[Abidin 2006]{IEC-61000}
+\abntrefinfo{Abidin}{ABIDIN}{2006}
+{ABIDIN, M. N.~Z. Iec 61000-3-2 harmonics standards overview.
+2006.}
+
+\bibitem[Abramovitz 2007]{Artigos-18-12}
+\abntrefinfo{Abramovitz}{ABRAMOVITZ}{2007}
+{ABRAMOVITZ, A. Steady-state characteristics of the off-duty cycle controlled
+  apfc with no input voltage sensing. In:  \emph{29th Int. Telecommunications
+  Energy Conf. (INTELEC)}. Rome, Italy: [s.n.], 2007. p. 541--546.}
+
+\bibitem[Abramovitz, Evzelman e Ben-Yaakov 2008]{Artigos-18-11}
+\abntrefinfo{Abramovitz, Evzelman e Ben-Yaakov}{ABRAMOVITZ; EVZELMAN;
+  BEN-YAAKOV}{2008}
+{ABRAMOVITZ, A.; EVZELMAN, M.; BEN-YAAKOV, S. Investigation of an alternative
+  apfc control with no sensing of line voltage based on a triangular modulation
+  carrier. In:  \emph{23rd Annu. IEEE Applied Power Electron. Conf. and Expo.
+  (APEC)}. Austin, TE: [s.n.], 2008. p. 709--714.}
+
+\bibitem[Akagi, Watanabe e Aredes 2007]{Livros-pq}
+\abntrefinfo{Akagi, Watanabe e Aredes}{AKAGI; WATANABE; AREDES}{2007}
+{AKAGI, H.; WATANABE, E.; AREDES, M. \emph{Instantaneous Power Theory and
+  Applications to Power Conditioning}. Piscataway, NJ: Wiley-Interscience,
+  2007. 400~p.}
+
+\bibitem[Anderson e Bose 1983]{Artigos-12-01}
+\abntrefinfo{Anderson e Bose}{ANDERSON; BOSE}{1983}
+{ANDERSON, P.~M.; BOSE, A. Stability simulation of wind turbine systems.
+\emph{IEEE Trans. Power App. Syst.}, v.~102, n.~12, p. 3791--3795, 1983.}
+
+\bibitem[Angquist e Bongiorno 2009]{Artigos-08-19}
+\abntrefinfo{Angquist e Bongiorno}{ANGQUIST; BONGIORNO}{2009}
+{ANGQUIST, L.; BONGIORNO, M. Auto-normalizing phase-locked loop for
+  grid-connected converters. In:  \emph{IEEE Energy Conversion Congr.
+  Exposition (ECCE)}. San Jose, CA: [s.n.], 2009. p. 2957--2964.}
+
+\bibitem[Aydin, Huang e Lipo 2004]{Artigos-14-06}
+\abntrefinfo{Aydin, Huang e Lipo}{AYDIN; HUANG; LIPO}{2004}
+{AYDIN, M.; HUANG, S.; LIPO, T.~A. Axial flux permanent magnet disc machines: A
+  review. In:  \emph{Symp. Power Electron., Elect. Drives, Automation and
+  Motion (SPEEDAM)}. Capri, Italy: [s.n.], 2004.}
+
+\bibitem[Barakati, Kazerani e Aplevich 2009]{Artigos-11-14}
+\abntrefinfo{Barakati, Kazerani e Aplevich}{BARAKATI; KAZERANI; APLEVICH}{2009}
+{BARAKATI, S.~M.; KAZERANI, M.; APLEVICH, J.~D. Maximum power tracking control
+  for a wind turbine system including a matrix converter.
+\emph{IEEE Trans. Energy Convers.}, v.~24, n.~3, p. 705--713, 2009.}
+
+\bibitem[Barbi 1985]{Livros-IVO}
+\abntrefinfo{Barbi}{BARBI}{1985}
+{BARBI, I. \emph{Teoria Fundamental do Motor de Indu{\c c}\~ao}.
+  Florian\'opolis, SC, Brazil: Editora da UFSC/ELETROBR\'AS, 1985. 234~p.}
+
+\bibitem[Barbi e Batista 2010]{Artigos-05-08}
+\abntrefinfo{Barbi e Batista}{BARBI; BATISTA}{2010}
+{BARBI, I.; BATISTA, F. A.~B. Space vector modulation for two-level
+  unidirectional pwm rectifiers.
+\emph{IEEE Trans. Power Electron.}, v.~25, n.~1, p. 178--187, 2010.}
+
+\bibitem[Baroudi, Dinavahi e Knight 2005]{Artigos-04-15}
+\abntrefinfo{Baroudi, Dinavahi e Knight}{BAROUDI; DINAVAHI; KNIGHT}{2005}
+{BAROUDI, J.~A.; DINAVAHI, V.; KNIGHT, A.~M. A review of power converter
+  topologies for wind generators. In:  \emph{IEEE Int. Conf. Electric Machines
+  and Drives}. San Antonio, TX: [s.n.], 2005. p. 458--465.}
+
+\bibitem[Batista 2006]{Teses-05-01}
+\abntrefinfo{Batista}{BATISTA}{2006}
+{BATISTA, F.
+\emph{Modula{\c c}\~ao Vetorial Aplicada a Retificadores PWM Trif\'asicos
+  Unidirecionais}.
+297~p. Tese (Doutorado em Engenharia El\'etrica) --- Instituto de Eletr\^onica
+  de Pot\^encia, Universidade Federal de Santa Catarina, Florian\'opolis, SC,
+  Brazil, 2006.}
+
+\bibitem[Batista e Barbi 2007]{Artigos-05-02}
+\abntrefinfo{Batista e Barbi}{BATISTA; BARBI}{2007}
+{BATISTA, F. A.~B.; BARBI, I. Space vector modulation applied to three-phase
+  three-switch two-level unidirectional pwm rectifier.
+\emph{IEEE Trans. Power Electron.}, v.~22, n.~6, p. 2245--2252, 2007.}
+
+\bibitem[Batschauer 2011]{Teses-Batschauer}
+\abntrefinfo{Batschauer}{BATSCHAUER}{2011}
+{BATSCHAUER, A.~L.
+\emph{Inversor Multiníveis Híbrido Trifásico baseado em Módulos Meia-ponte}.
+266~p. Tese (Tese de Doutorado em Engenharia El\'etrica) --- Instituto de
+  Eletr\^onica de Pot\^encia, Universidade Federal de Santa Catarina,
+  Florian\'opolis, SC, Brazil, 2011.}
+
+\bibitem[Ben-Yaakov e Zeltser 1998]{Artigos-18-01}
+\abntrefinfo{Ben-Yaakov e Zeltser}{BEN-YAAKOV; ZELTSER}{1998}
+{BEN-YAAKOV, S.; ZELTSER, I. Pwm converters with resistive input.
+\emph{IEEE Trans. Ind. Electron.}, v.~45, n.~3, p. 519--520, 1998.}
+
+\bibitem[Ben-Yaakov e Zeltser 1999]{Artigos-18-02}
+\abntrefinfo{Ben-Yaakov e Zeltser}{BEN-YAAKOV; ZELTSER}{1999}
+{BEN-YAAKOV, S.; ZELTSER, I. The dynamics of a pwm boost converter with
+  resistive input.
+\emph{IEEE Trans. Ind. Electron.}, v.~46, n.~3, p. 613--619, 1999.}
+
+\bibitem[Bernardes 2009]{Teses-01-10}
+\abntrefinfo{Bernardes}{BERNARDES}{2009}
+{BERNARDES, T.
+Mestrado em Engenharia El\'etrica, \emph{An\'alise e Controle de Gerador
+  S\'incrono a \'Im\~a Permanente Aplicado a Sistema de Convers\~ao de Energia
+  E\'olica}. Santa Maria, RS, Brazil: Universidade Federal de Santa Maria,
+  2009.
+192~p.}
+
+\bibitem[Bernardes, Pinheiro e Montagner 2009]{Artigos-05-20}
+\abntrefinfo{Bernardes, Pinheiro e Montagner}{BERNARDES; PINHEIRO;
+  MONTAGNER}{2009}
+{BERNARDES, T.~A.; PINHEIRO, H.; MONTAGNER, V.~F. Pmsg current control in the
+  overmodulation region. In:  \emph{IEEE 35th Ann. Conf. Ind. Electron.,
+  Control and Instrumentation (IECON)}. Porto, Portugal: [s.n.], 2009. p.
+  1687--1692.}
+
+\bibitem[Bernet 2000]{Artigos-03-29}
+\abntrefinfo{Bernet}{BERNET}{2000}
+{BERNET, S. Recent developments of high power converters for industry and
+  traction applications.
+\emph{IEEE Trans. Power Electron.}, v.~15, n.~6, p. 1102--1117, 2000.}
+
+\bibitem[Best 2003]{Livros-Best}
+\abntrefinfo{Best}{BEST}{2003}
+{BEST, R.~E. \emph{Phase-Locked Loops: Design, Simulation and Applications}.
+  USA: McGraw-Hill, 2003. 419~p.}
+
+\bibitem[Bianchi, Batista e Mantz 2007]{Livros-15}
+\abntrefinfo{Bianchi, Batista e Mantz}{BIANCHI; BATISTA; MANTZ}{2007}
+{BIANCHI, F.~D.; BATISTA, H.~D.; MANTZ, R.~J. \emph{Wind Turbine Control
+  Systems: Principles, Modelling and Gain Scheduling Design}. Germany:
+  Springer, 2007. 577~p.}
+
+\bibitem[Blaabjerg, Liserre e Ma. 2011]{Artigos-04-31}
+\abntrefinfo{Blaabjerg, Liserre e Ma.}{BLAABJERG; LISERRE; MA.}{2011}
+{BLAABJERG, F.; LISERRE, M.; MA., K. Power electronics for wind turbine
+  systems. In:  \emph{IEEE Energy Conversion Congr. Exposition (ECCE)}.
+  Phoenix, AZ: [s.n.], 2011. p. 281--290.}
+
+\bibitem[Blaabjerg et al. 2004]{Artigos-04-02}
+\abntrefinfo{Blaabjerg et al.}{BLAABJERG et al.}{2004}
+{BLAABJERG, F. et al. Power converters and control of renewable energy systems.
+  In:  \emph{Plenary Session Paper per l'ICPE}. Pusan, South Korea: [s.n.],
+  2004.}
+
+\bibitem[Blaschke 1972]{Blaschke}
+\abntrefinfo{Blaschke}{BLASCHKE}{1972}
+{BLASCHKE, F. The principles of field orientation as applied to the new
+  transvektor closed-loop control system for rotating field machines.
+\emph{Siemens Review}, v.~34, p. 217--220, 1972.}
+
+\bibitem[Boldea 2006]{Livros-20}
+\abntrefinfo{Boldea}{BOLDEA}{2006}
+{BOLDEA, I. \emph{Variable Speed Generators}. USA: CRC Press, 2006. 512~p.}
+
+\bibitem[Boldea 2008]{Artigos-01-31}
+\abntrefinfo{Boldea}{BOLDEA}{2008}
+{BOLDEA, I. Control issues in adjustable speed drives.
+\emph{IEEE Ind. Electron. Mag.}, v.~2, n.~3, p. 32--50, 2008.}
+
+\bibitem[Borgonovo 2001]{Teses-03-05}
+\abntrefinfo{Borgonovo}{BORGONOVO}{2001}
+{BORGONOVO, D.
+Mestrado em Engenharia El\'etrica, \emph{Modelagem e Controle de Retificadores
+  PWM Trif\'asicos Empregando a Transforma{\c c}\~ao de Park}. Florian\'opolis,
+  SC: Instituto de Eletr\^onica de Pot\^encia, Universidade Federal de Santa
+  Catarina, 2001.
+175~p.}
+
+\bibitem[Borgonovo 2005]{Teses-03-06}
+\abntrefinfo{Borgonovo}{BORGONOVO}{2005}
+{BORGONOVO, D.
+\emph{Análise, Modelagem e Controle de Retificadores PWM Trif\'asicos}.
+274~p. Tese (Doutorado em Engenharia El\'etrica) --- Instituto de Eletr\^onica
+  de Pot\^encia, Universidade Federal de Santa Catarina, Florian\'opolis, SC,
+  2005.}
+
+\bibitem[Borgonovo e Mussa 2008]{Artigos-18-05}
+\abntrefinfo{Borgonovo e Mussa}{BORGONOVO; MUSSA}{2008}
+{BORGONOVO, D.; MUSSA, S.~A. Single-phase boost pfc voltage-doubler
+  self-controlled using fpga. In:  \emph{39th Annu. IEEE Power Electron.
+  Specialists Conf. (PESC)}. Rhodes, Greece: [s.n.], 2008. p. 4457--4463.}
+
+\bibitem[Borgonovo et al. 2005]{Artigos-18-04}
+\abntrefinfo{Borgonovo et al.}{BORGONOVO et al.}{2005}
+{BORGONOVO, D. et al. A self-controlled power factor correction single-phase
+  boost pre-regulator. In:  \emph{36th Annu. IEEE Power Electron. Specialists
+  Conf. (PESC)}. Recife, PE, Brazil: [s.n.], 2005. p. 2351--2357.}
+
+\bibitem[Bose 2002]{Livros-01}
+\abntrefinfo{Bose}{BOSE}{2002}
+{BOSE, B.~K. \emph{Modern Power Electronics and AC Drives}. Upper Saddle River,
+  NJ: Prentice Hall PTR, 2002. 711~p.}
+
+\bibitem[Botteron et al. 2003]{Artigos-13-08}
+\abntrefinfo{Botteron et al.}{BOTTERON et al.}{2003}
+{BOTTERON, F. et al. New limiting algorithms for space vector modulated
+  three-phase four-leg voltage source inverters.
+\emph{IEE Proc. Electric Power Applicat.}, v.~150, n.~6, p. 733--742, 2003.}
+
+\bibitem[Briz e Degner 2011]{Artigos-Rotor}
+\abntrefinfo{Briz e Degner}{BRIZ; DEGNER}{2011}
+{BRIZ, F.; DEGNER, M.~W. Rotor position estimation.
+\emph{IEEE Ind. Electron. Mag.}, v.~5, n.~2, p. 24--36, 2011.}
+
+\bibitem[Buso e Mattavelli 2006]{Livros-09}
+\abntrefinfo{Buso e Mattavelli}{BUSO; MATTAVELLI}{2006}
+{BUSO, S.; MATTAVELLI, P. \emph{Digital Control in Power Electronics}. USA:
+  Morgan \& Claypool, 2006. 151~p.}
+
+\bibitem[Callegaro et al. 2011]{Artigos-Alan}
+\abntrefinfo{Callegaro et al.}{CALLEGARO et al.}{2011}
+{CALLEGARO, A.~D. et al. Power semiconductor switching losses experimental
+  characterization system. In:  \emph{Congresso Brasileiro de Eletrônica de
+  Potência (COBEP)}. Natal-RN, Brazil: [s.n.], 2011.}
+
+\bibitem[Carrasco et al. 2006]{Artigos-04-14}
+\abntrefinfo{Carrasco et al.}{CARRASCO et al.}{2006}
+{CARRASCO, J.~M. et al. Power electronic systems for the grid integration of
+  wind turbines. In:  \emph{IEEE 32nd Ann. Conf. Ind. Electron., Control and
+  Instrumentation (IECON)}. Paris, France: [s.n.], 2006. p. 4182--4188.}
+
+\bibitem[Casadei et al. 2002]{Artigos-01-08}
+\abntrefinfo{Casadei et al.}{CASADEI et al.}{2002}
+{CASADEI, D. et al. Foc and dtc: two viable schemes for induction motors torque
+  control.
+\emph{IEEE Trans. Power Electron.}, v.~17, n.~5, p. 779--787, 2002.}
+
+\bibitem[Chen 1999]{Livros-Chen}
+\abntrefinfo{Chen}{CHEN}{1999}
+{CHEN, C.~T. \emph{Linear System: Theory and Design}. New York, NY: Oxford
+  University Press, 1999. 352~p.}
+
+\bibitem[Chen, Pillay e Khan 2005]{Artigos-17-03}
+\abntrefinfo{Chen, Pillay e Khan}{CHEN; PILLAY; KHAN}{2005}
+{CHEN, Y.; PILLAY, P.; KHAN, A. Pm wind generator topologies.
+\emph{IEEE Trans. Ind. Appl.}, 2005.}
+
+\bibitem[Chen, Guerrero e Blaabjerg 2009]{Artigos-04-16}
+\abntrefinfo{Chen, Guerrero e Blaabjerg}{CHEN; GUERRERO; BLAABJERG}{2009}
+{CHEN, Z.; GUERRERO, J.~M.; BLAABJERG, F. A review of the state of the art of
+  power electronics for wind turbines.
+\emph{IEEE Trans. Power Electron.}, v.~24, n.~8, p. 1859--1875, 2009.}
+
+\bibitem[Chinchilla, Arnaltes e Burgos 2006]{Artigos-01-02}
+\abntrefinfo{Chinchilla, Arnaltes e Burgos}{CHINCHILLA; ARNALTES; BURGOS}{2006}
+{CHINCHILLA, M.; ARNALTES, S.; BURGOS, J.~C. Control of permanent magnet
+  generators applied to variable-speed wind-energy systems connected to the
+  grid.
+\emph{IEEE Trans. Energy Convers.}, v.~21, n.~1, p. 130--135, 2006.}
+
+\bibitem[Chung 2000]{Artigos-08-08}
+\abntrefinfo{Chung}{CHUNG}{2000}
+{CHUNG, S.-X. A phase tracking system for three phase utility interface
+  inverters.
+\emph{IEEE Trans. Power Electron.}, v.~15, n.~3, p. 431--438, 2000.}
+
+\bibitem[Ciobotaru et al. 2010]{Artigos-08-16}
+\abntrefinfo{Ciobotaru et al.}{CIOBOTARU et al.}{2010}
+{CIOBOTARU, M. et al. Accurate and less-disturbing active antiislanding method
+  based on pll for grid-connected converters.
+\emph{IEEE Trans. Power Electron.}, v.~25, n.~6, p. 1576--1584, 2010.}
+
+\bibitem[Ciobotaru, Teodorescu e Agelidis 2008]{Artigos-08-18}
+\abntrefinfo{Ciobotaru, Teodorescu e Agelidis}{CIOBOTARU; TEODORESCU;
+  AGELIDIS}{2008}
+{CIOBOTARU, M.; TEODORESCU, R.; AGELIDIS, V.~G. Offset rejection for pll based
+  synchronization in grid-connected converters. In:  \emph{23rd Annu. IEEE
+  Applied Power Electron. Conf. and Expo. (APEC)}. Austin, TE: [s.n.], 2008. p.
+  1611--1617.}
+
+\bibitem[Collier e Heldwein 2011]{Artigos-Collier}
+\abntrefinfo{Collier e Heldwein}{COLLIER; HELDWEIN}{2011}
+{COLLIER, D. A.~F.; HELDWEIN, M.~L. Modeling and design of a micro wind energy
+  system with a variable-speed wind turbine connected to a permanent magnet
+  synchronous generator and a pwm rectifier. In:  \emph{Congresso Brasileiro de
+  Eletrônica de Potência (COBEP)}. Natal-RN, Brazil: [s.n.], 2011.}
+
+\bibitem[Collier, Maryama e Heldwein 2011]{PCIM}
+\abntrefinfo{Collier, Maryama e Heldwein}{COLLIER; MARYAMA; HELDWEIN}{2011}
+{COLLIER, D. A.~F.; MARYAMA, V.; HELDWEIN, M.~L. {L}ow conduction losses pwm
+  rectifier for high efficiency wind power micro-generation. In:  \emph{Proc.
+  of the Int. Exhibition Conf. Power Electron., Intelligent Motion and Power
+  Quality (PCIM-Asia)}. Shanghai, China: [s.n.], 2011.}
+
+\bibitem[Cust\'odio 2009]{Livros-Custodio}
+\abntrefinfo{Cust\'odio}{CUST\'ODIO}{2009}
+{CUST\'ODIO, R.~S. \emph{Energia E\'olica para Produ{\c c}\~ao de Energia
+  El\'etrica}. Rio de Janeiro: Eletrobr\'as, 2009. 577~p.}
+
+\bibitem[Drofenik e Kolar 2005]{Artigos-03-34}
+\abntrefinfo{Drofenik e Kolar}{DROFENIK; KOLAR}{2005}
+{DROFENIK, U.; KOLAR, J.~W. A general scheme for calculating switching and
+  conduction losses of power semiconductors in numerical circuit simulations of
+  power electronic systems. In:  . Niigata, Japan: [s.n.], 2005. p.~4--8.}
+
+\bibitem[Dubois, Polinder e Ferreira 2000]{Artigos-17-02}
+\abntrefinfo{Dubois, Polinder e Ferreira}{DUBOIS; POLINDER; FERREIRA}{2000}
+{DUBOIS, M.~R.; POLINDER, H.; FERREIRA, J.~A. Comparison of generator
+  topologies for direct-driven wind turbines.
+\emph{In Proc. Nordic Countries Power and Ind. Electron. (NORPIE)}, 2000.}
+
+\bibitem[Dubois 2004]{Teses-09-02}
+\abntrefinfo{Dubois}{DUBOIS}{2004}
+{DUBOIS, M. R.~J.
+\emph{Optimized Permanent Magnet Generator Topologies for Direct-Drive Wind
+  Turbines}.
+266~p. Tese (Doctor of Philosophy) --- Technische Universiteit Delft, 2004.}
+
+\bibitem[Duesterhoeft, Schulz e Clarke 1951]{Artigos-Clarke}
+\abntrefinfo{Duesterhoeft, Schulz e Clarke}{DUESTERHOEFT; SCHULZ; CLARKE}{1951}
+{DUESTERHOEFT, W.~C.; SCHULZ, M.~W.; CLARKE, E. Determination of instantaneous
+  currents and voltages by means of alpha, beta, and zero components.
+\emph{Trans. Amer. Inst. Elect. Engineers}, v.~70, n.~2, p. 1248--1255, 1951.}
+
+\bibitem[Dutra 2003]{Artigos-09}
+\abntrefinfo{Dutra}{DUTRA}{2003}
+{DUTRA, R. \emph{Energia E\'olica: Princ\'ipios e Tecnologia}.
+CRESESB, 2003. Dispon{\'\i}vel em: $<$www\-.cresesb\-.cepel\-.br$>$.}
+
+\bibitem[Enercon 2010]{Enercon-Overview}
+\abntrefinfo{Enercon}{ENERCON}{2010}
+{ENERCON. Enercon wind energy converters - product overview.
+2010.}
+
+\bibitem[Erickson e Maksimovic 2001]{Livros-Erickson}
+\abntrefinfo{Erickson e Maksimovic}{ERICKSON; MAKSIMOVIC}{2001}
+{ERICKSON, R.~W.; MAKSIMOVIC, D. \emph{Fundamentals of Power Electronics}. New
+  York, NY: Kluwer Academic/Plenum Publishers, 2001. 883~p.}
+
+\bibitem[Franklin, Powell e Emani-Naeini 1994]{Livros-Franklin-3d}
+\abntrefinfo{Franklin, Powell e Emani-Naeini}{FRANKLIN; POWELL;
+  EMANI-NAEINI}{1994}
+{FRANKLIN, G.~F.; POWELL, J.~D.; EMANI-NAEINI, A. \emph{Feedback Control of
+  Dynamic Systems}. Stanford, CA: Addison-Wesley, 1994. 778~p.}
+
+\bibitem[Franklin, Powell e Workman 1998]{Livros-Franklin}
+\abntrefinfo{Franklin, Powell e Workman}{FRANKLIN; POWELL; WORKMAN}{1998}
+{FRANKLIN, G.~F.; POWELL, J.~D.; WORKMAN, M. \emph{Digital Control of Dynamic
+  Systems}. Piscataway, NJ: Ellis-Kagle Press, 1998. 850~p.}
+
+\bibitem[Gieras, Wang e Kamper 2004]{Livros-05}
+\abntrefinfo{Gieras, Wang e Kamper}{GIERAS; WANG; KAMPER}{2004}
+{GIERAS, J.~F.; WANG, R.~J.; KAMPER, M.~J. \emph{Axial Flux Permanent Magnet
+  Brushless Machines}. Dordrecht, Netherlands: Kluwer Academic Publishers,
+  2004. 344~p.}
+
+\bibitem[Grauers 1996]{Teses-09-03}
+\abntrefinfo{Grauers}{GRAUERS}{1996}
+{GRAUERS, A.
+\emph{Design of Direct-driven Permanent-magnet Generators for Wind Turbines}.
+133~p. Tese (Doctor of Philosophy) --- Chalmers University of Technology,
+  1996.}
+
+\bibitem[Guo 2009]{Artigos-11-18}
+\abntrefinfo{Guo}{GUO}{2009}
+{GUO, P. Research of a new mppt strategy based on gray wind speed prediction.
+  In:  \emph{Knowledge Acquisition and Modeling, 2009. KAM '09. Second
+  International Symposium on}. Wuhan: China, 2009. v.~3, p. 120--123.}
+
+\bibitem[GWEC 2010]{Artigos-GWEC-03}
+\abntrefinfo{GWEC}{GWEC}{2010a}
+{GWEC. Analysis of the regulatory framework for wind power generation in brazil
+  - summary report.
+2010.}
+
+\bibitem[GWEC 2010]{Artigos-GWEC-02}
+\abntrefinfo{GWEC}{GWEC}{2010b}
+{GWEC. Global wind energy outlook 2010.
+2010.}
+
+\bibitem[GWEC 2010]{Artigos-GWEC-01}
+\abntrefinfo{GWEC}{GWEC}{2010c}
+{GWEC. Global wind report - annual market update 2010.
+2010.}
+
+\bibitem[Hahn, Durstewitz e Rohrig 2006]{Artigos-Falhas-01}
+\abntrefinfo{Hahn, Durstewitz e Rohrig}{HAHN; DURSTEWITZ; ROHRIG}{2006}
+{HAHN, B.; DURSTEWITZ, M.; ROHRIG, K. Reliability of wind turbines - experience
+  of 15 years with 1500 wind turbines.
+\emph{Institute of Solar Energy Distribution Technology (ISET)}, 2006.}
+
+\bibitem[Hansen et al. 2001]{Teses-09-01}
+\abntrefinfo{Hansen et al.}{HANSEN et al.}{2001}
+{HANSEN, L.~H. et al. Conceptual survey of generators and power electronics for
+  wind turbines.
+\emph{Riso Nat. Laboratory}, Denmark, Riso-R-1250(EN), p.~108, 2001.}
+
+\bibitem[Hartmann et al. 2011]{Artigos-05-01}
+\abntrefinfo{Hartmann et al.}{HARTMANN et al.}{2011}
+{HARTMANN, M. et al. A three-phase delta switch rectifier for use in modern
+  aircraft.
+\emph{IEEE Trans. Ind. Electron.}, PP, n.~99, p.~1, 2011.}
+
+\bibitem[Heier 1998]{Livros-Heier}
+\abntrefinfo{Heier}{HEIER}{1998}
+{HEIER, S. \emph{Grid Integration of Wind Energy Conversion Systems}. New York,
+  NY: John Wiley \& Sons, Inc., 1998.}
+
+\bibitem[Hiti e Boroyevich 1994]{Artigos-03-15}
+\abntrefinfo{Hiti e Boroyevich}{HITI; BOROYEVICH}{1994}
+{HITI, S.; BOROYEVICH, D. Control of front-end three-phase boost rectifier. In:
+   \emph{9th Annu. IEEE Applied Power Electron. Conf. and Expo. (APEC)}.
+  Orlando, FL: [s.n.], 1994. v.~2, p. 92--933.}
+
+\bibitem[Hiti, Boroyevich e Cuadros 1994]{Artigos-03-14}
+\abntrefinfo{Hiti, Boroyevich e Cuadros}{HITI; BOROYEVICH; CUADROS}{1994}
+{HITI, S.; BOROYEVICH, D.; CUADROS, C. Small-signal modeling and control of
+  three-phase pwm converters. In:  \emph{IEEE Conf. Rec. of the Ind. Applicat.
+  Soc. Annu. Meeting}. Denver, CO: [s.n.], 1994. v.~2, p. 1143--1150.}
+
+\bibitem[Holmes e Lipo 2003]{Livros-LIPO}
+\abntrefinfo{Holmes e Lipo}{HOLMES; LIPO}{2003}
+{HOLMES, D.~G.; LIPO, T.~A. \emph{Pulse Width Modulation for Power Converters
+  (Principles and Practice)}. Piscataway, NJ: John Wiley \& Sons, Inc., 2003.
+  744~p.}
+
+\bibitem[Hsieh e Hung 1996]{Artigos-08-13}
+\abntrefinfo{Hsieh e Hung}{HSIEH; HUNG}{1996}
+{HSIEH, G.-C.; HUNG, J.~C. Phase-locked loop techniques. a survey.
+\emph{IEEE Trans. Ind. Electron.}, v.~43, n.~6, p. 609--615, 1996.}
+
+\bibitem[Inoue, Morimoto e Sanada 2008]{Artigos-01-19}
+\abntrefinfo{Inoue, Morimoto e Sanada}{INOUE; MORIMOTO; SANADA}{2008}
+{INOUE, Y.; MORIMOTO, S.; SANADA, M. Output maximization using direct torque
+  control for sensorless variable wind generation system employing ipmsg. In:
+  \emph{IEEE 13th Int. Power Electron. and Motion Control Conf. (IPEMC)}.
+  Poznan, Poland: [s.n.], 2008. p. 1859--1865.}
+
+\bibitem[Iov e Blaabjerg 2009]{Artigos-04-21}
+\abntrefinfo{Iov e Blaabjerg}{IOV; BLAABJERG}{2009}
+{IOV, F.; BLAABJERG, F. Power electronics and control for wind power systems.
+  In:  \emph{Power Electronics and Machines in Wind Applications, 2009. PEMWA
+  2009. IEEE}. Lincoln, NE: [s.n.], 2009. p. 1--16.}
+
+\bibitem[Johnson 2001]{Livros-16}
+\abntrefinfo{Johnson}{JOHNSON}{2001}
+{JOHNSON, G.~L. \emph{Wind Energy Systems}. USA: Electronic Ed., 2001. 577~p.}
+
+\bibitem[Kaura e Blasko 1997]{Artigos-08-11}
+\abntrefinfo{Kaura e Blasko}{KAURA; BLASKO}{1997}
+{KAURA, V.; BLASKO, V. Operation of a phase locked loop system under distorted
+  utility conditions.
+\emph{IEEE Trans. Ind. Appl.}, v.~33, n.~1, p. 58--63, 1997.}
+
+\bibitem[Kazmi et al. 2011]{Artigos-11-19}
+\abntrefinfo{Kazmi et al.}{KAZMI et al.}{2011}
+{KAZMI, S. M.~R. et al. A novel algorithm for fast and efficient
+  speed-sensorless maximum power point tracking in wind energy conversion
+  systems.
+\emph{IEEE Trans. Ind. Electron.}, v.~58, n.~1, p. 29--36, 2011.}
+
+\bibitem[Kazmierkowski e Malesani 1998]{Artigos-03-04}
+\abntrefinfo{Kazmierkowski e Malesani}{KAZMIERKOWSKI; MALESANI}{1998}
+{KAZMIERKOWSKI, M.~P.; MALESANI, L. Current control techniques for three-phase
+  voltage-source pwm converters: a survey.
+\emph{IEEE Trans. Ind. Electron.}, v.~45, n.~5, p. 691--703, 1998.}
+
+\bibitem[Kolar, Ertl e Zach 1990]{Artigos-Kolar-Y}
+\abntrefinfo{Kolar, Ertl e Zach}{KOLAR; ERTL; ZACH}{1990a}
+{KOLAR, J.~W.; ERTL, H.; ZACH, F.~C. Realization considerations for
+  unidirectional three-phase pwm rectifier system with low effects on the
+  mains. In:  \emph{6th Conf. Power Electronics and Motion Control (PEMC)}.
+  Budapest, Hungary: [s.n.], 1990.}
+
+\bibitem[Kolar, Ertl e Zach 1990]{Artigos-03-25}
+\abntrefinfo{Kolar, Ertl e Zach}{KOLAR; ERTL; ZACH}{1990b}
+{KOLAR, J.~W.; ERTL, H.; ZACH, F.~C. Realization considerations for
+  unidirectional three-phase pwm rectifier systems with low effects on the
+  mains. In:  \emph{6th Int. Conf. Power Electron. and Motion Control (PEMC)}.
+  Budapest, Hungary: [s.n.], 1990.}
+
+\bibitem[Kothare et al. 1994]{Artigos-13-01}
+\abntrefinfo{Kothare et al.}{KOTHARE et al.}{1994}
+{KOTHARE, M.~V. et al. A unified framework for the study of anti-windup
+  designs.
+\emph{J. Automatica}, v.~30, p. 1869--1883, 1994.}
+
+\bibitem[Kovacs, I. e M. 1959]{Livros-Kovacs}
+\abntrefinfo{Kovacs, I. e M.}{KOVACS; I.; M.}{1959}
+{KOVACS, K.~P.; I., R.; M., K. \emph{Transiente Vorgänge in
+  Wechselstrommachinen}. Budapest: Akademiai Kiado, Verein der Ungarischen
+  Akademic der Wissenschaften, 1959. 270~p.}
+
+\bibitem[Krause, Wasynczuk e Sudhoff 2002]{Livros-03}
+\abntrefinfo{Krause, Wasynczuk e Sudhoff}{KRAUSE; WASYNCZUK; SUDHOFF}{2002}
+{KRAUSE, P.; WASYNCZUK, O.; SUDHOFF, S. \emph{Analysis of Electric Machinery
+  and Drive Systems}. Piscataway, NJ: John Wiley \& Sons, Inc., 2002. 632~p.}
+
+\bibitem[Krishnan 1993]{Artigos-14-16}
+\abntrefinfo{Krishnan}{KRISHNAN}{1993}
+{KRISHNAN, R. Control and operation of pm synchronous motor drives in the
+  field-weakening region. In:  \emph{Proc. of the Int. Conf. Ind. Electron.,
+  Control and Instrumentation (IECON)}. [S.l.: s.n.], 1993. v.~2, p. 745--750.}
+
+\bibitem[Lago 2011]{Teses-Jack}
+\abntrefinfo{Lago}{LAGO}{2011}
+{LAGO, J.
+Mestrado em Engenharia El\'etrica, \emph{Redistribuidor de Correntes para Redes
+  de Distribuição em Corrente Contínua Bipolares}. Florian\'opolis, SC:
+  Instituto de Eletr\^onica de Pot\^encia, Universidade Federal de Santa
+  Catarina, 2011.
+188~p.}
+
+\bibitem[Lange e Heldwein 2011]{Artigos-Lange}
+\abntrefinfo{Lange e Heldwein}{LANGE; HELDWEIN}{2011}
+{LANGE, A. D.~B.; HELDWEIN, M.~L. Light load stability improvement for
+  single-phase boost pfc rectifier using input current self-control technique.
+  In:  \emph{Congresso Brasileiro de Eletrônica de Potência (COBEP)}. Natal-RN,
+  Brazil: [s.n.], 2011.}
+
+\bibitem[L'Aquila 2002]{Artigos-03-08}
+\abntrefinfo{L'Aquila}{L'AQUILA}{2002}
+{L'AQUILA, I. Comparison of current control techniques for pwm rectifiers. In:
+  \emph{IEEE Int. Symp. Ind. Electron. (ISIE)}. [S.l.: s.n.], 2002. v.~4, p.
+  1259--1263.}
+
+\bibitem[Lee e Lee 1998]{Artigos-05-14}
+\abntrefinfo{Lee e Lee}{LEE; LEE}{1998}
+{LEE, D.-C.; LEE, G.-M. A novel overmodulation technique for space-vector pwm
+  inverters.
+\emph{IEEE Trans. Power Electron.}, v.~13, n.~6, p. 1144--1151, 1998.}
+
+\bibitem[Li e Chen 2008]{Artigos-04-20}
+\abntrefinfo{Li e Chen}{LI; CHEN}{2008}
+{LI, H.; CHEN, Z. Overview of different wind generator systems and their
+  comparisons.
+\emph{Renewable Power Generation (IET)}, 2008.}
+
+\bibitem[Lipo e Novotny 1996]{Livros-02}
+\abntrefinfo{Lipo e Novotny}{LIPO; NOVOTNY}{1996}
+{LIPO, T.~A.; NOVOTNY, D.~W. \emph{Vector Control and Dynamics of AC Drives}.
+  Oxford, UK: Oxford University Press, 1996. 440~p.}
+
+\bibitem[Liserre 2001]{Teses-03-04}
+\abntrefinfo{Liserre}{LISERRE}{2001}
+{LISERRE, M.
+\emph{Innovative Control Techniques of Power Converters for Industrial
+  Automation}.
+303~p. Tese (Doctor of Philosophy) --- Politecnico di Bari, Bari, 2001.}
+
+\bibitem[Liserre et al. 2011]{Artigos-04-30}
+\abntrefinfo{Liserre et al.}{LISERRE et al.}{2011}
+{LISERRE, M. et al. Overview of multi-mw wind turbines and wind parks.
+\emph{IEEE Trans. Ind. Electron.}, v.~58, n.~4, p. 1081--1095, 2011.}
+
+\bibitem[Malinowski 2001]{Teses-03-02}
+\abntrefinfo{Malinowski}{MALINOWSKI}{2001}
+{MALINOWSKI, M.
+\emph{Sensorless Control Strategies for Three-Phase PWM Rectifiers}.
+128~p. Tese (Doctor of Philosophy) --- Warsaw University of Technology, Warsaw,
+  Poland, 2001.}
+
+\bibitem[Manwell, McGowan e Rogers 2002]{Livros-13}
+\abntrefinfo{Manwell, McGowan e Rogers}{MANWELL; MCGOWAN; ROGERS}{2002}
+{MANWELL, J.~F.; MCGOWAN, J.~G.; ROGERS, A.~L. \emph{Wind Energy Explained:
+  Theory, Design and Application}. UK: John Wiley \& Sons, Inc., 2002. 577~p.}
+
+\bibitem[March e Turner 2009]{Artigos-13-09}
+\abntrefinfo{March e Turner}{MARCH; TURNER}{2009}
+{MARCH, P.; TURNER, M.~C. Anti-windup compensator designs for nonsalient
+  permanent-magnet synchronous motor speed regulators.
+\emph{IEEE Trans. Ind. Appl.}, v.~45, n.~5, p. 1598--1609, 2009.}
+
+\bibitem[Mather e Maksimovic 2011]{Artigos-18-06}
+\abntrefinfo{Mather e Maksimovic}{MATHER; MAKSIMOVIC}{2011}
+{MATHER, B.~A.; MAKSIMOVIC, D. A simple digital power-factor correction
+  rectifier controller.
+\emph{IEEE Trans. Power Electron.}, v.~26, n.~1, p. 9--19, 2011.}
+
+\bibitem[McMillan e Ault 2010]{Artigos-04-23}
+\abntrefinfo{McMillan e Ault}{MCMILLAN; AULT}{2010}
+{MCMILLAN, D.; AULT, G.~W. Techno-economic comparison of operational aspects
+  for direct drive and gearbox-driven wind turbines.
+\emph{IEEE Trans. Energy Convers.}, v.~25, n.~1, p. 191--198, 2010.}
+
+\bibitem[Miller 2008]{Teses-03-14}
+\abntrefinfo{Miller}{MILLER}{2008}
+{MILLER, S. K.~T.
+\emph{Analysis of Three-Phase Rectifiers with AC-Side Switches and Interleaved
+  Three-Phase Voltage-Source Converters}.
+266~p. Tese (Ph.D. dissertation) --- Faculty of Rensselaer Polytechnic
+  Institute, Troy, NY, 2008.}
+
+\bibitem[Miller e Sun 2006]{Artigos-03-23}
+\abntrefinfo{Miller e Sun}{MILLER; SUN}{2006}
+{MILLER, S. K.~T.; SUN, J. Comparative study of three-phase pwm rectifiers for
+  wind energy conversion. In:  \emph{21th Annu. IEEE Applied Power Electron.
+  Conf. and Expo. (APEC)}. Dallas, TX: [s.n.], 2006. p. 937--943.}
+
+\bibitem[Mirecki, Roboam e Richardeau 2007]{Artigos-11-06}
+\abntrefinfo{Mirecki, Roboam e Richardeau}{MIRECKI; ROBOAM; RICHARDEAU}{2007}
+{MIRECKI, A.; ROBOAM, X.; RICHARDEAU, F. Architecture complexity and energy
+  efficiency of small wind turbines.
+\emph{IEEE Trans. Ind. Electron.}, v.~54, n.~1, p. 660--670, 2007.}
+
+\bibitem[Monajemy 2000]{Teses-01-12}
+\abntrefinfo{Monajemy}{MONAJEMY}{2000}
+{MONAJEMY, R.
+\emph{Control Strategies and Parameter Compensation for Permanent Magnet
+  Synchronous Motor Drives}.
+165~p. Tese (Doctor of Philosophy) --- Faculty of the Virginia Polytechnic
+  Institute and State University, 2000.}
+
+\bibitem[Morimoto, Takeda e Hirasa 1990]{Artigos-01-15}
+\abntrefinfo{Morimoto, Takeda e Hirasa}{MORIMOTO; TAKEDA; HIRASA}{1990}
+{MORIMOTO, S.; TAKEDA, Y.; HIRASA, T. Current phase control methods for
+  permanent magnet synchronous motors.
+\emph{IEEE Trans. Power Electron.}, v.~5, n.~2, p. 133--139, 1990.}
+
+\bibitem[Morren, Pierik e Haan 2006]{Artigos-12-05}
+\abntrefinfo{Morren, Pierik e Haan}{MORREN; PIERIK; HAAN}{2006}
+{MORREN, J.; PIERIK, J.; HAAN, S. W.~H. Inertial response of variable speed
+  wind turbines.
+\emph{Electric Power Systems Research}, 2006.}
+
+\bibitem[Mullane, Lightbody e Yacamini 2005]{Artigos-02-06}
+\abntrefinfo{Mullane, Lightbody e Yacamini}{MULLANE; LIGHTBODY; YACAMINI}{2005}
+{MULLANE, A.; LIGHTBODY, G.; YACAMINI, R. Wind-turbine fault ride-through
+  enhancement.
+\emph{IEEE Trans. Power Syst.}, v.~20, n.~4, p. 1929--1937, 2005.}
+
+\bibitem[Muller, Deicke e Doncker 2002]{Artigos-12-06}
+\abntrefinfo{Muller, Deicke e Doncker}{MULLER; DEICKE; DONCKER}{2002}
+{MULLER, S.; DEICKE, M.; DONCKER, R.~W. D. Doubly fed induction generator
+  systems for wind turbines.
+\emph{IEEE Ind. Appl. Mag.}, 2002.}
+
+\bibitem[Neacsu 1999]{Artigos-03-09}
+\abntrefinfo{Neacsu}{NEACSU}{1999}
+{NEACSU, D. Vectorial current control techniques for three-phase ac/dc boost
+  converters. In:  \emph{IEEE Int. Symp. Ind. Electron. (ISIE)}. [S.l.: s.n.],
+  1999. v.~2, p. 527--532.}
+
+\bibitem[Nocedal e Wright 1999]{Nocedal-1999}
+\abntrefinfo{Nocedal e Wright}{NOCEDAL; WRIGHT}{1999}
+{NOCEDAL, J.; WRIGHT, S.~J. \emph{Numerical Optimization}. New York, NY:
+  Springer, 1999. 651~p.}
+
+\bibitem[Normey-Rico e Camacho 2007]{Livros-Julio}
+\abntrefinfo{Normey-Rico e Camacho}{NORMEY-RICO; CAMACHO}{2007}
+{NORMEY-RICO, J.~E.; CAMACHO, E.~F. \emph{Control of Dead-time Process}.
+  [S.l.]: Springer, 2007. 474~p.}
+
+\bibitem[Nunes 2003]{Teses-04-02}
+\abntrefinfo{Nunes}{NUNES}{2003}
+{NUNES, M. V.~A.
+\emph{Avalia{\c c}\~ao do Comportamento de Aerogeradores de Velocidade Fixa e
+  Vari\'avel Integrados em Redes El\'etricas Fracas}.
+224~p. Tese (Doutorado em Engenharia El\'etrica) --- Grupo de Sistemas de
+  Pot\^encia, Universidade Federal de Santa Catarina, Florian\'opolis, SC,
+  2003.}
+
+\bibitem[ONS 2009]{Artigos-ONS-LVRF}
+\abntrefinfo{ONS}{ONS}{2009}
+{ONS. Submódulo 3.6 - requisitos técnicos mínimos para a conexão à rede básica.
+2009.}
+
+\bibitem[Ortmann 2008]{Teses-08-01}
+\abntrefinfo{Ortmann}{ORTMANN}{2008}
+{ORTMANN, M.~S.
+Mestrado em Engenharia El\'etrica, \emph{Filtro Ativo Trif\'asico com Controle
+  Vetorial utilizando DSP: Projeto e Implementa{\c c}\~ao}. Florian\'opolis,
+  SC: Instituto de Eletr\^onica de Pot\^encia, Universidade Federal de Santa
+  Catarina, 2008.
+241~p.}
+
+\bibitem[ORTMANN, COLLIER e HELDWEIN 2011]{Patente-Autocontrole}
+\abntrefinfo{ORTMANN, COLLIER e HELDWEIN}{ORTMANN; COLLIER; HELDWEIN}{2011}
+{ORTMANN, M.~S.; COLLIER, D. A.~F.; HELDWEIN, M.~L. Auto-controle de corrente
+  para geradores el\'etricos trifá\'asicos conectados a retificadores
+  auto-comutados.
+\emph{Pedido de Dep\'osisto de Patente ou Modelo de Utilidade}, DTI/PRPE/UFSC,
+  2011.}
+
+\bibitem[Ortmann et al. 2011]{Artigos-CELESC}
+\abntrefinfo{Ortmann et al.}{ORTMANN et al.}{2011}
+{ORTMANN, M.~S. et al. Interliga{\c c}\~ao de um gerador e\'olico com a rede
+  el\'etrica. In:  \emph{Congresso de Inova{\c c}\~ao Tecnol\'ogica em Energia
+  El\'etrica (CITENEL)}. Fortaleza, CE, Brazil: [s.n.], 2011.}
+
+\bibitem[Pacas 2011]{Artigos-Sensorless}
+\abntrefinfo{Pacas}{PACAS}{2011}
+{PACAS, M. Sensorless drives in industrial applications.
+\emph{IEEE Ind. Electron. Mag.}, v.~5, n.~2, p. 16--23, 2011.}
+
+\bibitem[Pao e Johnson 2011]{Artigos-04-29}
+\abntrefinfo{Pao e Johnson}{PAO; JOHNSON}{2011}
+{PAO, L.~Y.; JOHNSON, K. Control of wind turbines: Approaches, challenges, and
+  recent developments.
+\emph{IEEE Control Sys. Mag.}, v.~5, n.~2, p. 16--23, 2011.}
+
+\bibitem[Park 1928]{Artigos-Park02}
+\abntrefinfo{Park}{PARK}{1928}
+{PARK, R.~H. Definition of an ideal synchronous machine and formula for the
+  armature flux linkages.
+\emph{General Elec. Rev.}, 1928.}
+
+\bibitem[Park 1929]{Artigos-01-Park}
+\abntrefinfo{Park}{PARK}{1929}
+{PARK, R.~H. Two-reaction theory of synchronous machines generalized method of
+  analysis-part i.
+\emph{Trans. Amer. Inst. Elec. Engineers}, 1929.}
+
+\bibitem[Patel 1999]{Livros-17}
+\abntrefinfo{Patel}{PATEL}{1999}
+{PATEL, M.~R. \emph{Wind and Solar Power Systems}. USA: CRC Press, 1999.
+  577~p.}
+
+\bibitem[Patsios et al. 2009]{Artigos-11-09}
+\abntrefinfo{Patsios et al.}{PATSIOS et al.}{2009}
+{PATSIOS, C. et al. A comparison of maximum-power-point tracking control
+  techniques for low-power variable-speed wind generators. In:  \emph{8th Int.
+  Symp. Advanced Electromechanical Motion Syst. Electric Drives Joint Symp.
+  (ELECTROMOTION)}. Lille, France: [s.n.], 2009. p.~1--6.}
+
+\bibitem[Pillay e Krishnan 1988]{Artigos-01-47}
+\abntrefinfo{Pillay e Krishnan}{PILLAY; KRISHNAN}{1988}
+{PILLAY, P.; KRISHNAN, R. Modeling of permanent magnet motor drives.
+\emph{IEEE Trans. Ind. Electron.}, 1988.}
+
+\bibitem[Polinder et al. 2006]{Artigos-04-07}
+\abntrefinfo{Polinder et al.}{POLINDER et al.}{2006}
+{POLINDER, H. et al. Comparison of direct-drive and geared generator concepts
+  for wind turbines.
+\emph{IEEE Trans. Energy Convers.}, v.~21, n.~3, p. 725--733, 2006.}
+
+\bibitem[Price 2005]{Patente-Blyth}
+\abntrefinfo{Price}{PRICE}{2005}
+{PRICE, T.~J. James blyth, britain's first modern wind power pioneer.
+\emph{Wind Eng.}, Multi Science Publishing, v.~29, n.~3, p. 191--200, 2005.}
+
+\bibitem[Rajagopalan, Lee e Nora 1999]{Artigos-18-03}
+\abntrefinfo{Rajagopalan, Lee e Nora}{RAJAGOPALAN; LEE; NORA}{1999}
+{RAJAGOPALAN, J.; LEE, F.~C.; NORA, P. A general technique for derivation of
+  average current mode control laws for single-phase power-factor-correction
+  circuits without input voltage sensing.
+\emph{IEEE Trans. Power Electron.}, v.~14, n.~4, p. 663--672, 1999.}
+
+\bibitem[RIBRANT e BERTLING 2007]{Artigos-Falhas-02}
+\abntrefinfo{RIBRANT e BERTLING}{RIBRANT; BERTLING}{2007}
+{RIBRANT, J.; BERTLING, L.~M. Survey of failures in wind power systems with
+  focus on swedish wind power plants during 1997-2005.
+\emph{IEEE Trans. Energy Convers.}, v.~22, n.~1, p. 167--173, 2007.}
+
+\bibitem[Rolim, Costa e Aredes 2006]{Artigos-08-06}
+\abntrefinfo{Rolim, Costa e Aredes}{ROLIM; COSTA; AREDES}{2006}
+{ROLIM, L. G.~B.; COSTA, D.~R. da; AREDES, M. Analysis and software
+  implementation of a robust synchronizing pll circuit based on the pq theory.
+\emph{IEEE Trans. Ind. Electron.}, 2006.}
+
+\bibitem[Salmon 1994]{Artigos-03-17}
+\abntrefinfo{Salmon}{SALMON}{1994a}
+{SALMON, J.~C. Comparative evaluation of circuit topologies for 1-phase and
+  3-phase boost rectifiers operated with a low current distortion. In:
+  \emph{Proc. of the Canadian Conf. Elect. and Comput. Eng.} Halifax, NS,
+  Canada: [s.n.], 1994. v.~1, p. 30--33.}
+
+\bibitem[Salmon 1994]{Artigos-03-06}
+\abntrefinfo{Salmon}{SALMON}{1994b}
+{SALMON, J.~C. Reliable 3-phase pwm boost rectifiers employing a
+  series-connected dual boost converter sub-topology. In:  \emph{IEEE Conf.
+  Rec. of the Ind. Applicat. Soc. Ann. Meeting}. Denver, CO: [s.n.], 1994. p.
+  781--788.}
+
+\bibitem[Salmon 1995]{Artigos-03-16}
+\abntrefinfo{Salmon}{SALMON}{1995}
+{SALMON, J.~C. Circuit topologies for pwm boost rectifiers operated from
+  1-phase and 3-phase ac supplies and using either single or split dc rail
+  voltage outputs. In:  \emph{10th Annu. IEEE Applied Power Electron. Conf. and
+  Expo. (APEC)}. Dallas, TX: [s.n.], 1995. v.~1, p. 473--479.}
+
+\bibitem[Santisteban e Stephan 2001]{Artigos-01-30}
+\abntrefinfo{Santisteban e Stephan}{SANTISTEBAN; STEPHAN}{2001}
+{SANTISTEBAN, J.~A.; STEPHAN, R.~M. Vector control methods for induction
+  machines: an overview.
+\emph{IEEE Trans. Edu.}, v.~44, n.~2, p. 170--175, 2001.}
+
+\bibitem[Schiemenz e Stiebler 2001]{Artigos-11-02}
+\abntrefinfo{Schiemenz e Stiebler}{SCHIEMENZ; STIEBLER}{2001}
+{SCHIEMENZ, I.; STIEBLER, M. Control of a permanent magnet synchronous
+  generator used in a variable speed wind energy system. In:  \emph{IEEE Int.
+  Electric Machines and Drives Conf. (IEMDC)}. Cambridge, MA: [s.n.], 2001. p.
+  872--877.}
+
+\bibitem[Shen et al. 2009]{Artigos-08-17}
+\abntrefinfo{Shen et al.}{SHEN et al.}{2009}
+{SHEN, B. et al. Sensorless maximum power point tracking of wind by dfig using
+  rotor position phase lock loop (pll).
+\emph{IEEE Tran. Power Electron.}, v.~24, n.~4, p. 942--951, 2009.}
+
+\bibitem[Shirazi, Viki e Babayi 2009]{Artigos-11-07}
+\abntrefinfo{Shirazi, Viki e Babayi}{SHIRAZI; VIKI; BABAYI}{2009}
+{SHIRAZI, M.; VIKI, A.~H.; BABAYI, O. A comparative study of maximum power
+  extraction strategies in pmsg wind turbine system. In:  \emph{IEEE Elect.
+  Power Energy Conf. (EPEC)}. Montreal, QC, Canada: [s.n.], 2009. p.~1--6.}
+
+\bibitem[Shrestha, Polinder e Ferreira 2009]{Artigos-08}
+\abntrefinfo{Shrestha, Polinder e Ferreira}{SHRESTHA; POLINDER; FERREIRA}{2009}
+{SHRESTHA, G.; POLINDER, H.; FERREIRA, J.~A. Scaling laws for direct drive
+  generators in wind turbines. In:  \emph{IEEE Int. Electric Machines and
+  Drives Conf. (IEMDC)}. Miami, FL: [s.n.], 2009. p. 797--803.}
+
+\bibitem[Slootweg, Polinder e Kling 2003]{Artigos-12-04}
+\abntrefinfo{Slootweg, Polinder e Kling}{SLOOTWEG; POLINDER; KLING}{2003}
+{SLOOTWEG, J.~G.; POLINDER, H.; KLING, W.~L. Representing wind turbine
+  electrical generating systems in fundamental frequency simulations.
+\emph{IEEE Trans. Energy Convers.}, 2003.}
+
+\bibitem[Sype et al. 2004]{Artigos-08-02}
+\abntrefinfo{Sype et al.}{SYPE et al.}{2004}
+{SYPE, D.~M. Van~de et al. Small-signal laplace-domain analysis of
+  uniformly-sampled pulse-width modulators. In:  \emph{35th Annu. IEEE Power
+  Electron. Specialists Conf. (PESC)}. Aachen, Germany: [s.n.], 2004. v.~6, p.
+  4292--4298.}
+
+\bibitem[Tan e Islam 2004]{Artigos-11-24}
+\abntrefinfo{Tan e Islam}{TAN; ISLAM}{2004}
+{TAN, K.; ISLAM, S. Optimum control strategies in energy conversion of pmsg
+  wind turbine system without mechanical sensors.
+\emph{IEEE Trans. Energy Convers.}, v.~19, n.~2, p. 392--399, 2004.}
+
+\bibitem[Thounthong et al. 2009]{Artigos-03-30}
+\abntrefinfo{Thounthong et al.}{THOUNTHONG et al.}{2009}
+{THOUNTHONG, P. et al. Fuel cell high-power applications.
+\emph{IEEE Ind. Electron. Mag.}, v.~3, n.~1, p. 32--46, 2009.}
+
+\bibitem[Tibola 2009]{Teses-04-01}
+\abntrefinfo{Tibola}{TIBOLA}{2009}
+{TIBOLA, G.
+Mestrado em Engenharia El\'etrica, \emph{Sistema E\'olico de Pequeno Porte para
+  Gera{\c c}\~ao de Energia El\'etrica com Rastreamento de M\'axima
+  Pot\^encia}. Florian\'opolis, SC: Instituto de Eletr\^onica de Pot\^encia,
+  Universidade Federal de Santa Catarina, 2009.
+285~p.}
+
+\bibitem[Tu e Chen 1994]{Artigos-05-10}
+\abntrefinfo{Tu e Chen}{TU; CHEN}{1994}
+{TU, R.-J.; CHEN, C.-L. A new three-phase space-vector-modulated power factor
+  corrector. In:  \emph{9th Annu. IEEE Applied Power Electron. Conf. and Expo.
+  (APEC)}. Orlando, FL: [s.n.], 1994. p. 725--730.}
+
+\bibitem[Tu e Chen 1998]{Artigos-05-05}
+\abntrefinfo{Tu e Chen}{TU; CHEN}{1998}
+{TU, R.-J.; CHEN, C.-L. A new space-vector-modulated control for a
+  unidirectional three-phase switch-mode rectifier.
+\emph{IEEE Trans. Ind. Electron.}, v.~45, n.~2, p. 256--262, 1998.}
+
+\bibitem[Underwood 2006]{Teses-01-14}
+\abntrefinfo{Underwood}{UNDERWOOD}{2006}
+{UNDERWOOD, S.~J.
+\emph{On-line Parameter Estimation and Adaptive Control of Permanent Magnet
+  Synchronous Machines}.
+204~p. Tese (Doctor of Philosophy) --- The Graduate Faculty of the University
+  of Akron, Akron, 2006.}
+
+\bibitem[Urasaki, Senjyu e Uezato 2000]{Artigos-01-49}
+\abntrefinfo{Urasaki, Senjyu e Uezato}{URASAKI; SENJYU; UEZATO}{2000}
+{URASAKI, N.; SENJYU, T.; UEZATO, K. An accurate modeling for permanent magnet
+  synchronous motor drives. In:  \emph{15th Annu. IEEE Applied Power Electron.
+  Conf. and Expo. (APEC)}. New Orleans, LA: [s.n.], 2000.}
+
+\bibitem[Vestas 2010]{Vestas-850}
+\abntrefinfo{Vestas}{VESTAS}{2010a}
+{VESTAS. V52-850 kw. the turbine that goes anywhere.
+2010.}
+
+\bibitem[Vestas 2010]{Vestas-1650}
+\abntrefinfo{Vestas}{VESTAS}{2010b}
+{VESTAS. V82-1.65 mw. creating more from less.
+2010.}
+
+\bibitem[Viitanen e Tuusa 2003]{Artigos-05-07}
+\abntrefinfo{Viitanen e Tuusa}{VIITANEN; TUUSA}{2003}
+{VIITANEN, T.; TUUSA, H. Space vector modulation and control of a
+  unidirectional three-phase/level/switch vienna i rectifier with lcl-type ac
+  filter. In:  \emph{34th Annu. IEEE Power Electron. Specialists Conf. (PESC)}.
+  Acapulco, Mexico: [s.n.], 2003. v.~3, p. 1063--1068.}
+
+\bibitem[Viitanen e Tuusa 2004]{Artigos-05-06}
+\abntrefinfo{Viitanen e Tuusa}{VIITANEN; TUUSA}{2004}
+{VIITANEN, T.; TUUSA, H. Experimental results of vector controlled and vector
+  modulated vienna i rectifier. In:  \emph{35th Annu. IEEE Power Electron.
+  Specialists Conf. (PESC)}. Aachen, Germany: [s.n.], 2004. v.~6, p.
+  4637--4643.}
+
+\bibitem[Voltoni 1995]{Teses-Voltoni}
+\abntrefinfo{Voltoni}{VOLTONI}{1995}
+{VOLTONI, H.
+Mestrado em Engenharia El\'etrica, \emph{Controle Vetorial em M\'aquinas
+  S\'incronas a \'Im\~as Permanentes com Enfraquecimento de Campo}.
+  Florian\'opolis, SC: Grupo de Concep{\c c}\~ao de Dispositivos
+  Eletromagn\'eticos, Universidade Federal de Santa Catarina, 1995.
+80~p.}
+
+\bibitem[Weizheng et al. 2009]{Artigos-01-13}
+\abntrefinfo{Weizheng et al.}{WEIZHENG et al.}{2009}
+{WEIZHENG, Y. et al. Analyze of current control strategy based on vector
+  control for permanent-magnet synchronous generator in wind power system. In:
+  \emph{IEEE 6th Int. Power Electron. and Motion Control Conf. (IPEMC)}. Wuhan,
+  China: [s.n.], 2009. p. 2209--2212.}
+
+\bibitem[Wise e Bolinger 2007]{Artigos-CustokW}
+\abntrefinfo{Wise e Bolinger}{WISE; BOLINGER}{2007}
+{WISE, R.; BOLINGER, M. Annual report on u.s. wind power installation, cost,
+  and performance trends: 2006.
+\emph{U.S. Department of Energy Efficiency and Renewable Energy}, p.~24, 2007.}
+
+\bibitem[Wu 2006]{Livros-07}
+\abntrefinfo{Wu}{WU}{2006}
+{WU, B. \emph{High-Power Converters and AC Drives}. Hoboken, NJ: John Wiley \&
+  Sons, Inc., 2006. 450~p.}
+
+\bibitem[Yaoqin, Zhongqing e Binggang 2002]{Artigos-11-04}
+\abntrefinfo{Yaoqin, Zhongqing e Binggang}{YAOQIN; ZHONGQING; BINGGANG}{2002}
+{YAOQIN, J.; ZHONGQING, Y.; BINGGANG, C. A new maximum power point tracking
+  control scheme for wind generation. In:  \emph{Int. Conf. Power System
+  Technology (PowerCon)}. Kunming, China: [s.n.], 2002. v.~1, p. 144--148.}
+
+\bibitem[Yuan et al. 2009]{Artigos-01-07}
+\abntrefinfo{Yuan et al.}{YUAN et al.}{2009}
+{YUAN, X. et al. Dc-link voltage control of a full power converter for wind
+  generator operating in weak-grid systems.
+\emph{IEEE Trans. Power Electron.}, v.~24, n.~9, p. 2178--2192, 2009.}
+
+\bibitem[Zhang e Ula 2008]{Artigos-04-11}
+\abntrefinfo{Zhang e Ula}{ZHANG; ULA}{2008}
+{ZHANG, Y.; ULA, S. Comparison and evaluation of three main types of wind
+  turbines. In:  \emph{IEEE Transmission and Distribution Conf. and Exposition
+  (PES)}. Chicago, IL: [s.n.], 2008. p.~1--6.}
+
+\bibitem[Zhou e Wang 2002]{Artigos-05-03}
+\abntrefinfo{Zhou e Wang}{ZHOU; WANG}{2002}
+{ZHOU, K.; WANG, D. Relationship between space-vector modulation and
+  three-phase carrier-based pwm: a comprehensive analysis [three-phase
+  inverters].
+\emph{IEEE Trans. Ind. Electron.}, v.~49, n.~1, p. 186--196, 2002.}
+
+\end{thebibliography}

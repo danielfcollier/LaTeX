@@ -1,0 +1,727 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Análises Adicionais do VSR Delta]{Análises Adicionais do VSR$_{\Delta}$} \label{apendice:vsr-delta}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste apêndice serão apresentadas as seguintes análises adicionais da topologia do VSR$_\Delta$:
+
+\begin{itemize}
+ \item $ $ Tensão de modo comum;
+ \item $ $ Esforços de corrente;
+ \item $ $ Perdas em condução e em comutação;
+ \item $ $ Espectro harmônico das tensões de linha.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tensão de Modo Comum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Da mesma forma que para o VSR, pode-se considerar um ponto médio virtual para análise da tensão de modo comum\footnote{É o mesmo que tensão de sequência zero. Originalmente esta denominação é utilizada em componentes simétricas, isto é, fasores.} do VSR$_{\Delta}$ conforme ilustrado na Fig.~\ref{ap01:delta-CM}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/delta-CM.eps}
+	\caption{$\textrm{VSR}_{\Delta}$ com ponto médio.}
+	\label{ap01:delta-CM}
+\end{figure}
+
+A partir das análises realizadas no Capítulo~\ref{chapter-modulacao} para o setor $A_+$, pode-se determinar o valor da tensão de modo comum durante a aplicação de vetores não-nulos, isto é, quando a ponte de diodos está em condução. Durante a aplicação de vetores nulos a tensão de modo comum não está definida, conforme ilustrado na Fig.~\ref{retificador:estados}. Essa será definida, na prática, pelos elementos parasitas do circuito \cite{Teses-03-14,Artigos-05-01}. As tensões de fase e de modo comum geradas pelo retificador no setor $A_+$ estão apresentadas na Tabela~\ref{tab:vCM}\footnote{O símbolo * nas tensões significa que a tensão não está definida pelo estado de comutação, apenas por elementos parasitas. Esta será nula caso estes sejam desconsiderados.}.
+
+\begin{table}[!htb]
+\caption{Tensões de fase e tensão de modo comum no setor A$_+$}
+\label{tab:vCM}
+\centering
+
+\begin{center}
+\begin{tabular}{c c c | c c c c | c}
+\hline
+\multicolumn{3}{c|}{Comandos} & \multicolumn{4}{|c|}{Tensões} & \multirow{2}{*}{Vetor} \\
+\cline{1-7}
+$S_{ab}$ & $S_{bc}$ & $S_{ca}$ & $v_{a,r}$ & $v_{b,r}$& $v_{c,r}$ & $v_{0,r}$& \\
+\hline
+\hline
+
+$0$& $0$& $0$& $+{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $-{V_{dc}}/{6}$& $\vec{V}_1$\\
+\hline
+
+$0$& $0$& $1$& $+{V_{dc}}/{2}$& $+{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $+{V_{dc}}/{6}$& $\vec{V}_6$\\
+\hline
+
+$0$& $1$& $0$& $+{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $-{V_{dc}}/{6}$& $\vec{V}_1$\\
+\hline
+
+$0$& $1$& $1$& *& *& *& *& $\vec{V}_0$\\
+\hline
+
+$1$& $0$& $0$& $+{V_{dc}}/{2}$& $+{V_{dc}}/{2}$& $-{V_{dc}}/{2}$& $+{V_{dc}}/{6}$& $\vec{V}_2$\\
+\hline
+
+$1$& $0$& $1$& *& *& *& *&$\vec{V}_0$\\
+\hline
+
+$1$& $1$& $0$& *& *& *& *&$\vec{V}_0$\\
+\hline
+
+$1$& $1$& $1$& *& *& *& *&$\vec{V}_0$\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Observa-se que, se as características de bloqueio reverso dos diodos de retificação são as mesmas, a tensão de modo comum será nula. No entanto, como na prática há diferenças no processo de fabricação dos semicondutores, a tensão gerada será pequena \cite{Teses-03-14}. Resultados de práticos obtidos em \cite{Teses-03-14} mostraram que a tensão de modo comum gerada durante a aplicação do vetor nulo foi desprezível. 
+
+Esse valor nulo da tensão de modo comum durante a aplicação do vetor nulo é outra vantagem da utilização do VSR$_{\Delta}$ frente ao VSR. Este gera uma tensão com amplitude de $V_{dc}/2$ durante a aplicação do vetor nulo e de amplitude igual a $V_{dc}/6$ nos demais vetores. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Esforços de Corrente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Além da utilidade para o dimensionamento do estágio de potência do conversor, os esforços de corrente são necessários para realizar uma comparação entre as estratégias de modulação vetorial implementadas e para determinar as perdas em condução do VSR$_\Delta$. Serão determinados os esforços de corrente nos interruptores bidirecionais, nos diodos de retificação e no capacitor do barramento CC.
+
+Para determinar os esforços de corrente foram adotadas as seguintes hipóteses simplificadoras:
+
+\begin{itemize}
+\item $ $ Correntes de entrada senoidais, equilibradas e com amplitude constante;
+\item $ $ Comandos ideais e identificação dos setores de corrente ideal;
+\item $ $ Modulação analógica e com índice de modulação constante;
+\item $ $ Todos os MOSFETs têm a mesma resistência em condução;
+\item $ $ A tensão de polarização dos diodos em antiparalelo dos MOSFETs é nula;
+\item $ $ A queda de tensão nos diodos em antiparalelo é bem menor que a queda de tensão nos MOSFETs.
+\end{itemize}
+
+Observa-se que, as hipóteses simplificadoras sobre as características de condução dos MOSFETs fazem com que, para cada sentido de condução, a correntes sobre o interruptor bidirecional seja conduzida pelo canal do MOSFET e por um diodo em antiparalelo, conforme ilustrado na Fig.~\ref{ap01:conducao01}. Na prática, essas considerações não serão verdadeiras e uma divisão das correntes como mostrado na Fig.~\ref{ap01:conducao02} irá ocorrer. A consideração dessas não idealidades iria exigir um equacionamento complexo e que não irá afetar significativamente as perdas em condução. Esse resultado será demonstrado a seguir a partir de simulações numéricas. As correntes no MOSFET estão definidas na Fig.~\ref{ap01:conducao02}.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{ap01:conducao01}
+	\includegraphics[scale=\escalafig]{Figuras/ap01/conducao01.eps}}
+	
+	\subfigure[]{
+	\label{ap01:conducao02}
+	\includegraphics[scale=\escalafig]{Figuras/ap01/conducao02.eps}}
+	}
+	\caption{Correntes no interruptor bidirecional.}
+\end{figure}
+
+As correntes de entrada são definidas em (\ref{eq:iabc2}).
+
+\begin{equation}
+\label{eq:iabc2}
+\begin{array}{c l}
+i_{a}=& I_{pk} \cos\left(y + \delta_i\right)\\
+i_{b}=& I_{pk} \cos\left(y + \delta_i - \frac{2\pi}{3}\right)\\
+i_{c}=& I_{pk} \cos\left(y + \delta_i + \frac{2\pi}{3}\right)\\
+\end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$y$: é o ângulo de referência nos terminais do retificador na frequência síncrona, conforme apresentado em (\ref{eq:y}).
+
+\begin{equation}
+\label{eq:y}
+y=\omega_e t + \theta_y (t_0)
+\end{equation}
+
+E, as funções de razão cíclica são definidas em (\ref{eq:dabc}). As funções de razão cíclica nos interruptores são obtidas aplicando a transformada $\alpha\beta0$ em (\ref{eq:dabc}) e utilizando a Tabela~\ref{tab:dxy-delta}.
+
+\begin{equation}
+\label{eq:dabc}
+\begin{array}{c l}
+d_{a}=& \dfrac{M}{\sqrt{3}} \cos\left(y\right) + \dfrac{1}{2}\\
+\\
+d_{b}=& \dfrac{M}{\sqrt{3}}\cos\left(y - \frac{2\pi}{3}\right) + \dfrac{1}{2}\\
+\\
+d_{c}=& \dfrac{M}{\sqrt{3}} \cos\left(y + \frac{2\pi}{3}\right) + \dfrac{1}{2}\\
+\end{array}
+\end{equation}
+
+Assim, pode-se calcular os esforços de corrente a partir dos conceitos de VMQI e de valor eficaz quase-instantâneo (VEQI), em que o VEQI é dado por (\ref{eq:veqi}) \cite{Livros-Erickson}. Observa-se que nesses conceitos as correntes instantâneas são consideradas constantes em um período de comutação\footnote{Essas relações são válidas desde que $f_s/f_e\geq11$ \cite{Livros-LIPO}.}\footnote{Ou meio período de comutação.} como ilustrado na Fig.~\ref{ap01:veqi}.
+
+\begin{equation}
+\label{eq:veqi}
+\left\langle x \right\rangle_{T_s,rms} = \sqrt{\dfrac{1}{T_s} \int_{t-T_s}^{t} [x(\tau)]^2 d\tau}
+\end{equation}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/veqi.eps}
+	\caption{Representação da corrente instantânea em um interruptor no período de comutação.}
+	\label{ap01:veqi}
+\end{figure}
+
+Os valores médios e eficazes na frequência fundamental são então calculados pela integração dos VMQI e VEQI no período síncrono ($T_e\!=\!1/f_e$), em que os limites para integração dos setores de corrente são obtidos observando o mapa vetorial do VSR$_{\Delta}$ na Fig.~\ref{modulacao:mapa1}. Na Tabela~\ref{tab:limites-subsetores} estão apresentados estes limites considerando a divisão em subsetores feita no mapa vetorial.
+
+\begin{table}[!htbp]
+\caption{Limites dos subsetores}
+\label{tab:limites-subsetores}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c}
+\hline
+Subsetor & Limite Inferior & Limite Superior \\
+\hline
+\hline
+
+$1^A_+$ & $y_{i,1^A_+}=0$ & $y_{s,1^A_+}={\pi}/{6}-\delta_i$ \\
+\hline
+
+$1^C_-$ & $y_{i,1^C_-}={\pi}/{6}-\delta_i$ & $y_{s,1^C_-}={\pi}/{3}$ \\
+\hline
+
+$2^C_-$ & $y_{i,2^C_-}={\pi}/{3}$ & $y_{s,2^C_-}={\pi}/{2}-\delta_i$ \\
+\hline
+
+$2^B_+$ & $y_{i,2^B_+}={\pi}/{2}-\delta_i$ & $y_{s,2^B_+}={2\pi}/{3}$ \\
+\hline
+
+$3^B_+$ & $y_{i,3^B_+}={2\pi}/{3}$ & $y_{s,3^B_+}={5\pi}/{6}-\delta_i$ \\
+\hline
+
+$3^A_-$ & $y_{i,3^A_-}={5\pi}/{6}-\delta_i$ & $y_{s,3^A_-}=\pi$ \\
+\hline
+
+$4^A_-$ & $y_{i,4^A_-}=\pi$ & $y_{s,4^A_-}={7\pi}/{6}-\delta_i$ \\
+\hline
+
+$4^C_+$ & $y_{i,4^C_+}={7\pi}/{6}-\delta_i$ & $y_{s,4^C_+}={4\pi}/{3}$ \\
+\hline
+
+$5^C_+$ & $y_{i,5^C_+}={4\pi}/{3}$ & $y_{s,5^C_+}={3\pi}/{2}-\delta_i$ \\
+\hline
+
+$5^B_-$ & $y_{i,5^B_-}={3\pi}/{2}-\delta_i$ & $y_{s,5^B_-}={5\pi}/{3}$ \\
+\hline
+
+$6^B_-$ & $y_{i,6^B_-}={5\pi}/{3}$ & $y_{s,6^B_-}={11\pi}/{6}-\delta_i$ \\
+\hline
+
+$6^A_+$ & $y_{i,6^A_+}=-{\pi}/{6}-\delta_i$ & $y_{s,6^A_+}=0$ \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+A seguir serão calculados os esforços de corrente para as estratégias de modulação vetorial investigadas. Observa-se que, como as estratégias de modulação vetorial não mudam as correntes que serão conduzidas pelos diodos de retificação e pelo capacitor de barramento, estas só foram apresentadas durante a seção da estratégia SVM~I.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia SVM I}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Interruptores Bidirecionais}
+
+Inicialmente será calculado o valor médio da corrente nos interruptores bidirecionais, que embora seja nulo em um período da frequência síncrona, não será nos semicondutores que conduzem de acordo com o sentido da corrente. Os esforços serão determinados utilizando as expressões para o interruptor $S_{ab}$.
+
+Como há simetria entre os setores, só é necessário o cálculo em meio período da frequência síncrona. As correntes no interruptor $S_{ab}$ podem ser determinadas para o setor $A_+$ observando os estados topológicos da Fig.~\ref{retificador:estados}. Nos demais setores, podem ser determinadas aplicando os comandos apresentados na Fig.~\ref{modulacao:vetoresE01}. Então, o valor médio da corrente pode ser expresso pela integração em (\ref{eq:isab-I-avg})\footnote{É adotada a simbologia $d_{x,setor}$ para indicar as funções de razão cíclica na Tabela~\ref{tab:dxy-delta}.}, cujo resultado final é fornecido por (\ref{eq:isab-I-avg-final}).
+
+\begin{equation}
+\label{eq:isab-I-avg}
+I_{Ss,{avg}}\!\!=\!\!I_{Ds,{avg}} \!\!=\!\! \dfrac{1}{2\pi} \left[ \int^{y_{s,1^A_+}}_{y_{i,6^A_+}} d_{ab,A_+} (-i_b) dy \!\!+\!\! \int^{y_{s,6^B_-}}_{y_{i,5^B_-}} d_{ab,B_-} i_a dy \right]
+\end{equation}
+
+\begin{equation}
+\label{eq:isab-I-avg-final}
+I_{S,{avg}}=I_{Ss,{avg}}=I_{Ds,{avg}} = I_{pk}\left[ \dfrac{1}{2\pi} - \dfrac{M\cos(\delta_i)}{4\sqrt{3}} \right]
+\end{equation}
+
+E, o seu valor eficaz é dado por (\ref{eq:isab-I-rms}).
+
+\begin{equation}
+\label{eq:isab-I-rms}
+I_{S,{rms}}=I_{Ss,{rms}}=I_{Ds,{rms}} = I_{pk}\sqrt{ \dfrac{1}{6} - \dfrac{\sqrt{3}}{8\pi} - \dfrac{M \cos(\delta_i)}{2\pi\sqrt{3}}}
+\end{equation}
+
+\subsubsection{Diodos de Retificação}
+
+Aplicando a metodologia no diodo de retificação $D_{ap}$ e observando que nesse caso a corrente será nula no semiciclo negativo de $i_a$, obtém-se as integrais apresentadas em (\ref{eq:idap-avg}). O resultado final é dado por (\ref{eq:idap-avg-final}).
+
+\begin{flalign}
+\label{eq:idap-avg}
+& I_{D,avg} = \dfrac{1}{2\pi} \left[ \int^{y_{s,6^A_+}}_{y_{i,6^A_+}} \left[(d_{ca,A_+}-d_{ab,A_+}) (-i_{b}) + (1-d_{ca,A_+}) i_a \right] dy + \right. \nonumber \\
+&  +\int^{y_{s,1^A_+}}_{y_{i,1^A_+}} \left[(d_{ab,A_+}-d_{ca,A_+}) (-i_{c}) + (1-d_{ab,A_+}) i_a \right]  dy  + \nonumber \\
+&  +\left. \int^{y_{s,2^C_-}}_{y_{i,1^C_-}} (1-d_{ca,C_-}) i_a  dy + \int^{y_{s,6^B_-}}_{y_{i,5^B_-}} (1-d_{ab,B_-}) i_a dy \right]
+\end{flalign}
+
+\begin{equation}
+\label{eq:idap-avg-final}
+I_{D,avg} = I_{pk} \dfrac{M \cos(\delta_i)}{2\sqrt{3}}
+\end{equation}
+
+E, o valor eficaz é apresentado em (\ref{eq:idap-rms}).
+
+\begin{equation}
+\label{eq:idap-rms}
+I_{D,rms} = I_{pk} \sqrt{ \dfrac{ M \left[ 3 + 2 \cos(2\delta_i) +2 \sqrt{3} \cos(\delta_i) \right] } {12\pi} }
+\end{equation}
+
+\subsubsection{Capacitor do Barramento CC}
+
+A corrente no capacitor é uma combinação das correntes dos diodos subtraída da corrente de carga, isto é, subtraída da componente média das mesmas. O resultado final do valor eficaz da corrente no capacitor é apresentado em (\ref{eq:ic-rms}) e a corrente média por definição é nula.
+
+\begin{equation}
+\label{eq:ic-rms}
+I_{C,rms} = I_{pk} \sqrt{ \dfrac{M \left[ 3 + 2 \cos(2 \delta_i) \right]}{2\pi} - \dfrac{3}{4} \left[ M\cos(\delta_i) \right]^2}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia SVM II}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Como nessa estratégia é feita apenas uma modificação no vetor nulo da estratégia anterior, só foram determinados os esforços nos interruptores bidirecionais. 
+\subsubsection{Interruptores Bidirecionais}
+
+A integral que determina o valor médio da corrente nos semicondutores do interruptor bidirecional é dada por (\ref{eq:isab-II-avg}). Observa-se que há mais integrais, pois o intervalo de condução é aumentado.
+
+\begin{flalign}
+\label{eq:isab-II-avg}
+& I_{Ss,avg} = \dfrac{1}{2\pi} \left[ \int^{y_{s,6^A_+}}_{y_{i,6^A_+}} d_{ab,A_+} i_{ab} dy + \int^{y_{s,1^A_+}}_{y_{i,1^A_+}} d_{ca,A_+} i_{ab} dy + \right. \nonumber \\
+&  +\int^{y_{s,1^A_+}}_{y_{i,1^A_+}} (d_{ab,A_+}-d_{ca,A_+}) (-i_{b}) dy + \int^{y_{s,1^C_-}}_{y_{i,1^C_-}} d_{ca,C_-} i_{ab} dy + \nonumber \\
+&  +\int^{y_{s,2^C_-}}_{y_{i,2^C_-}} d_{bc,C_-} (-i_{ab}) dy +  \int^{y_{s,2^B_+}}_{y_{i,2^B_+}} d_{bc,B_+} (-i_{ab}) dy + \nonumber \\
+&  +\int^{y_{s,2^B_+}}_{y_{i,2^B_+}} (d_{ab,B_+}-d_{bc,B_+}) (-i_{a}) dy +  \int^{y_{s,3^B_+}}_{y_{i,3^B_+}} d_{ab,B_+} (-i_{ab}) dy
+\end{flalign}
+
+O resultado final dessa integral é apresentado em (\ref{eq:isab-II-avg-final}). 
+
+\begin{flalign}
+\label{eq:isab-II-avg-final}
+&I_{S,avg} =I_{Ss,avg} = I_{Ds,avg} = \nonumber \\
+& =I_{pk}\left[ \left( \dfrac{1}{\pi\sqrt{3}} - \dfrac{7M}{24\sqrt{3}} \right) \cos(\delta_i) + \dfrac{M\delta_i\textrm{sen}(\delta_i)}{4\pi} \right] 
+\end{flalign}
+
+E, o valor eficaz da corrente é dado por (\ref{eq:isab-II-rms}).
+
+\begin{flalign}
+\label{eq:isab-II-rms}
+& I_{S,rms} = I_{Ss,rms} = I_{Ds,rms} = \nonumber \\
+& =I_{pk} \sqrt { \dfrac{1}{12} + \dfrac{M}{12\pi} \left( 3 + \cos(2\delta_i) -4 \sqrt{3} \cos(\delta_i) \right) } 
+\end{flalign}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Validação por Simulação em Malha Aberta}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os esforços de corrente calculados analiticamente foram verificados adotando as hipóteses simplificadoras para simulação do VSR$_{\Delta}$ em malha aberta\footnote{Para tanto, considera-se que na entrada do retificador há uma fonte de corrente trifásica.}. Os parâmetros do conversor na  Tabela~\ref{tab:parametros-malha-aberta} e dos semicondutores na Tabela~\ref{tab:parametros-semicondutores}, em que $r_{Ss}$ é a resistência em condução do MOSFET, $r_{Ds}$ e $V_{Ds}$ são a resistência em condução e tensão de polarização do diodo em anti-paralelo do MOSFET, e, $r_{D}$ e $V_{D}$ são a resistência em condução e tensão de polarização do diodo de retificação.
+
+\begin{table}[!htbp]
+\caption{Parâmetros do conversor para simulação em malha aberta}
+\label{tab:parametros-malha-aberta}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c | c | c  }
+\hline
+$I_{pk}$ & $\delta_{i}$ & $V_{dc}$ & $f_e$ & $f_s$ \\ 
+\hline
+\hline
+
+15 A & 15$^{\circ}$ & 235 V & 60 Hz & 4 kHz\\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!htbp]
+\caption{Parâmetros dos semicondutores}
+\label{tab:parametros-semicondutores}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c| c | c | c  }
+\hline
+$r_{Ss}$ & $V_{Ss}$ & $r_{Ds}$ & $V_{Ds}$ & $r_D$ & $V_D$\\ 
+\hline
+\hline
+
+0,11 $\Omega$ & 0 V & 6,5 $\mu\Omega$ & 0 V& 23 m$\Omega$ & 0,95 V\\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Os resultados para todas as correntes equacionadas são apresentados na Fig.~\ref{ap01:esforcos}. Os resultados de simulação estão marcados com círculos e quadrados e o sobrescrito nas correntes dos interruptores bidirecionais indicam a estratégia de modulação vetorial para qual a corrente foi calculada. Observa-se que, os resultados teóricos estão muito próximos para todos os índices de modulação simulados, confirmando o equacionamento para as duas estratégias de modulação.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/esforcos.eps}
+	\caption{Esforços de corrente nos semicondutores e no capacitor do barramento CC.}
+	\label{ap01:esforcos}
+\end{figure}
+
+No entanto, como os semicondutores empregados não se encontram dentro das hipóteses simplicadoras adotadas, diferenças entre as correntes reais nos semicondutores irão aparecer. Os parâmetros dos semicondutores empregados\footnote{MOSFET do tipo \textit{CoolMOS} SPW47N60C3 fabricado pela Infineon e diodos de retificação do tipo \textit{Stealth Diode} ISL9R3060G2 fabricado pela Fairchild.} são apresentados na Tabela~\ref{tab:parametros-semicondutores-reais}. Os resultados dos esforços de corrente nos semicondutores do interruptor bidirecional são ilustrados na Fig.~\ref{ap01:esforcos-simulacao}. Nas Fig.~\ref{ap01:esforcos-simulacao}(a) e Fig.~\ref{ap01:esforcos-simulacao}(b) são apresentados os esforços considerando uma corrente de pico de 15~A para as estratégias SVM~I e SVM~II, respectivamente. Nas Fig.~\ref{ap01:esforcos-simulacao}(c) e Fig.~\ref{ap01:esforcos-simulacao}(d) são apresentados os esforços considerando uma corrente de pico de 30~A para as estratégias SVM~I e SVM~II, respectivamente. Observa-se que, à medida que a corrente de pico aumenta, os resultados ficam mais próximos dos valores teóricos (apresentados em traços). Entretanto, ao calcular as perdas em condução a partir dessas correntes, observou-se que os resultados foram praticamente os mesmos e ligeiramente menores a partir das correntes obtidas por simulação, conforme ilustrado na Fig.~\ref{ap01:perdas-mosfet}. As perdas no MOSFET foram obtidas a partir de (\ref{eq:perdas-1mosfet}).
+
+\begin{table}[!htb]
+\caption{Parâmetros dos semicondutores empregados}
+\label{tab:parametros-semicondutores-reais}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c | c | c | c  }
+\hline
+$r_{Ss}$ & $V_{Ss}$ & $r_{Ds}$ & $V_{Ds}$ & $r_D$ & $V_D$\\ 
+\hline
+\hline
+
+0,11 $\Omega$ & 0 V & 6,5 $m\Omega$ & 0,57 V& 23 m$\Omega$ & 0,95 V\\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{figure}[!hpb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/esforcos-simulacao.eps}
+	\caption{Esforços de corrente nos interruptores bidirecionais.}
+	\label{ap01:esforcos-simulacao}
+\end{figure}
+
+\begin{figure}[!hpb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/perdas-mosfet.eps}
+	\caption{Perdas em condução em um MOSFET.}
+	\label{ap01:perdas-mosfet}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Análise das Perdas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As perdas em condução podem ser determinadas a partir dos esforços de correntes. A análise das perdas em comutação será feita utilizando a metodologia proposta em \cite{Artigos-03-34}. Estas são modeladas por funções de energia quadráticas da corrente e cujos resultados são muito parecidos com dados de catálogo dos fabricantes \cite{Teses-Batschauer}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Perdas em Condução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A partir dos esforços de corrente é possível determinar as perdas em condução nos semicondutores por (\ref{eq:perdas-conducao}), em que $x$ é o elemento para qual as perdas são calculadas, isto é, o canal do MOSFET, o diodo em anti-paralelo do MOSFET ou o diodo de retificação. As perdas totais no MOSFET são então determinadas a partir de (\ref{eq:perdas-1mosfet}).
+
+\begin{equation}
+\label{eq:perdas-conducao}
+p_{x,cond}=r_xI_{x,rms}^2+V_xI_{x,avg}
+\end{equation}
+
+\begin{equation}
+\label{eq:perdas-1mosfet}
+p_{S,cond}=p_{Ss,cond}+p_{Ds,cond}
+\end{equation}
+
+Uma vez que o VSR$_{\Delta}$ possui um total de seis MOSFETs e seis diodos de retificação, as perdas em condução nos MOSFETs $P_{S,cond}$ e nos diodos de retificação $P_{D,cond}$ serão seis vezes as dos respectivos elementos semicondutores.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Perdas em Comutação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na análise das perdas de comutação devem-se observar as correntes instantâneas nos interruptores bidirecionais, pois embora haja um aumento do número de comutações ao se utilizar a estratégia SVM~II, as comutações ocorrem sob níveis de corrente menores. Este fato está ilustrado na Fig.~\ref{ap01:is} para o subsetor $1^A_+$. 
+
+\begin{figure}[!htb]
+	\centering
+	\mbox{
+	
+	\subfigure[SVM I]{
+	\includegraphics[scale=\escalafig]{Figuras/ap01/is-101-sequencia.eps}}
+	
+	\subfigure[SVM II]{
+	\includegraphics[scale=\escalafig]{Figuras/ap01/is-111-sequencia.eps}}
+	}
+	\caption{Correntes nos interruptores no subsetor $1^A_+$.}
+	\label{ap01:is}
+\end{figure}
+
+Caso se considere que as perdas de comutação são lineares e dependentes só das amplitudes das correntes, as perdas de comutação serão equivalentes quando $\delta_i=0$ como mostrado em \cite{Teses-03-14} e maiores para $\delta_i\neq0$,  pois nesse caso durante os instantes de defasagem $\delta_i$ entre os subsetores as comutações ocorreram sob níveis de correntes ligeiramente maiores. No entanto, deve-se quantificar esse aumento e, para esse trabalho, serão consideradas perdas de comutação não lineares devido às características dos MOSFETs.
+
+A energia dissipada na comutação em função da corrente instantânea é descrita por  (\ref{eq:energia-comutacao}) \cite{Artigos-03-34}, em que $k_{0}$, $k_{1}$ e $k_{2}$ são os coeficientes da função de energia e podem ser obtidos por ensaios ou a partir de dados do fabricante. Os coeficientes dos semicondutores empregados foram determinados de maneira experimental e são fornecidos na Tabela~\ref{tab:coeficientes-energia}. O procedimento para determinação experimental dos coeficientes pode ser realizado conforme apresentado em \cite{Artigos-Alan}.
+
+\begin{equation}
+\label{eq:energia-comutacao}
+W_{sw}(i)=k_{0}+k_{1} |i|+k_{2} i^2
+\end{equation}
+
+\begin{table}[!htb]
+\caption{Coeficientes da função de energia}
+\label{tab:coeficientes-energia}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c}
+
+\hline
+$k_{0}$ [J] & $k_{1}$ [J/A] & $k_{2}$ [J/A$^2$]  \\
+\hline
+\hline
+$8,41600 \cdot 10^{-5}$ & $2,70808 \cdot 10^{-6}$ & $1,50292 \cdot 10^{-6}$ \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+A potência dissipada é então obtida calculando a energia média dissipada em todos os instantes de comutação em um período da frequência fundamental. No entanto, pode-se aproximar esse somatório pela integração da função de energia vezes o número de comutações em um período da frequência fundamental (\ref{eq:integral-energia}), em que a corrente é a envoltória da corrente no interruptor. 
+
+\begin{equation}
+\label{eq:integral-energia}
+P_{sw}\approx\dfrac{f_s}{2\pi} \int^{2\pi}_{0} W_{sw}(i(\theta_e)) d\theta_e
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalasim]{Figuras/ap01/is-envoltorias.eps}
+	\caption{Corrente $i_{S_{ab}}$ e as suas envoltórias nas duas estratégias.}
+	\label{ap01:is-envoltorias}
+\end{figure}
+
+Para determinar as envoltórias senoidais das correntes nos interruptores deve-se observar os comportamentos das correntes instantâneas nos interruptores. Na Fig.~\ref{ap01:is-envoltorias} estão ilustradas as correntes e as envoltórias para o interruptor $S_{ab}$ no subsetor $1^A_+$ para as duas estratégias de modulação vetorial. O resultado da aplicação de (\ref{eq:integral-energia}) em $S_{ab}$ é apresentado em (\ref{eq:comutacao-svmI}) e (\ref{eq:comutacao-svmII}) para a estratégia SVM~I e SVM~II, respectivamente. Então, as perdas totais do VSR$_{\Delta}$ em comutação $P_{S,sw}$ são três vezes as perdas do interruptor $S_{ab}$.
+
+\begin{flalign}
+\label{eq:comutacao-svmI}
+P^{\textrm{(I)}}_{S_{ab},sw}  &= \dfrac{f_s}{\pi } \left[ \int_{y_{i,5^B_-}}^{y_{s,6^B_-}} W_{sw} (i_a) dy + \int_{y_{i,6^A_+}}^{y_{s,1^A_+}} W_{sw} (-i_b )  dy \right] \nonumber \\
+& = f_s \left[ \dfrac{2}{3} k_{0} +\dfrac{1}{\pi} k_{1} I_{pk} + \left( \dfrac{1}{3} - \dfrac{\sqrt{3}}{4\pi}\right)k_{2} I_{pk}^2 \right]
+\end{flalign} 
+
+\begin{flalign}
+\label{eq:comutacao-svmII}
+&P^{\textrm{(II)}}_{S_{ab},sw} = \dfrac{f_s}{\pi } \left[ \int_{y_{i,5^C_+}}^{y_{s,5^C_+}} W_{sw} (i_{ab}) dy + \int_{y_{i,5^B_-}}^{y_{s,5^B_-}} W_{sw} (i_a) dy + \right. \nonumber \\
+& \int_{y_{i,6^B_-}}^{y_{s,6^B_-}} W_{sw} (i_{ab} )  dy + \int_{y_{i,6^A_+}}^{y_{s,6^A_+}} W_{sw} (i_{ab} )  dy +  \nonumber \\
+& \left.\int_{y_{i,1^A_+}}^{y_{s,1^A_+}} W_{sw} (-i_{b} )  dy + \int_{y_{i,1^C_-}}^{y_{s,1^C_-}} W_{sw} (i_{ab} )  dy \right] \nonumber \\
+& = f_s \left\{ k_{0} +\dfrac{1}{\pi} k_{1} I_{pk} + \left[ \dfrac{5}{18} - \dfrac{[1+2\cos(2\delta_i)]}{4\pi\sqrt{3}} \right] k_{2} I_{pk}^2 \right\}
+\end{flalign} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Espectro Harmônico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A ferramenta matemática mais usual para a determinação das componentes harmônicas de um sinal periódico é a série de Fourier (\ref{eq:serie-fourier}). Esta ferramenta é muito útil quando este sinal periódico é função de uma variável, isto é, a frequência fundamental. No entanto, conversores estáticos PWM são dependentes não só da frequência fundamental como também da frequência de comutação \cite{Livros-LIPO}. Esse autor analisa em detalhe a ferramenta matemática conhecida como \textit{intregral dupla de fourier} com a aplicação em conversores estáticos PWM. E, esta será brevemente abordada com o enfoque apenas para compreender as modificações necessárias para a aplicação ao VSR$_{\Delta}$.
+
+\begin{equation}
+\label{eq:serie-fourier}
+f(y) = \genfrac{}{}{0pt}{1}{\underbrace{\dfrac{a_0}{2}}}{\genfrac{}{}{0pt}{1}{\textrm{Componente}}{\textrm{Contínua}}} +  \genfrac{}{}{0pt}{1}{\underbrace{\sum^{\infty}_{n=1} \left[a_n \cos(ny) + b_n \textrm{sen}(ny) \right]}}{\genfrac{}{}{0pt}{1}{\textrm{Fundamental}}{\textrm{\& Harmônicas}}}	
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$y$: é a variável da frequência fundamental, sendo esta já definida conforme a (\ref{eq:y});
+
+$n$: indica a ordem da componente harmônica da fundamental, com $n\in \mathbb{N}$;
+
+$a_n$ e $b_n$: são os coeficientes da série dados por (\ref{eq:an}) e (\ref{eq:bn}), respectivamente.
+
+\begin{equation}
+\label{eq:an}
+a_n=\dfrac{1}{\pi} \int_{-\pi}^{\pi} f(y) \cos(ny) dy
+\end{equation}
+
+\begin{equation}
+\label{eq:bn}
+b_n=\dfrac{1}{\pi} \int_{-\pi}^{\pi} f(y) \textrm{sen}(ny) dy
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integral Dupla de Fourier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O objetivo de utilizar a integral dupla de fourier é estender a aplicação da séria de Fourier para descrever um sinal periódico no domínio do tempo que é função de duas variáveis. Essas variáveis, no caso de conversores estáticos, são a frequência síncrona ($\omega_e\!=\!2\pi f_e$) e a frequência de comutação ($\omega_s\!=\!2\pi f_s$) como apresentado em (\ref{eq:serie-dupla-fourier}). Os coeficientes da série são obtidos a partir da integral dupla de Fourier (\ref{eq:integral-dupla}).
+
+\begin{flalign}
+\label{eq:serie-dupla-fourier}
+& f(x,y)=  \genfrac{}{}{0pt}{1}{\underbrace{\dfrac{A_{00}}{2}}}{\genfrac{}{}{0pt}{1}{\textrm{Componente}}{\textrm{Contínua}}} +  \genfrac{}{}{0pt}{1}{\underbrace{\sum^{\infty}_{n=1} \left[ A_{0n} \cos(ny) + B_{0n} \textrm{sen}(ny) \right]}}{\genfrac{}{}{0pt}{1}{\textrm{Fundamental}}{\textrm{\& Harmônicas}}} + \nonumber \\
+&  \genfrac{}{}{0pt}{1}{\underbrace{\sum^{\infty}_{m=1} \left[ A_{m0} \cos(mx) + B_{m0} \textrm{sen}(mx) \right]}}{\textrm{Harmônicas da Portadora}} +  \\
+&  \genfrac{}{}{0pt}{1}{\underbrace{\sum^{\infty}_{m=1} \sum^{\infty}_{\genfrac{}{}{0pt}{1}{n=-\infty}{(n\neq0)}} \left[ A_{mn} \cos(mx+ny) + B_{mn} \textrm{sen}(mx+ny) \right]}}{\textrm{Harmônicas em Bandas Laterais}} \nonumber
+\end{flalign}
+
+Onde:
+\nopagebreak
+
+$x$: é a variável da frequência da portadora, sendo esta dada por (\ref{eq:x});
+
+$m$: indica a ordem da componente harmônica da portadora, com $m\in \mathbb{Z}^{+}$;
+
+\begin{equation}
+\label{eq:x}
+x=\omega_s t +\theta_x(t_0)
+\end{equation}
+
+\begin{equation}
+\label{eq:integral-dupla}
+\dot{C}_{mn}=A_{mn}+jB_{mn}=\dfrac{1}{2\pi^2}\int_{-\pi}^{\pi}\int_{-\pi}^{\pi}f(x,y)e^{j(mx+ny)} dx dy
+\end{equation}
+
+Os limites de integração dessa integral e o valor de $f(x,y)$ são obtidos pela comparação entre as funções de razão cíclica $f(y)$ e portadora $f(x)$.  A descrição matemática da portadora triangular ilustrada na Fig.~\ref{ap01:portadora-fourier} é apresentada em (\ref{eq:portadora-fourier}).
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/portadora-fourier.eps}
+	\caption{Descrição matemática da portadora triangular.}
+	\label{ap01:portadora-fourier}
+\end{figure}
+
+\begin{equation}
+\label{eq:portadora-fourier}
+f(x)=\left\{
+	\begin{matrix} 
+	\dfrac{x}{\pi} \qquad&, 0\leq &x& < \pi \\
+	 2-\dfrac{x}{\pi} \qquad&, \pi\leq &x& < 2\pi
+	\end{matrix}
+	\right.
+\end{equation}
+
+Então, para determinar os limites de integração a partir de uma função de razão cíclica $f(y)$ e o valor da função $f(x,y)$ realizam-se os seguintes testes:
+
+\begin{itemize}
+\item $ $ $f(y)\geq f(x)$: e determina-se o valor $f(x,y)$ resultante dessa comparação (0 ou 1);
+\item $ $ Idem ao item anterior com $f(y)<f(x)$.
+\end{itemize}
+
+E, para determinar a tensão de interesse basta substituir o valor de $f(x,y)$ pelo valor da tensão de gerada com a aplicação do pulso de comando durante a comparação.
+
+Para inserir os efeitos da modulação digital no cálculo das componentes harmônicas deve-se realizar uma substituição de variáveis \cite{Livros-LIPO}, cujos resultados são expressos por (\ref{eq:cmn-su}) para a técnica de \textit{single-update} e por (\ref{eq:cmn-du}) para a \textit{double-update}. Observa-se que as harmônicas passaram a depender do índice de modulação em frequência $M_f$ dado por (\ref{eq:Mf}). No caso da técnica de \textit{double-update} deve-se separar a integração em duas partes, uma dependente da rampa de subida da portadora triangular, que corresponde à parcela em que foi adicionado $j n M_f \pi /2$ na parcela exponencial, e uma dependente da rampa de descida correspondente à adição da parcela $-j n M_f \pi /2$.
+
+\begin{equation}
+\label{eq:cmn-su}
+\dot{C}_{mn,su}=\dfrac{1}{2\pi^2}\int_{-\pi}^{\pi} \left[ \int_{-\pi}^{\pi}f(x,y)e^{j[(m+n M_f)x+ny]} dx \right] dy
+\end{equation}
+
+\begin{flalign}
+\label{eq:cmn-du}
+\dot{C}_{mn,du}=&\dfrac{1}{2\pi^2}\int_{-\pi}^{\pi} \left[ \int_{0}^{\pi}f(x,y)e^{j[(m+n M_f)x+ny+n M_f \pi/2]} dx + \right. \nonumber \\ 
+& \left. \int_{\pi}^{2\pi}f(x,y)e^{j[(m+n M_f)x+ny-n M_f \pi/2]} dx \right] dy
+\end{flalign}
+
+\begin{equation}
+\label{eq:Mf}
+M_f=\dfrac{f_s}{f_e}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Espectro Harmônico do VSR$_{\Delta}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Devido à presença dos setores de corrente, as integrais calculadas a partir de (\ref{eq:integral-dupla}) estão divididas entre os setores de corrente de acordo com (\ref{eq:cmn}) e (\ref{eq:cmnz}). Na Tabela~\ref{tab:cmn} são apresentados os limites de integração e o valores da função $f(x,y)$ para os quais a tensão de linha $v_{ab}$ não é nula. Observa-se que nos setores $C_+$ e $C_-$ a tensão $v_{ab}$ é gerada de maneira indireta pelas outras duas tensões de linha, pois $v_{ab}=-v_{bc}-v_{ca}$.
+
+\begin{equation}
+\label{eq:cmn}
+\dot{C}_{mn}=\sum_{l=1}^8 \dot{C}_{mn}(l)
+\end{equation}
+
+\begin{flalign}
+\label{eq:cmnz}
+&\dot{C}_{mn}(l)= \dfrac{1}{2\pi^2}\int_{y_{i}(l)}^{y_{s}(l)} \left[ \int_0^{\pi M\cos[y+\phi(l)]} f_{xy}(l) e^{j(mx+ny)}dx  +\right. \\
+& \left. \int_{\pi\{2-M\cos[y+\phi(l)]\}}^{2\pi} f_{xy}(l) e^{j(mx+ny)} dx \right] dy \nonumber
+\end{flalign}
+
+\begin{table}[!htb]
+\caption{Parâmetros para cálculo da integral dupla de fourier}
+\label{tab:cmn}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c | c | c | c }
+
+\hline
+l & $v_{L}$ & $y_{i}(l)$ & $y_{s}(l)$ & $f_{xy}(l)$ &  $\phi(l)$  \\
+\hline
+\hline
+1 & $v_{ab}$ &  $y_{i,6^A_+}$ & $y_{s,1^A_+}$ & $+V_{dc}$ & $\pi/6$ \\
+\hline
+
+2 & $v_{ab}$ & $y_{i,3^A_-}$ & $y_{s,4^A_-}$ & $-V_{dc}$ & $7\pi/6$ \\
+\hline
+
+3 & $v_{ab}$ & $y_{i,2^B_+}$ & $y_{s,3^B_+}$ & $-V_{dc}$ & $7\pi/6$ \\
+\hline
+
+4& $v_{ab}$ & $y_{i,5^B_-}$ & $y_{s,6^B_-}$ & $+V_{dc}$ & $\pi/6$ \\
+\hline
+
+5 & $-v_{bc}$ & \multirow{2}{*}{$y_{i,4^C_+}$} & \multirow{2}{*}{$y_{s,5^C_+}$} & $+V_{dc}$ & $\pi/2$ \\
+\cline{1-2} \cline{5-6}
+
+6 & $-v_{ca}$ &  &  & $-V_{dc}$ & $5\pi/6$\\
+\hline
+
+7 & $-v_{bc}$ &  \multirow{2}{*}{$y_{i,1^C_-}$} & \multirow{2}{*}{$y_{s,2^C_-}$} & $-V_{dc}$ & $-\pi/2$ \\
+\cline{1-2} \cline{5-6}
+8 & $-v_{ca}$ &  &  & $+V_{dc}$ & $-\pi/6$\\
+\hline
+ 
+\end{tabular}
+\end{center}
+\end{table}
+
+A partir dos limites de integração e dos valores da função $f(x,y)$, pode-se representar a célula unitária do VSR$_{\Delta}$, em que estão representados os níveis de tensão obtidos na tensão de linha do conversor. Na Fig.~\ref{ap01:celula} e na Fig.~\ref{ap01:celula2} estão ilustradas as células unitárias para duas condições de funcionamento com índice de modulação igual a 0,7 e ângulo $\delta_i$ igual a 0 e 30$^{\circ}$, respectivamente. Observa-se que, como esperado, é possível gerar uma tensão de linha na saída com três níveis.  A partir da célula unitária é também possível determinar a tensão de saída, conforme ilustrado na Fig.~\ref{ap01:celula-vab}. Os instantes que ocorrem as comutações são determinados pela intersecção entre os limites da célula e uma reta de coeficiente linear dado pelo índice de modulação em frequência.
+
+\begin{figure}[!p]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/celula.eps}
+	\caption{Célula unitária do VSR$_{\Delta}$ para $M=0,7$ e $\delta_i=0$.}
+	\label{ap01:celula}
+\end{figure}
+
+\begin{figure}[!p]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/celula2.eps}
+	\caption{Célula unitária do VSR$_{\Delta}$ para $M=0,7$ e $\delta_i=30^{\circ}$.}
+	\label{ap01:celula2}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/celula-vab.eps}
+	\caption[Tensão de linha $v_{ab}$ obtida a partir da célula unitária.]{Tensão de linha $v_{ab}$ obtida a partir da célula unitária com $M\!=\!0,7$, $\delta_i\!=\!0$ e $M_f\!=\!11$ .}
+	\label{ap01:celula-vab}
+\end{figure}
+
+Aplicando os dados da Tabela~\ref{tab:cmn} em (\ref{eq:cmn}) e com o auxílio da expansão em séries de Bessel (\ref{eq:bessel}) de Jacobi-Anger \cite{Livros-LIPO}, foi possível determinar a expressão analítica da harmônicas da tensão $v_{ab}$, cujos coeficientes $C_{mn}$ são dados por (\ref{eq:vab-analitica}). Dos coeficientes da tensão de linha, observa-se que a amplitude da fundamental tem o módulo da fundamental igual ao valor esperado de $M V_{dc}$.  E, não são geradas harmônicas com bandas laterais pares em torno das múltiplas da frequência de comutação. Na Fig.~\ref{ap01:harmonicas} estão ilustradas as componentes harmônicas obtidas analiticamente e por simulação até a terceira múltipla da frequência de comutação, em que se observam resultados muito próximos aos obtidos por simulação. Os valores das componentes harmônicas estão apresentados em função do índice de modulação na Fig.~\ref{ap01:cmn} para alguns valores de $m$ e $n$. Observa-se que estas componentes foram normalizadas pela tensão do barramento, isto é, $|\dot{C}_{mn}|_N=|\dot{C}_{mn}|/V_{dc}$.
+
+\begin{equation}
+\label{eq:bessel}
+e^{\pm j \xi \cos(\theta)} = J_0(\xi) + 2 \sum^{\infty}_{k=1}j^{\pm}J_k(\xi)\cos(k\theta)
+\end{equation}
+
+\begin{equation}
+\label{eq:vab-analitica}
+\dot{C}_{mn}=\left\{\begin{array}{c l}
+ 0 & \textrm{, se $n=0$} \\
+ \\
+ \dfrac{M V_{dc}}{2}(\sqrt{3}-j) & \textrm{, se $m=0$ e $n=1$} \\
+ \\
+ 0 & \textrm{, se $m=0$ e $n\neq1$}  \\
+ \\
+ 0 & \textrm{, se $m>0$ e $n$ é par} \\
+ \\
+ 0 & \textrm{, se $m>0$ e $n$ é múltiplo de 3} \\
+ \\
+ \textrm{$\dot{C}_{mn,g}$ dado por (\ref{eq:Cmn})} & \textrm{, se $m>0$ e $n$ é ímpar}
+ \end{array} 
+ \right.
+\end{equation}
+
+\begin{flalign}
+\label{eq:Cmn}
+ \dot{C}_{mn,g}=-j \dfrac{V_{dc}}{\pi^2m}& \Bigg\{ \dfrac{2\pi}{3} \dfrac{J_n(m \pi M) (j^n\!\!-\!\!j^{-n})}{e^{jn\pi/6}} \left[ 1 \!+\! \cos\!\left(\!\dfrac{n\pi}{3}\!\right) \right]  + \\
+ +4 \textrm{sen}\!\left(\!\dfrac{n\pi}{3}\!\right) \!\!\!\!\sum^{\infty}_{\genfrac{}{}{0pt}{1}{k=1}{(k\neq|n|)}}\! & \dfrac{ J_k(m \pi M) (j^k\!\!-\!\!j^{-k}) } {e^{jn(\pi/6+\delta_i)}(k^2\!-\!n^2)} \!\!\left[1\!-\!2\cos\!\left(\!\dfrac{k\pi}{3}\!\right)\right]\times  \nonumber \\
+ & \times\left[ n\cos(k\delta_i)\!+\!jk\textrm{sen}(k\delta_i) \right] \Bigg\} \nonumber
+\end{flalign}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/Vab-harmonicas.eps}
+	\caption[Resultados teóricos e simulados das componentes harmônicas.]{Resultados teóricos e simulados das componentes harmônicas da tensão de linha.}
+	\label{ap01:harmonicas}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap01/cmn.eps}
+	\caption{Componentes harmônicas da tensão de linha.}
+	\label{ap01:cmn}
+\end{figure}

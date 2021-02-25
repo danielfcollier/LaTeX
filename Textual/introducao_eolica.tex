@@ -1,0 +1,522 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introdução aos Sistemas de Conversão de Energia Eólica} \label{chapter-introducao}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo é apresentada uma revisão sobre os WECSs com o foco nas aplicações encontradas para eletrônica de potência. 
+
+Inicialmente são apresentados aspectos históricos dos sistemas eólicos e sua evolução até os dias atuais. São citadas as principais aplicações das turbinas eólicas modernas, bem como uma descrição sucinta dos seus componentes. Exemplos de aplicações dos WECSs são dados, em que estes são encontrados desde simples aplicações ao carregamento de baterias, a grandes parques eólicos conectados aos sistemas de transmissão e distribuição de energia elétrica. 
+
+Nos últimos anos, a geração de energia eólica destaca-se como uma tecnologia em pleno desenvolvimento e expansão de mercado, se tornando cada vez mais competitiva frente a outras fontes de energia. Nesse contexto, destacam-se as empresas que empregam  arquiteturas de sistemas com GSIPs, visto que estas já possuem maiores participações no mercado de turbinas eólicas.   
+
+O papel da eletrônica de potência e do controle na evolução dos WECSs é o foco da segunda parte deste capítulo. É feita uma revisão bibliográfica das principais arquiteturas de sistemas, isto é, das formas de integração das turbinas eólicas com conversores estáticos, encontradas na literaturas. Por fim, é feito e apresentado um estudo comparativo das principais turbinas eólicas empregadas atualmente, em que mostra-se a atual necessidade pela busca de sistemas robustos e \textit{sensorless}, isto é, sem a inclusão de sensores mecânicos.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evolução dos Sistemas Eólicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A palavra eólica vem do latim \textit{eolus} ou \textit{aeolus} que tem origem na palavra grega \textit{Aiolos}, que é o nome do deus grego dos ventos. Assim, a energia eólica é a energia cinética proveniente do movimento dos ventos. O vento é uma massa de ar em movimento causado pelas diferenças de temperatura existentes na superfície do planeta. Os ventos tiveram, e ainda têm, um papel fundamental na história da evolução tecnológica humana.
+
+As primeiras aplicações da utilização da força dos ventos remota desde a Era Pré-histórica, quando foram encontrados restos de um barco a vela em um túmulo sumeriano datado de 4000~a.C. \cite{Teses-04-01}. Desde a Antiguidade até a Idade Moderna, a força dos ventos foi utilizada para mover navios utilizados no comércio e na exploração de terras desconhecidas datando de 1000~a.C., o início da navegação comercial pelos fenícios. O catavento tem sua invenção na Pérsia datada por volta de 200~a.C., cujas aplicações são o bombeamento d'água, moagem de grãos, irrigação, serralheria, movimentação de ferramentas em geral, entre outros \cite{Livros-13,Artigos-09}. Acredita-se ainda que na China (2000 a.C.) e na Babilônia (1700 a.C) foram utilizados os primeiros cataventos rústicos para irrigação \cite{Artigos-09}. Os moinhos de ventos mais famosos foram aperfeiçoados na Holanda por volta do século XI e então disseminados por toda a Europa, na Fig.~\ref{intro:moinho} está ilustrado um moinho de vento holandês típico.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/moinho.eps}
+	\caption[Moinho de vento holandês em Alkmaar, Holanda.]{Moinho de vento holandês em Alkmaar, Holanda. Fonte: www.flickr.com/photos/allard1/2896474647. Acesso em 01/03/2010.}
+	\label{intro:moinho}
+\end{figure}
+
+% fonte http://www.flickr.com/photos/allard1/2896474647/
+
+Apenas com o advento da Revolução Industrial, que marca o início da Idade Contemporânea, é que ocorreu um declínio da utilização de moinhos de ventos e de barcos a vela. O surgimento da máquina a vapor tornou praticamente dispensável a utilização dos moinhos de ventos. Estes, que eram cerca de 23.000 na Europa antes da Revolução Industrial, caíram para 2.500 no início do século XX e  para menos de 1.000 no ano de 1960. No entanto, os cataventos de múltiplas pás (Fig.~\ref{intro:catavento}) para bombeamento d'água continuaram sendo de extrema importância nas áreas rurais para abastecimento de bebedouros de gado, em que estima-se que existiam cerca de 6 milhões de cataventos na segunda metade do século XIX só nos EUA \cite{Artigos-09}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/cataventos.eps}
+	\caption[Cataventos para bombeamento d'água.]{Cataventos para bombeamento d'água. Fonte: www.flickr.com/photos/composde/3339365336. Acesso em 01/03/2010.}
+	\label{intro:catavento}
+\end{figure}
+
+% fonte http://www.flickr.com/photos/composde/3339365336/
+
+As aplicações para geração de energia elétrica iniciaram após o advento das máquinas elétricas no século XIX. Em julho de 1887 o escocês e engenheiro eletricista James	Blyth realizou os primeiros experimentos com geração de energia elétrica a partir do vento. Ele construiu uma pequena turbina eólica para carregamento de baterias e iluminação, cujos resultados lhe resultaram na primeira patente em 1891 sobre geração de energia elétrica a partir dos ventos \cite{Patente-Blyth}. E, nessa mesma epóca (1888) o americano e industrial Charles Brush construiu um protótipo de 12~kW para carregamento de baterias e iluminação, que se tornou famoso por seu invento ter ficado em funcionamento durante 20 anos \cite{Artigos-09}. A primeira experiência bem sucedida para geração de energia em alta potência foi feita pelo dinamarquês Poul la Cour na década de 1890. Os seus trabalhos na área forneceram as bases para as modernas turbinas eólicas, tendo ele construído mais de 100 turbinas eólicas com potências entre 20 e 35~kW \cite{Livros-13}. O primeiro túnel de vento desenvolvido por Pour la Cour em 1891 está ilustrado na Fig.~\ref{intro:first-tunel}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/firstwind.eps}
+	\caption[Primeiro túnel de vento desenvolvido por Pour la Cour.]{Primeiro túnel de vento desenvolvido por Pour la Cour em 1891. Fonte: www.poullacour.dk/engelsk/vindtunn.htm. Acesso em 01/03/2010.}
+	\label{intro:first-tunel}
+\end{figure}
+
+% fonte http://www.poullacour.dk/engelsk/vindtunn.htm
+
+Nos anos seguintes, as turbinas de pequena potência se tornaram muito populares nos EUA para iluminação de áreas remotas em zonas rurais. Estas só se tornaram obsoletas na década de 1930 com o avanço da rede elétrica para as áreas rurais. Nessa época, os maiores desenvolvimentos tecnológicos foram alcançados no campo da aerodinâmica, o que permitiu o controle de potência e proteção das turbinas. E, em 1941 nos EUA um marco do desenvolvimento foi a construção da primeira turbina de megawatts, a máquina de Smith-Putnam, ilustrada na Fig.~\ref{intro:first-mw} \cite{Livros-13}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/vermont.eps}
+	\caption[Primeira turbina de megawatts construída nos EUA em 1941.]{Primeira turbina de megawatts construída nos EUA em 1941. Fonte: www.wind-works.org/photos/Smith-PutnamPhotos.html. Acesso em 01/03/2010.}
+	\label{intro:first-mw}
+\end{figure}
+
+% fonte http://www.wind-works.org/photos/Smith-PutnamPhotos.html
+
+Contudo, foi somente com as preocupações das consequências ambientais do desenvolvimento industrial no final dos 1960 e a crise do petróleo na década de 1970, que ocorreu crescimento dos sistemas eólicos para geração de energia elétrica. Assim, novos incentivos governamentais incentivaram o desenvolvimento tecnológico e a produção, principalmente nos EUA durante a década de 1970. No entanto, os incentivos nos EUA duraram  até o início da década de 1980 e a tecnologia desenvolvida na Dinamarca foi a que obteve os maiores sucessos no mercado \cite{Livros-13}. E, com os avanços da eletrônica de potência foi possível conceber os modernos sistemas de geração de energia eólica. 
+
+A Fig.~\ref{intro:evolucao} ilustra a evolução do tamanho e da potência das turbinas eólicas nos últimos anos \cite{Artigos-08}. No entanto, por ser uma tecnologia em pleno desenvolvimento, as informações contidas na Fig.~\ref{intro:evolucao} não refletem o atual estado tecnológico das turbinas eólicas. Mais recentemente em \cite{Artigos-04-31}, uma figura semelhante é ilustrada na tentativa de acompanhar a evolução do tamanho das turbinas, em que uma turbina de 7,0~MW produzida pela Vestas é citada como a maior turbina produzida até o ano de 2010. Entretanto, no mesmo ano a Enercon produziu uma turbina de 7,5~MW \cite{Enercon-Overview}. E, segundo \cite{Artigos-04-30} a Windtec e a Clipper já anunciaram que estão em fase de desenvolvimento de turbinas eólicas de 10~MW.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/evolucaoWind.eps}
+	\caption{Evolução no tamanho das turbinas eólicas de 1980 até 2005.}
+	\label{intro:evolucao}
+\end{figure}
+
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turbinas Eólicas Modernas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Existem turbinas com diversos aspectos construtivos, entre elas, de eixo horizontal com uma pá (Fig.~\ref{intro:oneblade}), com duas pás (Fig.~\ref{intro:twoblades}) e turbinas de eixo vertical (Fig.~\ref{intro:darrieus}). No entanto, foi a turbina de eixo horizontal com três pás, como a ilustrada na Fig.~\ref{intro:enersud}, que melhor se adaptou aos esforços de sustentação aerodinâmica (\textit{lift forces}) causados pelos ventos \cite{Livros-13}. Essas são as mais difundidas no mercado e são encontradas em aplicações que vão desde o carregamento de baterias (baixa potência) aos grandes parques eólicos (alta potência) conectados à rede elétrica \cite{Livros-13}, como as ilustradas nas Fig.~\ref{intro:enersud} e Fig.~\ref{intro:hiberdrola}, respectivamente. 
+
+\begin{figure}[!htb]
+\centering
+
+	\mbox{
+	\subfigure[Aerogerador com uma pá]{
+	\label{intro:oneblade}
+	\includegraphics[scale=\escalafig]{Figuras/introducao/oneblade.eps}}
+	
+	\subfigure[Aerogerador com duas pás]{
+	\label{intro:twoblades}
+	\includegraphics[scale=\escalafig]{Figuras/introducao/twoblades.eps}}
+	}
+
+	\subfigure[Aerogerador de eixo vertical]{
+	\label{intro:darrieus}
+	\includegraphics[scale=\escalafig]{Figuras/introducao/darrieus.eps}}
+
+\caption[Turbinas eólicas de diferentes aspectos construtivos.]{Turbinas eólicas de diferentes aspectos construtivos. Fontes: (a) en.wikipedia.org/wiki/Wind\_turbine\_design (b) www.energia-eolica.it (c) www.energia-eolica.it. Acesso em 01/03/2010. }
+\end{figure}
+
+% fonte http://en.wikipedia.org/wiki/Wind_turbine_design
+% fonte http://www.energia-eolica.it/userfiles/image/canada.jpg
+% fonte http://www.energia-eolica.it/rotore_darrieus_a_cap_chat_in_canada
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalasim]{Figuras/introducao/enersud.eps}
+	\caption[Turbina eólica para carregamento de baterias.]{Turbina eólica para carregamento de baterias (ENERSUD; 6~kW). Fonte: www.enersud.com.br. Acesso em 01/03/2010. }
+	\label{intro:enersud}
+\end{figure}
+
+% fonte http://www.enersud.com.br/produtos.asp
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalasim]{Figuras/introducao/hiberdrola.eps}
+	\caption[Turbinas eólicas no Parque Eólico do Rio do Fogo, RN .]{Turbinas eólicas no Parque Eólico do Rio do Fogo, RN (HIBERDROLA; 850~kW). Fonte: arquivo pessoal.}
+	\label{intro:hiberdrola}
+\end{figure}
+
+\clearpage
+%\FloatBarrier
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Componentes de um Aerogerador Moderno}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Conforme apresentado anteriormente, as turbinas podem ser fabricadas para diversas faixas de potência. E, em todas elas preserva-se o aspecto construtivo de um aerogerador de três pás. Assim como a quantidade de pás, diversos componentes podem ser encontrados em comum nas diversas turbinas. Dessa forma, pode-se apresentar, sem perdas de generalidades, os principais componentes de um aerogerador moderno com os dados da turbina de 850 kW da Vestas na Fig.~\ref{intro:nacele} \cite{Vestas-850} .
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/introducao/nacele.eps}
+	\caption[Componentes de uma turbina eólica moderna.]{Componentes de uma turbina eólica moderna (VESTAS; 850 kW).}
+	\label{intro:nacele}
+\end{figure}
+
+% fonte VESTAS catálogo V52 850 kW
+
+Observa-se que a maioria dos componentes estão na \textit{nacele}, que é a carcaça montada sobre a torre e onde está colocado o cubo do rotor para encaixe das pás. Algumas funções do sistema de controle e proteção geralmente são colocados na parte interna da torre como mostrado na Fig.~\ref{intro:torre} ou por acesso externo em um painel \cite{Vestas-1650}. O transformador elétrico pode estar na \textit{nacele} ou na torre.
+ 
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/introducao/torre.eps}
+	\caption[Torre de uma turbina eólica moderna.]{Torre de uma turbina eólica moderna (VESTAS; 1,65~MW).}
+	\label{intro:torre}
+\end{figure}
+
+% fonte VESTAS catálogo V82 1.65 MW
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aplicações dos WECSs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Quanto à capacidade de geração, pode-se classificar as aplicações dos WECSs em \cite{Artigos-09}:
+
+\begin{itemize}
+	\item Sistemas de pequeno porte: geração de potências menores que 10~kW;
+	\item Sistemas de porte intermediário: geração entre 10 e 250~kW; 
+	\item Sistemas de grande porte: potências maiores que 250~kW.
+\end{itemize}
+
+Os sistemas de pequeno porte são aplicados a residências, fazendas, barcos e aplicações remotas. Estes são, em geral, conectados a sistemas com armazenamento de energia (por exemplo, os bancos de baterias) ou podem ainda estar conectados a sistemas híbridos, isto é, sistemas com mais de uma fonte de energia. 
+
+Os sistemas de grande porte podem estar conectados em sistemas de geração distribuída ou ao sistema de transmissão.  Em geração distribuída os geradores são conectados à rede de distribuição ou subtransmissão próximos aos centros de carga \cite{Teses-04-02}. É muito comum encontrar os geradores agrupados em grandes quantidades formando os conhecidos parques eólicos (\textit{wind farm}) de forma a aumentar a produção de energia local. Os parques eólicos podem ser encontrados em terra firme (\textit{onshore}) ou em plataformas aquáticas (\textit{offshore}), como ilustrado na Fig.~\ref{intro:onshore} e na Fig.~\ref{intro:offshore}, respectivamente.
+
+\begin{figure}[!htbp]
+\centering
+
+	\subfigure[Parque Eólico \textit{onshore} em Osório, RS.]{
+	\label{intro:onshore}
+	\includegraphics[scale=0.8]{Figuras/introducao/onshore.eps}}
+	
+	\subfigure[Parque Eólico \textit{offshore} na Dinamarca.]{
+	\label{intro:offshore}
+	\includegraphics[scale=0.8]{Figuras/introducao/offshore.eps}}
+
+\caption[Tipos de parques eólicos.]{Tipos de parques eólicos. Fontes: (a) econewsbirigui.files.wordpress.com/2009/03/parque-eolico-rs.jpg (b) www.flickr.com/photos/andjohan/1022097482. Acesso em 01/03/2010. }
+\end{figure}
+
+% fonte http://econewsbirigui.files.wordpress.com/2009/03/parque-eolico-rs.jpg
+% fonte http://www.flickr.com/photos/andjohan/1022097482/
+
+Os sistemas de porte intermediário são uma transição entre os de pequeno porte e os de grande porte, podendo ser encontrados em aplicações diversas. Por exemplo, em Dubai foram construídas três turbinas eólicas de 225 kW para alimentar cerca de 15\% da energia consumida nos prédios do Bahrain World Trade Center (Fig.~\ref{intro:dubai}).
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/introducao/dubai.eps}
+	\caption[Turbinas eólicas no Bahrain World Trade Center em Dubai.]{Turbinas eólicas no Bahrain World Trade Center em Dubai. Fonte: forum.imaginebirds.com/topic/1307-the-bahrain-world-trade-center. Acesso em 01/03/2010.}
+	\label{intro:dubai}
+\end{figure}
+
+% fonte http://forum.imaginebirds.com/topic/1307-the-bahrain-world-trade-center/
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Panorama da Geração de Energia Eólica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Segundo \cite{Artigos-GWEC-01}, em 2010, pela primeira vez na história, o aumento da capacidade instalada se deu predominantemente em países em desenvolvimento e emergentes. Em 2009, a Agência Nacional de Energia Elétrica (ANEEL) realizou por meio da Câmara de Comercialização de Energia Elétrica (CCEE) o primeiro leilão\footnote{Leilão n$^\circ$~003/2009 da ANEEL. Disponível em www.aneel.gov.br.} exclusivo de energia eólica no Brasil. Além disso, nesse ano de 2011 o leilão de n$^\circ$~002/2011 (denominado leilão A-3) surpreendeu os investidores, pois dentre as diversas fontes alternativas de energia no leilão\footnote{Participaram pequenas centrais hidrelétricas, usinas a biomassa, usinas térmicas a gás e parques eólicos.} a fonte eólica foi a que apresentou os menores preços\footnote{Informação disponível em www.abeeolica.org.br. Acesso em 12/09/2011.}.  Isso demonstra como o potencial da energia eólica tem se desenvolvido no Brasil e no mundo, se apresentando como um panorama de crescimento e competitiva frente a outras fontes de energia elétrica \cite{Artigos-GWEC-01,Artigos-GWEC-02,Artigos-GWEC-03}. 
+
+Dentre as empresas que atuam na geração de energia eólica, destaca-se neste trabalho as empresas que têm arquiteturas de sistemas que empregam GSIPs, conforme ilustrado na Fig.~\ref{intro:fabri-globais} as logomarcas de diversas empresas globais e nacionais. Dessas, a Enercon possui atualmente a maior turbina eólica, sendo esta de 7,5~MW  \cite{Enercon-Overview}.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=0.8]{Figuras/introducao/fabricantes_globais.eps}
+	\caption{Empresas globais e nacionais que atuam com GSIPs em WECSs.}
+	\label{intro:fabri-globais}
+\end{figure}
+
+A divisão de mercado entre as empresas fabricantes de turbinas eólicas de 1,5~MW a 3~MW está ilustrada na Fig.~\ref{intro:divisao-mercado}. Observa-se que mais de 50\% dessas empresas empregam GSIPs nos seus WECSs \cite{Artigos-04-30}.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/divisao_mercado.eps}
+	\caption{Divisão de mercado entre as empresas fabricantes de arquiteturas de sistemas para WECSs.}
+	\label{intro:divisao-mercado}
+\end{figure}
+
+%\begin{figure}[!htbp]
+%	\centering
+%	\includegraphics[scale=0.8]{Figuras/introducao/fabricantes_nacionais.eps}
+%	\caption{Empresas globais e nacionais que atuam com GSIPs em WECSs.}
+%	\label{intro:fabri-nacionais}
+%\end{figure}
+
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section[Papel da Eletrônica de Potência e do Controle]{Papel da Eletrônica de Potência e do Controle na Geração de Energia Eólica} \label{turbinas-eletronica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Desde as primeiras aplicações comerciais para geração de energia elétrica a partir de turbinas eólicas  na década de 1980, a eletrônica de potência tem tido um papel fundamental. As primeiras turbinas eólicas que operavam com velocidade fixa e eram interligadas com a rede elétrica, precisavam de partida suave (\textit{soft-start}) feita por meio de tiristores. 
+
+Atualmente, a eletrônica de potência é responsável pelo aumento da eficiência e desempenho de turbinas eólicas com velocidade variável, além de garantir os requisitos para interligação e melhoria da estabilidade transitória em sistemas elétricos \cite{Artigos-04-11,Teses-04-02}. Os elementos principais de uma turbina eólica são apresentados na Fig.~\ref{ch02sistema}, que incluem a turbina, o rotor, a caixa de engrenagens, o gerador, os conversores estáticos e um transformador para interligação com a rede elétrica \cite{Artigos-04-21}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/introducao/sistema.eps}
+	\caption{Principais componentes de uma turbina eólica convencional.}
+	\label{ch02sistema}
+\end{figure}
+
+No sistema mecânico, a energia é capturada pela turbina eólica. Como é importante limitar a potência máxima mecânica quando as velocidades do vento são altas, tal limitação é feita por um controle aerodinâmico. Este pode ser tanto pelo controle por estol quanto pelo controle por ângulo de passo da turbina. Grandes turbinas eólicas operam, em geral, na faixa dos 10 a 15 rpm \cite{Artigos-04-21}. A maneira mais comum de adaptar essa baixa velocidade da turbina à alta velocidade dos geradores elétricos é utilizando uma caixa de engrenagens com vários estágios. Outra maneira é utilizar geradores multipólos acoplados diretamente ao gerador elétrico ou uma combinação de multipólos com menos estágios na caixa de engrenagens. Estudos sobre qual configuração é a mais adequada envolvem aspectos econômicos e requisitos para interconexão com a rede, cujo tema tem sido pesquisado por vários autores \cite{Artigos-04-11,Artigos-04-07,Artigos-04-23}. O gerador elétrico é responsável pela conversão eletromecânica, cujo processo pode ser controlado por meio de conversores estáticos para conexão com a rede ou conectados diretamente pelo conceito dinamarquês (\textit{danish concept}) \cite{Artigos-04-21}. Por fim, um transformador elétrico irá adaptar a tensão à da rede elétrica.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Formas de Integração de Turbinas Eólicas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+De acordo com o nível de potência e da tecnologia, diferentes sistemas de conversão eletromecânica de energia podem ser empregados. A seguir é feita uma revisão das principais turbinas eólicas com velocidade fixa e velocidade variável. 
+
+Um resumo das soluções empregadas para geração de energia eólica é apresentado no mapa tecnológico da Fig.~\ref{ch02mapa}. A saída elétrica desse sistema pode ser tanto um sistema CC quanto um sistema CA (utilizando inversor) \cite{Artigos-04-21}. 
+
+\begin{landscape}
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[angle=270,scale=\escalafig]{Figuras/introducao/mapa.eps}
+	\caption[Mapa tecnológico de aplicações em turbinas eólicas.]{Mapa tecnológico de aplicações em turbinas eólicas. Em destaque o foco deste trabalho.}
+	\label{ch02mapa}
+\end{figure}
+\end{landscape}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Turbinas Eólicas com Velocidade Fixa}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Turbinas eólicas com velocidade fixa operam com a configuração do conceito dinamarquês, muito popular na década de 1980, ilustrado na Fig.~\ref{ch02turbF1}. A limitação de potência pode ser feita pelo controle por estol ou controle por ângulo de passo \cite{Artigos-04-16}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaF1.eps}
+	\caption[Conceito dinamarquês para turbinas eólicas.]{Conceito dinamarquês para turbinas eólicas com velocidade fixa.}
+	\label{ch02turbF1}
+\end{figure}
+
+Devido ao efeito amortecedor da gaiola  de esquilo, são utilizados geradores de indução com gaiola de esquilo, que são quase independentes para variações de torque e operam em uma velocidade fixa (escorregamento típico de 1\% a 2\%) \cite{Artigos-04-16,Artigos-04-02}. O baixo custo, robustez e facilidade para conexão com a rede (necessita de partida suave a tiristores para conexão gradual e não precisa de sincronização) são vantagens obtidas pelo seu uso. Além da conexão gradual com a rede, a partida suave diminui a corrente de partida (\textit{inrush}) e por sua vez diminui também os problemas de cintilação (\textit{flicker}) na rede. Um banco de capacitores variável é utilizado para compensar a demanda de reativos (praticamente eliminar) do gerador de indução \cite{Artigos-04-21}. 
+
+Como desvantagens da operação com velocidade fixa está a necessidade do gerador estar conectado a redes fortes (``\textit{stiff grids}''), pois variações de vento seriam convertidas em flutuações de tensão em redes fracas, além de gerar turbulências mecânicas na turbina. Consequentemente, a estrutura mecânica deve ser capaz de suportar fortes turbulências, resultando em mais gastos com a estrutura. Outra desvantagem ocorre em casos de falta da rede elétrica, pois a tensão ou a potência reativa não pode ser controlada diretamente levando a problemas de estabilidade de tensão. Esse problema torna essa aplicação inviável para a conexão com sistemas elétricos de grande porte \cite{Artigos-04-21,Artigos-04-16}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Turbinas Eólicas com Velocidade Variável}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inicialmente, destaca-se uma grande vantagem das turbinas eólicas com velocidade variável: a possibilidade de variar a velocidade de rotação frente a variações da velocidade do vento ou de carga. Isto permite que as estruturas sejam mecanicamente mais simples, tenham menos desgastes nos componentes mecânicos e ruído acústico reduzido, o que aumenta a confiabilidade do sistema e diminui os gastos com a estrutura \cite{Artigos-04-16}. Outra vantagem é a maior captação de energia, que segundo \cite{Artigos-04-14} é cerca de 5\% maior do que sistemas de velocidade fixa. Embora seja necessário empregar conversores estáticos em turbinas eólicas com velocidade variável, o que acarreta em perdas  adicionais, o sistema de controle dos conversores deve ser capaz de rastrear o ponto de máxima potência e, como resultado, mais energia é obtida. O cintilamento não ocorre porque o sistema está desacoplado da rede elétrica.
+
+O desacoplamento pode ser feito por meio de um barramento em corrente contínua (CC). Dois tipos de desacoplamentos podem ser realizados: desacoplamento parcial e desacoplamento total. No primeiro tipo, um gerador de indução com rotor bobinado é ligado à rede pelo estator e o rotor é ligado por meio de um conversor estático processando parte da potência. No outro, o desacoplamento total é realizado por meio de conversores estáticos processando toda energia do gerador. Em ambos os esquemas a limitação de potência é feita pelo controle por estol ativo ou controle por ângulo de passo. A seguir são apresentadas configurações típicas dessas arquiteturas de sistemas \cite{Artigos-04-21,Artigos-04-16,Artigos-04-14,Artigos-04-15}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Desacoplamento Parcial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O desacoplamento parcial do gerador permite obter uma pequena faixa de variação de velocidade. Esta pode ser suficiente para melhorar o desempenho da turbina frente às variações de vento. Duas configurações típicas para geradores de indução são encontradas: com rotor bobinado controlado por resistências rotóricas e com rotor bobinado duplamente excitado controlado por um conversor estático processando parte da potência da turbina, ambas ilustradas na Fig.~\ref{ch02turbinasP1} e na Fig.~\ref{ch02turbinasP2}, respectivamente.
+ 
+Na configuração da Fig.~\ref{ch02turbinasP1} as resistências extras do rotor podem ser variadas por meio de um conversor estático. Ressalta-se que esta solução ainda necessita de partida suave (\textit{soft-start}) e de um sistema de compensação de reativos. 
+
+\begin{figure}[!htb]
+	\centering
+	\center{
+		\subfigure[\label{ch02turbinasP1}]{
+		\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaP1.eps}}
+	}
+	\center{
+		\subfigure[\label{ch02turbinasP2}]{
+		\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaP2.eps}}
+	}
+	\caption{Turbinas eólicas com desacoplamento parcial da rede elétrica.}
+	\label{ch02turbinasP}
+\end{figure}
+
+A segunda opção ilustrada na Fig.~\ref{ch02turbinasP2} é a mais utilizada e conhecida como gerador de indução duplamente alimentado (DFIG $-$ \textit{doubly fed induction generator}). Em geral, o conversor processa cerca de 30\% da potência nominal da turbina. Isto permite uma variação de velocidade de cerca de $\pm30\%$ da velocidade síncrona. Nesse esquema não é mais necessário um circuito de partida suave e de compensação de reativos. E, ainda é possível controlar as potências ativa e reativa entregues à rede. Isto permite uma real melhoria no desempenho dinâmico frente a distúrbios (aumento da estabilidade de tensão), melhoria do desempenho em regime permanente, e uma redução significativa do ruído acústico produzido e esforços mecânicos da estrutura. 
+
+No entanto, sob condições de faltas da rede, a presença de grandes correntes no estator do DFIG resultam em grandes correntes no rotor, o que faz com que os conversores estáticos precisem de proteções especiais para evitar sua destruição por sobrecorrentes. E, essas grandes correntes estatóricas podem causar altos torques e danificar a estrutura mecânica do eixo da turbina, diminuindo a vida útil do WECS \cite{Artigos-04-30}. Dessa forma, as estratégias\footnote{As estratégias de tomada de carga são requisitos de alguns operadores do sistema transmissão \cite{Artigos-04-20,Artigos-02-06,Artigos-ONS-LVRF}. Estas devem ser implementadas para evitar perdas significativas na produção de energia eólica	durante condições de falta da rede. Isto significa que o WECS deve permanecer conectado à rede durante distúrbios, como por exemplo, afundamentos de tensão. Dessa forma, é necessário que o WECS seja capaz dar suporte de ativos e reativos para o controle de frequência e tensão da rede elétrica.} \textit{low voltage ride-through} ou \textit{fault ride-through capability} para suporte à rede em condições de falta podem ser bastantes complicadas, devido à conexão direta do estator do DFIG à rede elétrica \cite{Artigos-04-20}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Desacoplamento Total}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[!htb]
+	\centering
+	\center{
+		\subfigure[\label{ch02turbV1}]{
+		\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaV1.eps}}
+	}
+	\center{
+		\subfigure[\label{ch02turbV2}]{
+		\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaV2.eps}}
+	}
+	\center{
+		\subfigure[\label{ch02turbV3}]{
+		\includegraphics[scale=\escalafig]{Figuras/introducao/turbinaV3.eps}}
+	}
+	 	 	\caption{Turbinas eólicas com desacoplamento total da rede elétrica.}
+	\label{ch02turbinasV}
+\end{figure}
+
+O desacoplamento total é feito por conversores estáticos processando toda a energia da turbina eólica. Embora estes conversores tenham mais perdas no processo de conversão de energia, a geração de energia é aumentada pela melhoria de desempenho e pelo sistema de controle. Esse convesor deve ser capaz de rastrear o ponto de máxima potência em uma ampla faixa de operação do aerogerador e o controle das potências ativa e reativa entregues à rede é feito por um inversor trifásico ou monofásico. Na Fig.~\ref{ch02turbinasV} estão ilustradas três configurações típicas, em que podem ser aplicados geradores de indução e geradores síncronos.
+
+A configuração da Fig.~\ref{ch02turbV1} utiliza geradores de indução com gaiola de esquilo que precisam de engrenagens para adaptar a velocidade à rede. Geradores síncronos podem ser de rotor bobinado, que precisa de excitação independente para o enrolamento de campo, ou a ímãs permanentes, ambos ilustrados nas Fig.~\ref{ch02turbV2} Fig.~\ref{ch02turbV3}, respectivamente. Ambos podem ser multipólos com estágios de engrenagens ou multipólos com acionamento direto (\textit{direct drive}), isto é, sem estágio de engrenagens.
+
+Todas as três soluções têm a mesma controlabilidade uma vez que o barramento CC desacopla completamente o gerador da rede elétrica. O desempenho do controle é muito mais rápido e em algumas situações pode-se entregar potência reativa à rede sem haver nenhum vento. Portanto, em casos de falta da rede o sistema está apto para atuar, isto é, o sistema tem capacidade de atender melhor a requisitos de \textit{low voltage ride-through} \cite{Artigos-04-30}. Com essas soluções é possível a operação com rastreamento do ponto de máxima potência ou com potência abaixo da máxima, sendo esta definida por um operador do sistema. Esses benefícios dão ao WECS a característica de uma planta de geração ao WECS. No entanto, o efeito negativo é o aumento na complexidade de implementação dos sistemas de controle e de custos iniciais, pois o conversor passa a representar cerca de 7\% dos custos da turbina eólica.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparação das Turbinas Eólicas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As turbinas eólicas com velocidade fixa foram as mais utilizadas até meados da década de 1990, devido ao seu baixo custo e facilidade de implantação. No entanto, a queda nos preços dos semicondutores, a baixa eficiência, alto ruído acústico, cintilação devido às variações de vento e a ausência do controle de potência reativa fazem com que esses sistemas estejam desaparecendo do mercado \cite{Artigos-04-11,Artigos-04-07}. 
+
+A partir de 1990 os fabricantes investiram suas atenções para os sistemas a velocidade variável. Esta tecnologia permitiu aumentar o nível de potência dos aerogeradores, diminuir o ruído acústico, diminuir os esforços mecânicos e melhorar a qualidade de energia. A principal solução desses sistemas foi o DFIG pelos baixos custos de implantação e do conversor utilizado que processa cerca de 30\% da potência nominal, o que justifica sua grande difusão na indústria. Nessa mesma época, iniciaram-se os investimentos em geradores síncronos multipólos com acionamento direto ou com menos estágios na caixa de engrenagens, cujos principais objetivos são a redução de perdas, a redução de falhas nas caixas de engrenagens e diminuição dos problemas de manutenção \cite{Artigos-04-07}. 
+
+%Os DFIG mais utilizados operam com três estágios na caixa de engrenagens \cite{Artigos-04-07}
+%No entanto, tem baixo aproveitamento de energético devido às altas perdas na caixa de engrenagens que é três estágios  \cite{Artigos-04-07}.
+
+Na Fig.~\ref{intro:falhas} estão ilustrados os índices de falhas por componentes de turbinas eólicas coletados na Alemanha durante 15 anos \cite{Artigos-Falhas-01}. Essa informação combinada com o tempo necessário para manutenção (Fig.~\ref{intro:manutencao}) e com a taxa de falhas por ano (Fig.~\ref{intro:taxa}) são indicativos para avaliar a confiabilidade das turbinas eólicas. É importante ressaltar que a caixa de engrenagens contribui de maneira significativa para a redução do tempo de operação do sistema e este número pode ser ainda maior como indicam experiências recentes na Suécia \cite{Artigos-Falhas-02}. Além disso, os custos de manutenção de um aerogerador com caixa de engrenagens é sempre 1\% maior do que os com acoplamento direto. E a reposição de caixa de engrenagens pode custar cerca de 10\% a 15\% do custo inicial do projeto e cerca de 80\% para aerogeradores em alto mar. O que nunca irá acontecer em acionamentos com acoplamento direto, mas se esse gerador falhar o custo também é alto porque se trata de uma máquina maior \cite{Artigos-04-11}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/tabela01.eps}
+	\caption{Índice de falhas nos componentes de uma turbina eólica.}
+	\label{intro:falhas}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/tabela02.eps}
+	\caption[Tempo de manutenção por componente de uma turbina eólica.]{Tempo de manutenção (em dias) por componente de uma turbina eólica.}
+	\label{intro:manutencao}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalagraf]{Figuras/introducao/tabela03.eps}
+	\caption{Taxa anual de falha dos componentes de uma turbina eólica.}
+	\label{intro:taxa}
+\end{figure}
+
+Outros motivos que contribuem para a utilização de geradores síncronos com acionamento direto ou com menos estágios na caixa de engrenagens são a melhoria de desempenho em casos de falta da rede e o sistema de controle ser mais simples \cite{Artigos-04-11}. Por esses motivos, diversos fabricantes têm utilizado está solução como pode ser observado na Fig.~\ref{intro:fabri-globais}, em que estão ilustrados os fabricantes de arquiteturas de sistemas que empregam GSIPs nos WECSs. Estes têm melhor rendimento, o volume mais compacto e a excitação é fornecida pelos campos magnéticos dos ímãs, o que elimina o conversor para controle da excitação e dá mais autonomia e robustez para o sistema. No entanto, deve-se ressaltar que alguns fabricantes utilizam geradores multipólos e um estágio na caixa de engrenagens (máquinas convencionais de dois pólos utilizam três estágios), estes são conhecidos como sistemas multi-híbridos. Dentre os motivos para essa escolha está o aumento da estrutura em sistemas sem caixa de engrenagens e do custo do gerador à medida que se eleva a potência. Existem estudos que avaliam os custos e o impacto na confiabilidade do sistema quando se utiliza um estágio na caixa de engrenagens  \cite{Artigos-04-07,Artigos-04-23}.
+
+Deve-se observar ainda na Fig.~\ref{intro:falhas} e na Fig.~\ref{intro:taxa}, o alto índice e taxa anual de falhas dos sensores e dos sistemas de controle. Essas falhas se devem, na grande maioria dos casos, à utilização de sensores mecânicos nos WECSs. Portanto, o estudo de técnicas de controle que não utilizam sensores mecânicos (\textit{sensorless}) e que são mais robustas são justificadas pela necessidade de se implementar sistemas mais robustos.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo foi feita uma revisão bibliográfica sobre os WECSs voltada a aplicações de eletrônica de potência. Foi apresentada a evolução da turbinas eólicas desde sua invenção aos modernos geradores encontrados atualmente. No panorama da geração eólica foi dado enfoque aos países em desenvolvimento e emergentes, em que se percebe que a tecnologia e a penetração de mercado dos WECSs é realmente global. Foram destacados os principais fabricantes e empresas que atuam com WECSs e empregam GSIPs nas suas arquiteturas de sistemas. O papel fundamental da eletrônica de potência e das técnicas de controle são destacados como elementos principais para a evolução da arquiteturas dos WECSs. Por fim, são comparadas as turbinas eólicas com relação à confiabilidade das arquiteturas de sistemas, em que mostra-se a necessidade pela busca de sistemas com acionamento direto e \textit{sensorless}.
+
+%De fato... falar sobre os geradores em geração eólica de pequeno porte, em que o campeão é o gerador síncrono a ímãs permanentes.
+%% voltar
+%
+%Comparar dados de mercado para sistemas de grande e pequeno porte de {MSIP}! (dados na revista de eólica)
+
+% corrigir: incluir comentários sobre sistemas de pequeno porte
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section[Conversores Estáticos Conectados ao \textrm{GSIP}]{Conversores Estáticos Conectados a Geradores Eólicos a Ímãs Permanentes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Como citado anteriormente, os geradores eólicos podem ser conectados ao sistema elétrico de diversas maneiras. Os geradores eólicos a ímãs permanentes precisam sempre de conversores com capacidade nominal para transferir a energia gerada ao sistema.  Esses conversores podem ser implementados por diversas topologias já encontradas na literatura e podem ser divididos nas seguintes categorias \cite{Artigos-04-21}:
+%
+%\begin{itemize}
+%\item conversores bidirecionais;
+%\item conversores unidirecionais;
+%\item conversores multiníveis;
+%\item conversores matriciais;
+%\item conversores modulares.
+%\end{itemize}
+%
+%Essas categorias apresentam intersecções e não representam uma divisão formal dos tipos de conversores, mas servem como um roteiro para o que será apresentado. A seguir são apresentados as principais topologias de conversores estáticos dessas categorias aplicadas a geradores eólicos a ímãs permanentes.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Conversores Bidirecionais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Os conversores bidirecionais permitem que o fluxo de potência seja tanto da geração para a carga quanto da carga para a geração. Permitem a utilização de estratégias de controle de alto desempenho e diversas técnicas já empregadas na indústria em inversores podem ser adaptadas à MSIP. Tipicamente são utilizados no estágio retificador e, quando presente, no estágio inversor. Uma das soluções mais difundidas na indústria é a configuração \textit{back-to-back} ilustrada para o caso de dois conversores em ponte completa com barramento capacitivo. 
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/back2back.eps}
+%	\caption{Conversores em configuração \textit{back-to-back}.}
+%	\label{intro:b2b}
+%\end{figure}
+%
+%Podem-se encontrar diversas aplicações desse conversor à MSIP, dentre elas as referências \cite{Artigos-11-02,Artigos-01-06,Artigos-01-07} apresentam a modelagem e resultados experimentais da aplicação dessa configuração a geradores eólicos a ímãs permanentes. No entanto, a utilização do conversor em ponte completa não é robusta devido à possibilidade de curto-circuito de braço e, portanto, deve-se implentar tempo morto (\textit{dead-time}) que aumenta a complexidade e diminui o desempenho do sistema.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Conversores Unidirecionais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Falar das vantagens e desvantagens de se utilizar uma topologia unidirecional, que só é possível para MSIP (Artigos-04-15 e Artigos-04-21).
+%
+%\cite{Artigos-03-12} - Artigos-03-12: diversas topologias de retificadores trifásicos com PFC.
+%
+%\cite{Artigos-03-11,Artigos-03-13} - Artigos-03-11 e Artigos-03-13: topologias de retificadores com comutação suave. PODE UTILIZAR ATÉ QUE FAIXA DE POTÊNCIA?
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/boost.eps}
+%	\caption{Ponte a diodos trifásica em série com conversor $boost$.}
+%	\label{intro:boost}
+%\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Conversores Multiníveis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\cite{Artigos-03-05} - Artigos-03-05: aplicação do conversor NPC ativo de 9 níveis do lado inversor e 5 níveis do lado retificador.
+%
+%\cite{Artigos-03-07} - Artigos-03-07: inversor cascade aplicado a PMSG para geração eólica.
+%
+%\cite{Artigos-03-10} - Artigos-03-10: retificadores multiníveis.
+%
+%\cite{Teses-03-03} - Teses-03-03: revisão bibliográfica de conversores multiníveis. Introdução sobre geração de energia eólica.
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/npc.eps}
+%	\caption{Conversor grampeado a diodos de 3 níveis.}
+%	\label{intro:npc}
+%\end{figure}
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/fc.eps}
+%	\caption{Conversor com capacitores flutuantes de 3 níveis.}
+%	\label{intro:fc}
+%\end{figure}
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/cascade.eps}
+%	\caption{Conversor em cascata simétrico de 5 níveis.}
+%	\label{intro:cascade}
+%\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Conversores Matriciais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\cite{Artigos-11-14} - Artigos-11-14: aplicação de conversor matricial e rastreamento de máxima potência com P\&O.
+%
+%\cite{Artigos-11-16} - Artigos-11-16: aplicação de conversor matricial e rastreamento de máxima potência com P\&O.
+%
+%\cite{Artigos-11-22} - Artigos-11-22: aplicação de conversor matricial.
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/controles01.eps}
+%	\caption{Sistema de controle com MPPT do lado retificador.}
+%	\label{intro:controle01}
+%\end{figure}
+%
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/introducao/controles02.eps}
+%	\caption{Sistema de controle com controle de tensão do lado retificador.}
+%	\label{intro:controle02}
+%\end{figure}
+%
+%Falar um pouco do histórico da geração de energia eólica, os avanços e as tendências do mercado. Último item que será feito.
+%% corrigir
+%
+%Retificador do lado do gerador:
+%
+%O retificador mais simples, a ponte de diodos, é uma alternativa barata e simples, porém não proporciona nenhum grau de liberdade. Uma vez que tanto o fator de potência como a relação entre a tensão na etapa de CC e a tensão na etapa de CA estão dadas, por isso ele não permite controlar a tensão nem a corrente do gerador. Isso impossibilita a realização de um seguimento do ponto de funcionamento do aerogerador de modo a extrair a máxima potência. Com o objetivo de permitir este seguimento a ponte retificadora somente se emprega naqueles sistemas que incorporam um conversor DC/DC. Assim, alguns utilizam uma ponte retificadora de diodos, um chopper elevador e um inversor com IGBT's. O rendimento deste conversor em carga nominal é de 97\%. 
+%
+%Os principais inconvenientes do emprego de um retificador de diodos são:
+%
+%"	A corrente de saída do gerador não é senoidal, com o conseqüente incremento das perdas no cobre e no ferro do gerador.
+%
+%"	A comutação dos diodos provoca quedas de tensão em torno de 5\% da tensão de saída.
+%
+%"	O fator de potência é elevado (próximo da unidade), porém as vezes é mais eficiente trabalhar com um fator de potência diferente da unidade.
+%Também é possível utilizar um retificador controlado pwm com IGBT. As vantagens de utilizar um retificador controlado do lado da máquina são as seguintes:
+%
+%"	Mediante um retificador controlado é possível controlar o valor eficaz da tensão e sua defasagem em relação a uma referência (a fem do gerador). Desta forma, é possível conseguir a corrente desejada na saída do gerador e com o fator de potência desejado. Isto permite trabalhar com um fator de potência capacitivo tal que a corrente necessária para desenvolver o torque desejado seja mínima. Isto resulta em um rendimento melhor para uma potência gerada.
+%
+%"	Com a adequada modulação dos pulsos de disparo dos IGBT's é possível conseguir uma corrente na máquina com conteúdo harmônico muito reduzido, com o que se evitam torques pulsantes que ocasionam fadiga no eixo. As perdas no cobre também são reduzidas sensivelmente para um mesmo valor de torque no eixo. A diminuição das perdas que se pode conseguir utilizando uma ponte retificadora controlada em lugar de uma ponte de diodos é especialmente importante em baixas velocidades (potência gerada reduzida), pois com ela se consegue reduzir ao máximo a velocidade de vento de conexão (CUT-in) incrementando com isto o fator de capacidade da instalação.
+%
+%Inversor do lado da rede
+%
+%O inversor PWM do lado da rede apresenta uma série de vantagens, quais sejam:
+%É possível controlar o fator de potência da corrente injetada na rede.
+%Seu funcionamento é reversível.
+%
+%Existe a possibilidade de empregar duas pontes PWM unidas por uma etapa em CC. A ponte do lado da máquina funciona como um retificador controlado. O controle desta ponte tem como finalidade controlar a potência extraída da turbina para cada velocidade de vento. A ponte do lado da rede funciona como inversor de tensão ainda que com um laço de controle de corrente. Mediante este inversor é possível conseguir o fator de potencia desejado e manter a tensão da etapa em CC em um valor de projeto previamente estabelecido.

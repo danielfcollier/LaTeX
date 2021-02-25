@@ -1,0 +1,866 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Modulação Vetorial do VSR Delta]{Modulação Vetorial do Retificador Ativo Trifásico Unidirecional com Interruptores CA em Delta} \label{chapter-modulacao}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo será apresentada a estratégia de modulação e o sistema de implementação digital chamado de modulador. O modulador é o responsável pela etapa de comando dos interruptores do VSR$_{\Delta}$ e está posicionado no WECS conforme ilustrado na Fig.~\ref{modulador}. Esse recebe como sinal de comando as amplitudes das tensões fundamentais de fase desejadas ($\vec{v}_{abc}^*$) e utiliza a informação do vetor de correntes para que seja possível comandar o retificador.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulador.eps}
+	\caption{Neste capítulo será apresentado o modulador em destaque.}
+	\label{modulador}
+\end{figure}
+
+Dentre as técnicas de modulação conhecidas aplicadas a retificadores e inversores trifásicos, a modulação vetorial (SVM $-$ \textit{space vector modulation}) é um dos métodos mais importantes e consolidados na literatura \cite{Artigos-05-03}. Além da ampla faixa de operação linear do método, a partir do posicionamento adequado dos pulsos de comando permite que diversos índices de desempenho sejam otimizados, tais quais: minimização do número de comutações, minimização de perdas e minimização da taxa de distorção harmônica, entre outros.
+
+Os conceitos fundamentais da modulação vetorial podem ser encontrados em uma vasta literatura \cite{Livros-07, Livros-LIPO, Artigos-05-03}, entre outros. E sua aplicação mais comum é no inversor de tensão trifásico apresentado na Fig.~\ref{modulacao:inversor}. Em retificadores trifásicos unidirecionais deve-se observar que os vetores de tensão disponíveis são dependentes não só dos estados de comutação, mas também do sentido da corrente \cite{Artigos-05-06, Artigos-05-07, Artigos-05-02, Artigos-05-08, Teses-05-01}. 
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/vsi-conversor.eps}
+	\caption{Inversor de tensão trifásico.}
+	\label{modulacao:inversor}
+\end{figure}
+
+Na Fig.~\ref{modulacao:mapa2} é apresentado o mapa de vetores do inversor de tensão trifásico e seus respectivos setores de tensão definidos como sendo a região entre vetores adjacentes. Estes estão ilustrados no domínio do tempo para tensões trifásicas senoidais e balanceadas na Fig.~\ref{modulacao:setores}, em conjunto com os setores de corrente definidos na Fig.~\ref{retificador:setores}. Os vetores de tensão são calculados segundo (\ref{eq:vetores}).
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=\escalafig]{Figuras/modulacao/vsi-mapa.eps}
+\caption{Mapas de vetores do inversor de tensão trifásico.}
+\label{modulacao:mapa2}
+\end{figure}
+
+\begin{equation}
+\label{eq:vetores}
+\vec{V}_k=\left\{
+\begin{array}{c l}
+ 0 & \textrm{, com } k=0 \\
+ \dfrac{2}{3}V_{dc}e^{j\left(k-1\right)\pi/3} & \textrm{, com } k\in\{1,2,..,6\}
+\end{array}\right.
+\end{equation}
+
+Como o sentido das correntes influencia no vetor de tensão gerado em retificadores trifásicos unidirecionais, são definidos subsetores para as intersecções entre os setores de tensão e corrente da Fig.~\ref{modulacao:setores} \cite{Teses-05-01}. O mapa de vetores e os respectivos subsetores estão ilustrados na Fig.~\ref{modulacao:mapa1}. A defasagem angular entre tensão e corrente $\delta_i$ é transferida para o mapa de vetores.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/delta-setores.eps}
+	\caption{Setores de corrente e tensão.}
+	\label{modulacao:setores}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=\escalafig]{Figuras/modulacao/delta-mapa.eps}
+\caption{Mapas de vetores do $\textrm{VSR}_{\Delta}$.}
+\label{modulacao:mapa1}
+\end{figure}
+
+Será apresentada a metodologia para obtenção dos estados de comutação associados aos vetores do $\textrm{VSR}_{\Delta}$ \cite{Teses-05-01}. Duas estratégias de modulação do VSR$_{\Delta}$  serão analisadas e comparadas quantitativamente  pela análise das perdas. Uma dessas estratégias está sendo proposta neste trabalho e tem como objetivo minimizar as perdas em condução. Em seguida, é apresentada a metodologia para implementação digital e quais os efeitos causados devido à operação com relativa baixa frequência de comutação, isto é, baixo índice de modulação em frequência, bem como os métodos empregados para compensar tais efeitos. Por fim, são apresentados resultados de simulação para validar as técnicas de modulação e os métodos de compensação.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Análise Vetorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A metodologia para determinação de todos os vetores disponíveis, que são função dos estados de comutação dos interruptores e das correntes de fase, é exemplificada para os subsetores $6^A_+$ e $1^A_+$ (setor $A_+$) da Fig.~\ref{modulacao:mapa1}. Nesses subsetores tem-se que $i_a>0$, $i_b<0$ e $i_c<0$ e deseja-se obter os vetores disponíveis variando-se os estados de comutação dos interruptores $S_{ab}$, $S_{bc}$ e $S_{ca}$. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/A+_100-conversor.eps}
+	\caption{Análise do VSR$_\Delta$ para os subsetores $6^A_+$ e $1^A_+$.}
+	\label{modulacao:convI}
+\end{figure}
+
+Na Fig.~\ref{modulacao:convI} está ilustrado o VSR$_\Delta$ em que foram aplicados os comando de conduzir ($=1$) no interruptor $S_{ab}$ e bloquear ($=0$) em $S_{bc}$ e $S_{ca}$. No exemplo dado, os diodos $D_{cp}$, $D_{an}$ e $D_{bn}$ encontram-se bloqueados e os diodos $D_{ap}$, $D_{bp}$ e $D_{cn}$ aptos a conduzir, então é possível determinar as tensões de linha sobre os terminais do gerador. Nesse caso tem-se que $v_{ab}=0$, $v_{bc}=+V_{dc}$ e $v_{ca}=-V_{dc}$. Os resultados para todos os estados topológicos são mostrados no plano $\alpha\beta$ da Fig.~\ref{modulacao:vetoresA}, em que os estados estão escritos na forma $(S_{ab}S_{bc}S_{ca})$. Os vetores foram obtidos a partir da Transformada de Clarke\footnote{Utiliza-se $\theta(t_0)=\pi/2$, que é a posição dos eixos mais comum na análise de conversores estáticos \cite{Livros-LIPO}. Esta é ainda a forma original empregada por Edith Clarke \cite{Artigos-Clarke}.} nas tensões de fase do retificador, com $v_{\alpha}=v^0_{d,r}$, $v_{\beta}=v^0_{q,r}$ e $\vec{V}=v_{\alpha}+jv_{\beta}$. Observa-se que estas foram calculadas transformando as tensões de fase em tensões de linha a partir de (\ref{eq:clarke-linha}), pois em alguns estados a tensão de modo comum não é definida pelos estados topológicos do conversor, apenas por elementos parasitas \cite{Teses-03-14,Artigos-05-01}. Uma análise das tensões de modo comum é apresentada no Apêndice~\ref{apendice:vsr-delta}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/vetores-A.eps}
+	\caption{Vetores disponíveis nos subsetores $6^A_+$ e $1^A_+$.}
+	\label{modulacao:vetoresA}
+\end{figure}
+
+Da Fig.~\ref{modulacao:vetoresA} nota-se uma grande redundância de vetores nulos (4 possibilidades), tais vetores podem ser utilizados para otimizar uma sequência de comutação pelos seus posicionamentos. Nota-se também que todos os vetores nulos foram gerados pela combinação de dois ou três interruptores em condução. Portanto, pode-se utilizar apenas dois interruptores para controlar as correntes, podendo o outro interruptor ficar bloqueado por $60^{\circ}$ \cite{Artigos-05-01}. Essas conclusões irão influenciar na determinação de sequências de comutação otimizadas para o retificador.
+
+\begin{equation}
+\label{eq:clarke-linha}
+\left[\begin{matrix}
+ v_{\alpha}\\
+ v_{\beta}
+\end{matrix}\right]=\dfrac{2}{3}\left[
+\begin{matrix}
+ 1 & -1/2 & -1/2 \\
+ 0 & \sqrt{3}/2 & -\sqrt{3}/2 
+\end{matrix}\right]\left[\begin{matrix}
+ v_{a,r}\\
+ v_{b,r}\\
+ v_{c,r}
+\end{matrix}\right]=\dfrac{1}{3}\left[
+\begin{matrix}
+ 1 & 0 & -1 \\
+ 0 & \sqrt{3} & 0 
+\end{matrix}\right]\left[\begin{matrix}
+ v_{ab}\\
+ v_{bc}\\
+ v_{ca}
+\end{matrix}\right]
+\end{equation}
+
+Os resultados da aplicação da metodologia apresentada para todos os subsetores são mostrados na Tabela~\ref{tab:SVM_01}\footnote{O símbolo $*$ nas correntes significa que esta pode ser positiva ou negativa.}. Os subsetores foram omitidos para compactação dos resultados.
+
+\begin{table}[!htb]
+\caption{Estados de comutação e vetores disponíveis}
+\label{tab:SVM_01}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c c c | c c c | c c c}
+
+\hline
+\multirow{2}{*}{Vetor} & \multicolumn{3}{|c|}{Tensões de Linha} & \multicolumn{3}{|c|}{Comandos} & \multicolumn{3}{|c}{Correntes}  \\
+\cline{2-10}
+ &  $v_{ab}$ & $v_{bc}$ & $v_{ca}$ & $S_{ab}$ & $S_{bc}$ & $S_{ca}$ & $i_{a}$ & $i_{b}$ & $i_{c}$
+\\  
+
+\hline
+\hline
+ \multirow{4}{*}{$\vec{V}_0$}& \multirow{4}{*}{$0$}& \multirow{4}{*}{$0$}& \multirow{4}{*}{$0$}& $  0  $ & $   1  $ & $   1   $ & $*$ & $*$ & $*$\\
+ & & & & $  1  $ & $  0   $ & $   1   $ & $*$ & $*$ & $*$\\
+ &  &  &  & $1$ & $1$ & $0$ & $*$ & $*$ & $*$\\
+ & & & & $1$ & $1$ & $1$ & $*$ & $*$ & $*$\\
+
+\hline
+\multirow{2}{*}{$\vec{V}_1$}& \multirow{2}{*}{$+V_{dc}$}& \multirow{2}{*}{$0$}& \multirow{2}{*}{$-V_{dc}$} & $0$ & $1$ & $0$ & $+$ & $*$ & $*$\\
+ &  &  &  & $0$ & $0$ & $0$ & $+$ & $-$ & $-$\\
+
+\hline
+\multirow{2}{*}{$\vec{V}_2$}& \multirow{2}{*}{$0$}& \multirow{2}{*}{$+V_{dc}$}& \multirow{2}{*}{$-V_{dc}$} & $1$ & $0$ & $0$ & $*$ & $*$ & $-$\\
+ &  &  &  & $0$ & $0$ & $0$ & $+$ & $+$ & $-$\\
+
+\hline
+ \multirow{2}{*}{$\vec{V}_3$}& \multirow{2}{*}{$-V_{dc}$}& \multirow{2}{*}{$+V_{dc}$}& \multirow{2}{*}{$0$} & $0$ & $0$ & $1$ & $*$ & $+$ & $*$\\
+ &  &  &  & $0$ & $0$ & $0$ & $-$ & $+$ & $-$\\
+
+\hline
+ \multirow{2}{*}{$\vec{V}_4$}& \multirow{2}{*}{$-V_{dc}$}& \multirow{2}{*}{$0$}& \multirow{2}{*}{$+V_{dc}$} & $0$ & $1$ & $0$ & $-$ & $*$ & $*$\\
+ &  &  &  & $0$ & $0$ & $0$ & $-$ & $+$ & $+$\\
+
+\hline
+\multirow{2}{*}{$\vec{V}_5$}& \multirow{2}{*}{$0$}& \multirow{2}{*}{$-V_{dc}$}& \multirow{2}{*}{$+V_{dc}$} & $1$ & $0$ & $0$ & $*$ & $*$ & $+$\\
+ & &  &  & $0$ & $0$ & $0$ & $-$ & $-$ & $+$\\
+
+\hline
+\multirow{2}{*}{$\vec{V}_6$}& \multirow{2}{*}{$+V_{dc}$}& \multirow{2}{*}{$-V_{dc}$}& \multirow{2}{*}{$0$} & $0$ & $0$ & $1$ & $*$ & $-$ & $*$\\
+ &  &  &  & $0$ & $0$ & $0$ & $+$ & $-$ & $+$\\
+
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementação dos Vetores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A síntese do vetor de referência será feita como em um inversor de tensão trifásico \cite{Livros-07}. Embora para o retificador estejam à disposição quatro vetores a cada subsetor, serão utilizados somente os vetores adjacentes ao setor de tensão, conforme ilustrado na Fig.~\ref{modulacao:mapa3}. Portanto, para o subsetor $1^A_{+}$ o vetor $\vec{V}_6$ não será utilizado.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-vetorRef.eps}
+	\caption{Detalhe do mapa de vetores e vetor de referência como exemplo.}
+	\label{modulacao:mapa3}
+\end{figure}
+
+O vetor de referência será uma composição dos vetores $\vec{V}_0$, $\vec{V}_1$ e $\vec{V}_2$, cuja relação matemática é dada pelo balanço de fluxo em um período de comutação\footnote{Ou meio período de comutação, caso a portadora seja triangular.} (\ref{eq:fluxoVref}).
+
+\begin{equation}
+\label{eq:fluxoVref}
+\vec{V}^*{T_s}=\vec{V}_{0}{T_0}+\vec{V}_{1}{T_1}+\vec{V}_{2}{T_2}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\vec{V}^*$: é o vetor de referência fornecido pelo controle de corrente. A sua relação com as tensões do plano $\alpha\beta$ é dada por (\ref{eq:Vref2});
+
+$T_s$: é o período de comutação dado pela soma dos tempos de aplicação dos vetores em (\ref{eq:Ts});
+
+$T_0$: é o tempo de aplicação do vetor nulo;
+
+$T_1$: é o tempo de aplicação do vetor $\vec{V}_1$;
+
+$T_2$: é o tempo de aplicação do vetor $\vec{V}_2$.
+
+\begin{equation}
+\label{eq:Ts}
+T_s=T_0+T_1+T_2
+\end{equation}
+
+\begin{equation}
+\label{eq:Vref2}
+\vec{V}^*=V^*e^{j\theta_v^*}=v_{\alpha}^*+jv_{\beta}^*
+\end{equation}
+
+Assim, os tempos de aplicação dos vetores $T_0$, $T_1$ e $T_2$ são obtidos substituindo (\ref{eq:Vref2}) e (\ref{eq:Ts}) em (\ref{eq:fluxoVref}). Os resultados são apresentados em (\ref{eq:T1}), (\ref{eq:T2}) e (\ref{eq:T0}).
+
+\begin{equation}
+\label{eq:T1}
+T_1=\frac{\sqrt{3} T_s V^*}{V_{dc}}\textrm{sen} \left(\frac{\pi}{3}-\theta'_v\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:T2}
+T_2=\frac{\sqrt{3} T_s V^*}{V_{dc}}\textrm{sen} \left(\theta'_v\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:T0}
+T_0=T_s-T_1-T_2
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\theta'_v$: é uma transformação para que os ângulos sejam referenciados ao setor $S_1$, isto é, $0 \leq \theta'_v \leq 60^{\circ}$. Essa transformação é dada por (\ref{eq:theta}), em que $n$ é número do setor de tensão \cite{Livros-07}.
+
+\begin{equation}
+\label{eq:theta}
+\theta'_v=\theta_v^*-\left(n-1\right)\dfrac{\pi}{3} \quad
+\textrm{com } n\in\{1,2,...,6\}
+\end{equation}
+
+Deve-se observar que (\ref{eq:T1}), (\ref{eq:T2}) e (\ref{eq:T0}) são válidas para operação na região de modulação linear do retificador. O limite da região linear é o vetor de referência cuja amplitude máxima da tensão de fase é $V^*_{max}=V_{dc}/\sqrt{3}$. A limitação da amplitude do vetor de referência é feita pela saturação da ação de controle nesse limite e calculando o vetor de referência de acordo com a metodologia apresentada.
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sequências de Comutação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para efeito comparativo serão apresentadas duas estratégias de sequências de comutação. Uma proposta por \cite{Artigos-05-01} (referenciada como SVM~I) que visa minimizar o número de comutações. E outra em que é proposta uma modificação nessa estratégia (referenciada como SVM~II) pelo reposicionamento do vetor nulo e que resulta na minimização das perdas em condução \cite{PCIM}. 
+
+Os esforços de corrente e as perdas em condução e em comutação são determinados no Apêndice~\ref{apendice:vsr-delta} para ambas as modulações. Uma comparação das perdas das sequências de comutação para o WECS será apresentada no Capítulo~\ref{chapter-gsip-controle}, em que conclui-se que a estratégia que resulta nas menores perdas é, de fato, a estratégia SVM~II.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SVM I: Minimização das Comutações}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O objetivo desta estratégia é minimizar o número de comutações e, se possível, escolher dentre as sequências obtidas a que tenha as menores perdas para otimizar o resultado. Mais uma vez, utiliza-se o subsetor $1^A_+$ para exemplificar a metodologia aplicada. 
+
+O subsetor $1^A_+$ têm $\vec{V}_0$, $\vec{V}_1$ e $\vec{V}_2$  como vetores disponíveis e sabe-se que um interruptor não precisa ser comandado, de forma que sejam evitadas comutações desnecessárias. Analisando a Fig.~\ref{modulacao:vetoresA}, conclui-se que os estados topológicos possíveis são $4$. Estes estão reescritos na Tabela~\ref{tab:S1a} por comodidade. As sequências que minimizam as comutações devem ser de cinco segmentos e na seguinte ordem $\left({\vec{V}_1,\vec{V}_2},\vec{V}_0,\vec{V}_2,\vec{V}_1\right)$, dessa forma é possível trabalhar com portadoras triangulares para sintetizar os comandos. São possíveis 	duas sequências com número de mínimo de comutações e que estão ilustradas na Fig.~\ref{modulacao:coms} para meio período de comutação.  Observa-se que a minimização das comutações foi atingida com uma comutação por período e um interruptor bloqueado. Portanto, o critério para determinar a melhor sequência torna-se as perdas.
+
+\begin{figure}[!htb]
+	\centering
+	\mbox{
+	
+	\subfigure[]{
+	\label{modulacao:com101}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-101-sequencia.eps}}
+	
+	\subfigure[]{
+	\label{modulacao:com110}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-110-sequencia.eps}}
+	}
+	\caption[Possíveis sequências no subsetor $1^A_+$.]{Possíveis sequências no subsetor $1^A_+$ em meio período de comutação.}
+	\label{modulacao:coms}
+\end{figure}
+
+\begin{table}[!htb]
+\caption{Vetores disponíveis no subsetor $1^A_+$}
+\label{tab:S1a}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c c c | c c c | c}
+\hline
+\multicolumn{3}{c|}{Comandos} & \multicolumn{3}{|c|}{Tensões} & \multirow{2}{*}{Vetor} \\
+\cline{1-6}
+$S_{ab}$ & $S_{bc}$ & $S_{ca}$ & $v_{ab}$ & $v_{bc}$& $v_{ca}$ & \\
+\hline
+\hline
+
+$0$& $0$& $0$& $+V_{dc}$& $0$& $-V_{dc}$& $\vec{V}_1$\\
+\hline
+
+$1$& $0$& $0$& $0$& $+V_{dc}$& $-V_{dc}$& $\vec{V}_2$\\
+\hline
+
+$1$& $0$& $1$& $0$& $0$& $0$& $\vec{V}_0$\\
+\hline
+
+$1$& $1$& $0$& $0$& $0$& $0$& $\vec{V}_0$\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+As perdas são analisadas no funcionamento da estrutura com o vetor nulo, em que os caminhos das correntes estão ilustrados na Fig.~\ref{modulacao:perdas}. A diferença entre os dois casos é a condução da corrente $i_a$, que no caso da Fig.~\ref{modulacao:perdas2} se dá totalmente pelo interruptor $S_{ab}$ e  na Fig.~\ref{modulacao:perdas1} é dividida entre os interruptores $S_{ab}$ e $S_{ca}$. O caso que resulta nas menores perdas de condução é o primeiro, pois as correntes são menores e, portanto, leva a menores perdas. Logo, o resultado obtido é uma sequência de comutação ótima \cite{Artigos-05-01}.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\subfigure[$\left(S_{ab}S_{bc}S_{ca}\right)=\left(101\right)$ no subsetor $1^A_+$]{
+	\label{modulacao:perdas2}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-101-conversor.eps}}
+	
+	\subfigure[ $\left(S_{ab}S_{bc}S_{ca}\right)=\left(110\right)$ no subsetor $1^A_+$]{
+	\label{modulacao:perdas1}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-110-conversor.eps}}
+	
+	\caption{Aplicação do vetor nulo para os casos em análise.}
+	\label{modulacao:perdas}
+\end{figure}
+
+Aplicando essa metodologia a todos os subsetores, foram determinadas todas as sequências de comutação e de vetores ótimas para o $\textrm{VSR}_{\Delta}$. Estas são apresentadas na Fig.~\ref{modulacao:vetoresE01}, cujos resultados podem ser utilizados para desenvolver um algoritmo para implementar a modulação vetorial. É importante observar que na troca de subsetores não ocorrem comutações, pois todas as sequências iniciam e terminam com os interruptores abertos, isto é, $(S_{ab}S_{bc}S_{ca})=(000)$. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/vetoresE01.eps}
+	\caption{Sequências de comutação para a estratégia SVM I.}
+	\label{modulacao:vetoresE01}
+\end{figure}
+
+Por fim, é importante salientar uma propriedade dessa estratégia de modulação: simetria de quarto de onda. Na Fig.~\ref{modulacao:simetria} estão ilustradas as tensões de linha geradas em dois subsetores diametralmente opostos ($1^A_+$ e $4^A_-$), mostrando que as tensões geradas são opostas. Este resultado será comprovado pelo cálculo analítico das harmônicas das tensões de linha no Apêndice~\ref{apendice:vsr-delta}, em que mostra-se que estas só tem conteúdo harmônico em baixa frequência na frequência fundamental. As harmônicas da portadora dependem da técnica de amostragem empregada, mas mostra-se que é possível escolher uma técnica que gere somente harmônicas com bandas laterais ímpares.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/simetria.eps}
+	\caption{Tensões de linha geradas nos subsetores $1^A_+$ e $4^A_-$.}
+	\label{modulacao:simetria}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SVM II: Minimização das Perdas em Condução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O objetivo desta estratégia é determinar a sequência de comutação que gere as menores perdas em condução. A análise do posicionamento do vetor nulo para determinar as menores perdas em condução foi realizada por \cite{Teses-03-14}, mas não houve a preocupação de determinar uma sequência de comutação otimizada. Foi também realizada uma análise das perdas em comutação, provando que estas são as mesmas para as quatro escolhas possíveis de vetores nulos. No entanto, essa análise não era para uma sequência de comutações otimizada e era considerado que as perdas em comutação são lineares, o que é válido apenas para IGBTs de alta potência. 
+
+Mais uma vez será utilizado o subsetor $1^A_+$ para exemplificar a metodologia aplicada. Para os vetores ativos há apenas uma redundância no vetor $\vec{V}_1$ e que, nesse caso, utiliza-se o mesmo estado topológico da sequência anterior, pois a outra possibilidade não mudaria as perdas em condução, aumentaria o número de comutações e as perdas em comutação. Portanto, a estratégia proposta visa modificar o vetor nulo utilizado na sequência anterior para o estado topológico em que as perdas em condução são as menores. 
+
+Na sequência anterior foram analisadas duas situações para o posicionamento do vetor nulo, aqui se faz uma análise das duas restantes ilustradas na Fig.~\ref{modulacao:zerovector}. Nota-se que para estado $\left(011\right)$ (Fig.~\ref{modulacao:011}) as perdas em condução são equivalentes ao estado $\left(110\right)$ (Fig.~\ref{modulacao:perdas1}) e já se concluiu que esses estados não são úteis. Deve-se então comparar a estratégia anterior (SVM~I) com a estratégia que utiliza todos os estados para geração do vetor nulo (SVM~II). Esta é ilustrada na Fig.~\ref{modulacao:111}.  
+
+\begin{figure}[!p]
+	\centering
+	
+	\subfigure[$\left(S_{ab}S_{bc}S_{ca}\right)=\left(011\right)$ no subsetor $1^A_+$]{
+	\label{modulacao:011}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-011-conversor.eps}}
+	
+	\subfigure[ $\left(S_{ab}S_{bc}S_{ca}\right)=\left(111\right)$ no subsetor $1^A_+$]{
+	\label{modulacao:111}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/S1a-111-conversor.eps}}
+	
+	\caption{Aplicação do vetor nulo para os casos restantes.}
+	\label{modulacao:zerovector}
+\end{figure}
+
+Para comparar as sequências em termos das perdas em condução, determinam-se os esforços de corrente e as perdas em condução para cada sequência, conforme apresentado no Apêndice~\ref{apendice:vsr-delta}. Na  Fig.~\ref{modulacao:perdas-cond} está ilustrado o ganho percentual de perdas em condução no MOSFET ao se utilizar a estratégia proposta frente à estratégia SVM~I com $\delta_i=0$, em que se observa, como esperado, uma redução das perdas.
+
+\begin{figure}[!p]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/perdas-cond.eps}
+	\caption{Ganho percentual de perdas em condução no MOSFET.}
+	\label{modulacao:perdas-cond}
+\end{figure}
+
+Da mesma maneira que as perdas em condução, são determinadas as perdas em comutação no Apêndice~\ref{apendice:vsr-delta}. O ganho percentual de perdas em comutação no MOSFET está ilustrado na Fig.~\ref{modulacao:perdas-comu}. Observa-se que há regiões em que as perdas são maiores na estratégia SVM~I e outras em que estas são maiores na SVM~II. Portanto, a conclusão sobre as perdas em comutação irá depender dos pontos de operação do WECS. 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/perdas-comu.eps}
+	\caption{Ganho percentual de perdas em comutação no MOSFET.}
+	\label{modulacao:perdas-comu}
+\end{figure}
+
+Ressalta-se que é possível obter para as duas estratégias as mesmas perdas em comutação da estratégia SVM~I, caso se utilize um tempo morto ``dinâmico'' nos interruptores. Isto é, aplica-se o vetor nulo da estratégia SVM~I e após um período de tempo morto aplica-se o comando para utilizar o estado (111). Essa estratégia garantiria comutação sob tensão nula para o interruptor com tempo morto e, portanto, sem perdas. No entanto, optou-se por não implementar essa estratégia devido ao baixo ganho de rendimento e ao aumento da complexidade computacional, pois há a necessidade de modificar em tempo real o interruptor que recebe o tempo morto.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aspectos da Implementação Digital} \label{mod:sec-digital}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modulação Vetorial por Portadoras}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Devido à forma simétrica dos pulsos de comando e de haver apenas uma comutação por período de comutação, pode-se facilitar a implementação da modulação vetorial em dispositivos digitais, tais como DSCs (\textit{digital signal controller} $-$ contolador digital de sinais), FPGAs (\textit{field-programmable gate array} $-$ arranjo de portas programável em campo) etc, pela determinação de funções de razão cíclica. 
+
+As funções de razão cíclica são obtidas a partir das relações entre os tempos de atuação dos vetores e dos tempos de comando dos interruptores para cada subsetor. Assim, é possível gerar os comandos a partir da comparação com portadoras disponíveis no DSC ao invés de implementar a modulação pela busca de vetores em tabelas. A portadora deve ser triangular, pois a sequência dos pulsos de comando têm simetria de meia-onda. Essa metodologia pode ser encontrada em diversos trabalhos \cite{Artigos-05-03,Teses-05-01}. 
+
+A metodologia será aplicada ao $\textrm{VSR}_{\Delta}$ para a sequência de comandos da estratégia SVM I\footnote{Para utilizar a estratégia SVM II bastam apenas algumas simples modificações.} apresentada em duas etapas para facilitar a compreensão. Ressalta-se que, a obtenção das funções de razão cíclica é interessante também para o cálculo dos esforços de correntes e das componentes harmônicas das tensões, conforme apresentado no Apêndice~\ref{apendice:vsr-delta}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cálculo das Funções de Razão Cíclica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sejam os comandos dos interruptores bidirecionais no subsetor $1^A_{+}$ ilustrados na Fig.~\ref{modulacao:vetoresE01}. Os tempos de aplicação dos comandos em cada interruptor podem ser calculados a partir da soma dos tempos de aplicação dos vetores em um período de comutação. O cálculo desses tempos é apresentado em (\ref{eq:tempos-d}).
+
+\begin{equation}
+\label{eq:tempos-d}
+\begin{array}{c l}
+T_{ab}&=T_2+T_0=T_s-T_1 \\
+T_{bc}&=0 \\
+T_{ca}&=T_0=T_s-T_1-T_2 
+\end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$T_{x}$: é o tempo de aplicação dos comandos no interruptor $x$.
+
+Ao aplicar essa metodologia para todos os subsetores, determinam-se os tempos de aplicação dos comandos para cada subsetor em função dos tempos de aplicação vetores calculados a partir de (\ref{eq:T1}), (\ref{eq:T2}) e  (\ref{eq:T0}). Esse tempos podem convertidos em razões cíclicas pela divisão de (\ref{eq:tempos-d}) pelo período de comutação em (\ref{eq:T-d}). Na Tabela~\ref{tab:d012} estão os resultados da aplicação dessa metodologia para todos os subsetores\footnote{As aspas simples nas razões cíclicas indicam a ordem em que o vetor aparece na sequência. Por exemplo, no subsetor $4^A_{-}$ que é utilizada a sequência $\left(\vec{V}_4,\vec{V}_5,\vec{V}_0,\vec{V}_5,\vec{V}_4\right)$, o vetor correspondente ao vetor $\vec{V}'_1$ é $\vec{V}_4$ e o correnspondente ao vetor $\vec{V}'_2$ é $\vec{V}_5$.}.
+
+\begin{equation}
+\label{eq:T-d}
+d_{x}=\dfrac{T_{x}}{T_s} \qquad \textrm{, com } x\in\{ab,bc,ca, 0, 1, 2\}
+\end{equation}
+
+\begin{table}[!htbp]
+\caption{Funções de razão cíclica pelo tempo de aplicação dos vetores}
+\label{tab:d012}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  | c  }
+\hline
+\multirow{2}{*}{Subsetor} & \multicolumn{3}{|c}{Funções de Razão Cíclica} \\
+\cline{2-4}
+& $d_{ab}$ & $d_{bc}$ & $d_{ca}$  \\
+\hline
+\hline
+
+$1^A_{+}$ e $4^A_{-}$ & $1-d'_1$ & $0$ & $1-d'_1-d'_2$ \\
+\hline
+
+$1^C_{-}$ e $4^C_{+}$ & $0$ & $1-d'_2$ & $1-d'_1-d'_2$ \\
+\hline
+
+$2^C_{-}$ e $5^C_{+}$ & $0$ & $1-d'_1-d'_2$ & $1-d'_1$ \\
+\hline
+
+$2^B_{+}$ e $5^B_{-}$ & $1-d'_2$ & $1-d'_1-d'_2$ & $0$ \\
+\hline
+
+$3^B_{+}$ e $6^B_{-}$ & $1-d'_1-d'_2$ & $1-d'_1$ & $0$ \\
+\hline
+
+$3^A_{-}$ e $6^A_{+}$ & $1-d'_1-d'_2$ & $0$ & $1-d'_2$ \\
+
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Para ilustrar o resultado da utilização da Tabela~\ref{tab:d012}, são apresentadas\footnote{$T_e=1/f_e$ é igual ao período na frequência angular síncrona.} na Fig.~\ref{modulacao:dab-E01} as funções de razão cíclica $d_{ab}$ e $d_{bc}$ obtidas com as funções de modulação, em que $M=0,75$ e $\delta_i=0$. São também ilustrados os períodos referentes aos subsetores. Estas funções de razões cíclicas podem ser aplicadas em um comparador para gerar os pulsos de comandos, conforme ilustrado na Fig.~\ref{modulacao:comparador-d}. Observa-se que o comparador deve estar invertido e as funções de razão cíclica devem ser complementares.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/dab-E01.eps}
+	\caption{Funções de razão cíclica para a estratégia SVM I.}
+	\label{modulacao:dab-E01}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/comparador-d.eps}
+	\caption{Comparador para determinação dos tempos dos vetores.}
+	\label{modulacao:comparador-d}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection[Funções de Razão Cíclica no Plano AlphaBeta]{Funções de Razão Cíclica no Plano $\alpha \beta$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para evitar o cálculo dos tempos dos vetores, pode-se calcular diretamente as funções de razão de cíclica a partir das relações obtidas no plano $\alpha\beta$. Esse procedimento visa reduzir o número de cálculos necessários, mas pode ser evitado caso se deseje. Para exemplificar a metodologia estão ilustrados na Fig.~\ref{modulacao:planoV12} as relações entre o plano $\alpha\beta$ e os vetores associados aos estados de comutação do setor $S_1$.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/planoV12.eps}
+	\caption{Relação entre os tempos dos vetores e o plano $\alpha\beta$.}
+	\label{modulacao:planoV12}
+\end{figure}
+
+As relações matemáticas entre os vetores da Fig.~\ref{modulacao:planoV12} podem ser obtidas a partir de (\ref{eq:fluxoVref}), (\ref{eq:Vref2}) e (\ref{eq:T-d}), cujo resultado é mostrado em (\ref{eq:vab-v12}).
+
+\begin{equation}
+\label{eq:vab-v12}
+\vec{V}^*=v^*_{\alpha} + j v^*_{\beta}=d_1 \vec{V}_1 + d_2 \vec{V}_2
+\end{equation}
+
+Aplicando os valores dos vetores expressos por (\ref{eq:vetores}) em (\ref{eq:vab-v12}) e fazendo $v^*_{\alpha}=d^*_{\alpha}V_{dc}$ e $v^*_{\beta}=d^*_{\beta}V_{dc}$, obtém-se as razões cíclicas em termos das componentes $\alpha\beta$ (\ref{eq:dab-d12}).
+
+\begin{equation}
+\label{eq:dab-d12}
+\begin{array}{c l}
+d_{1}&=\dfrac{3}{2}\left(d^*_{\alpha}-\dfrac{1}{\sqrt{3}}d^*_{\beta}\right) \\
+d_{2}&=\sqrt{3}d^*_{\beta}
+\end{array}
+\end{equation}
+
+\begin{table}[!htbp]
+\caption{Relação entre os tempos dos vetores e o plano $\alpha\beta$}
+\label{tab:d12-dab}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c }
+\hline
+Setor  & \multicolumn{2}{c}{Funções de Razão Cíclica dos Vetores} \\
+\cline{2-3}
+de Tensão & $d'_1$ & $d'_2$\\
+\hline
+\hline
+%& & \\
+$S_1$ & $d_1=\dfrac{3}{2}\left(d^*_{\alpha}-\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ & $d_2=\sqrt{3}d^*_{\beta}$ \\
+%& & \\
+\hline
+
+%& & \\
+$S_2$ & $d_2=\dfrac{3}{2}\left(d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ & $d_3=\dfrac{3}{2}\left(-d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ \\
+%& & \\
+\hline
+
+%& & \\
+$S_3$ & $d_3=\sqrt{3}d^*_{\beta}$  & $d_4=-\dfrac{3}{2}\left(d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$\\
+%& & \\
+\hline
+
+%& & \\
+$S_4$ & $d_4=\dfrac{3}{2}\left(-d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ & $d_5=-\sqrt{3}d^*_{\beta}$ \\
+%& & \\
+\hline
+
+%& & \\
+$S_5$ & $d_5=-\dfrac{3}{2}\left(d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ & $d_6=\dfrac{3}{2}\left(d^*_{\alpha}-\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ \\
+%& & \\
+\hline
+
+%& & \\
+$S_6$ & $d_6=-\sqrt{3}d^*_{\beta}$ & $d_1=\dfrac{3}{2}\left(d^*_{\alpha}+\dfrac{1}{\sqrt{3}}d^*_{\beta}\right)$ \\
+%& & \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+Aplicando essa metodologia a todos os setores de tensão obtém-se o resultado mostrado na Tabela~\ref{tab:d12-dab}. Utilizando esse resultado na Tabela~\ref{tab:d012} obtém-se como resultado a Tabela~\ref{tab:dxy-delta}, que apresenta as funções de razão cíclica do VSR$_\Delta$ em termos das variáveis $\alpha\beta$ \footnote{Para a estratégia SVM II é só substituir a função de razão cíclica nula pelo menor valor entre as duas funções de razão cíclica não nulas daquele setor ($d_x$ e $d_y$), isto é, $\min(d_x,d_y)$. Por exemplo, para o setor $A_+$ tem-se que $d_{bc}=\min(d_{ab},d_{ca})$.}. Observa-se que ao utilizar esta tabela não é necessário determinar os setores tensão, apenas os setores de corrente.
+
+\begin{table}[!htbp]
+\caption{Funções de razão cíclica em função das variáveis do plano $\alpha\beta$}
+\label{tab:dxy-delta}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  | c  }
+\hline
+Setor de & \multicolumn{3}{|c}{Funções de Razão Cíclica} \\
+\cline{2-4}
+Corrente & $d_{ab}$ & $d_{bc}$ & $d_{ca}$\\
+\hline
+\hline
+
+%& & \\
+$A_+$ & $1-\dfrac{3}{2} d^*_{\alpha} + \dfrac{\sqrt{3}}{2}d^*_{\beta}$ & $0$ & $1-\dfrac{3}{2} d^*_{\alpha} - \dfrac{\sqrt{3}}{2}d^*_{\beta}$  \\
+%& & \\
+\hline
+
+%& & \\
+$C_-$ & $0$ & $1-\sqrt{3}d^*_{\beta}$ & $1-\dfrac{3}{2} d^*_{\alpha} - \dfrac{\sqrt{3}}{2}d^*_{\beta}$  \\
+%& & \\
+\hline
+
+%& & \\
+$B_+$ & $1+\dfrac{3}{2} d^*_{\alpha} - \dfrac{\sqrt{3}}{2}d^*_{\beta}$ & $1-\sqrt{3}d^*_{\beta}$ & $0$  \\
+%& & \\
+\hline
+
+%& & \\
+$A_-$ & $1+\dfrac{3}{2} d^*_{\alpha} - \dfrac{\sqrt{3}}{2}d^*_{\beta}$ & $0$ & $1+\dfrac{3}{2} d^*_{\alpha} + \dfrac{\sqrt{3}}{2}d^*_{\beta}$  \\
+%& & \\
+\hline
+
+%& & \\
+$C_+$ & $0$ & $1+\sqrt{3}d^*_{\beta}$ & $1+\dfrac{3}{2} d^*_{\alpha} + \dfrac{\sqrt{3}}{2}d^*_{\beta}$  \\
+%& & \\
+\hline
+
+%& & \\
+$B_-$ & $1-\dfrac{3}{2} d^*_{\alpha} + \dfrac{\sqrt{3}}{2}d^*_{\beta}$ & $1+\sqrt{3}d^*_{\beta}$ & $0$  \\
+%& & \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Escolha da Técnica de Amostragem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consideram-se duas principais técnicas de amostragem ao se utilizar portadoras triangulares \cite{Livros-LIPO, Artigos-08-02}:
+
+\begin{enumerate}
+\item Amostragem regular e simétrica na subida ou na descida (\textit{symmetrical regular sampled} ou \textit{single-update mode symmetric on-time \textrm{ou} off-time}), ilustrada na Fig.~\ref{modulacao:single-update};
+\item Amostragem regular e assimétrica (\textit{asymmetrical regular sampled} ou \textit{double-update mode}), mostrada na Fig.~\ref{modulacao:double-update}.
+\end{enumerate}
+
+\begin{figure}[!htb]
+	\centering
+	
+	\subfigure[\textit{Single-update mode symmetric on-time}]{
+	\label{modulacao:single-update}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/single-update.eps}}
+	
+	\subfigure[\textit{Double-update mode}]{
+	\label{modulacao:double-update}
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/double-update.eps}}
+	
+	\caption{Técnicas de amostragem na portadora triangular.}
+	\label{modulacao:updates}
+\end{figure}
+
+Nos dois casos, os instantes de amostragem acontecem nos extremos da portadora triangular por dois motivos:
+
+\begin{enumerate}
+\item Não há ruído de comutação. Isto é, não há comutações ocorrendo no circuito e, portanto, é melhor fazer as aquisições nesses instantes para reduzir as interferências causadas pelas comutações;
+\item A corrente instantânea é igual ao VMQI (Fig.~\ref{modulacao:portadoras-analogico}), que é justamente a componente da corrente que se deseja controlar.
+\end{enumerate}
+
+Na amostragem regular e simétrica pode-se amostrar no pico (\textit{on-time}) ou na passagem por zero (\textit{off-time}) da portadora triangular. Na amostragem regular e assimétrica amostra-se nesses dois instantes. 
+
+Em \cite{Livros-LIPO} mostra-se que as maiores vantagens de utilizar a amostragem regular e assimétrica são: o cancelamento intrínseco de harmônicas de bandas laterais pares das múltiplas da portadora nas tensões de linhas, que são geradas pelo processo de amostragem regular e simétrica; e, o espectro harmônico muito parecido com o da modulação naturalmente amostrada (analógica), que é o melhor caso\footnote{Por não haver os atrasos digitais na modulação analógica, a resposta da modulação é instantânea.}. O cálculo analítico do espectro harmônico da tensão de linha para o caso da modulação naturalmente amostrada é apresentado no Apêndice~\ref{apendice:vsr-delta}. Para as modulações digitais são descritos os procedimentos para o cálculo numérico.
+
+Do ponto de vista do modelo de grandes sinais, a amostragem regular e assimétrica também apresenta vantagens. Essa se comporta como uma portadora triangular analógica mantendo a mesma frequência máxima para o modelo de grandes sinais, pois é possível aplicar dois VMQI a cada período de comutação. Enquanto a amostragem regular e simétrica se comporta como uma portadora dente-de-serra diminuindo a frequência máxima do modelo, pois o controle também só será atualizado uma vez por período de comutação. Há também os atrasos, que são maiores na amostragem regular e simétrica, pois se leva mais tempo para atualizar a lei de controle. Esses atrasos diminuem a estabilidade do sistema, pois há um decréscimo linear da fase com o aumento da frequência e, portanto, a uma degradação da margem de fase do sistema.  Por esses motivos, a melhor escolha para a técnica de amostragem é a regular e assimétrica.
+
+As funções de transferência de pequenos sinais dos moduladores digitais para diferentes estratégias de amostragem são apresentadas em \cite{Artigos-08-02}. Para o caso da amostragem regular e assimétrica a função de transferência é dada por (\ref{eq:pwm-du}). Deve-se observar que a resposta em frequência dessa função de transferência é muito parecida com a resposta do sustentador de ordem zero (ZOH $-$ \textit{zero-order hold}), cuja função de transferência é dada  por (\ref{eq:zoh}). No entanto, para comparar essas funções de transferência deve-se compensar o ganho causado pelo amostrador ideal, que é igual ao valor da frequência de amostragem ($f_a=1/T_a$) \cite{Livros-09,Livros-Franklin}. 
+
+\begin{equation}
+\label{eq:pwm-du}
+\textrm{PWM}_{du}(s)=\dfrac{1}{2}\left(e^{-s(1-D)T_a}+e^{-sDT_a}\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:zoh}
+\textrm{ZOH}(s)=\dfrac{1-e^{-sT_a}}{s}
+\end{equation}
+
+Na Fig.~\ref{modulacao:zoh-pwm} estão ilustradas as respostas em frequência do PWM$_{du}$ para três valores de razão cíclica e do ZOH na região de interesse (abaixo da metade da frequência de amostragem). A frequência de amostragem utilizada é de 8~kHz. Nota-se que, as repostas, de fato, são bem semelhantes, principalmente se for observado que o ideal é projetar o controlador com uma largura de banda máxima de $f_a/20$ \cite{Livros-Franklin}, isto é, uma década abaixo da frequência de comutação para este tipo de amostragem. Os atrasos que são causados pelo ZOH e pelo PWM$_{du}$ são iguais em todas as condições, cujo valor é igual a meio  período de amostragem. Portanto, o ZOH representa adequadamente o PWM$_{du}$ em aplicações de controle digital, em que a largura de banda do sistema de controle é no máximo $f_a/20$. Para projetos de controladores com larguras de banda acima dessa frequência, a condição em que o ganho do modulador é unitária ($D\!=\!0,5$) representa a condição crítica, pois o ganho é sobrestimado.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/zoh_pwm.eps}
+	\caption{Diagramas de resposta em frequência do ZOH e do PWM$_{du}$.}
+	\label{modulacao:zoh-pwm}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Efeitos dos Atrasos na Modulação Digital do VSR$_{\Delta}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Como apresentado até agora, os vetores gerados pelo VSR$_{\Delta}$ são dependentes dos setores de corrente e é, portanto, necessária a identificação destes setores para comandá-lo. Devido aos atrasos existentes, haverá uma influência significativa destes no processo de identificação de setores de corrente. É importante salientar que, esses atrasos têm seus efeitos realçados devido à operação com relativa baixa frequência de comutação ($f_s\leq10$ kHz) no VSR$_{\Delta}$.
+
+Os atrasos envolvidos na identificação vão desde a leitura das correntes até a aplicação dos comandos nos interruptores, estes são o atraso causado pelo filtro anti-\textit{aliasing}, o atraso de processamento digital e atraso de reconstrução da corrente. Na Fig.~\ref{modulacao:atraso-corrente} está ilustrada a corrente amostrada no instante $k$ e o sinal de corrente no instante efetivo da aplicação do comando. Entre esses instantes há um atraso total $\phi_T$.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/atraso-corrente.eps}
+	\caption{Atraso na corrente devido à implementação digital.}
+	\label{modulacao:atraso-corrente}
+\end{figure}
+
+O atraso do filtro anti-\textit{aliasing} é obtido a partir da sua função de transferência (\ref{eq:faa}). Neste trabalho, o filtro foi realizado por um filtro passa-baixas de primeira ordem com frequência de corte $\omega_c$ igual a metade da frequência de amostragem. 
+
+\begin{equation}
+\label{eq:faa}
+F_{aa}(s)=\dfrac{\omega_c}{s+\omega_c}
+\end{equation}
+
+O atraso computacional é referente ao tempo necessário para realizar os cálculos computacionais e atualizar os registradores do processador digital. Em geral, é considerado um período de amostragem \cite{Livros-09,Teses-08-01,Teses-03-04} e dado pela função de transferência (\ref{eq:atraso-computacional}).
+
+\begin{equation}
+\label{eq:atraso-computacional}
+F_{comp}(s)=e^{-s T_a}
+\end{equation}
+
+A reconstrução da corrente tem um atraso de meio período de amostragem \cite{Livros-Franklin}. O efeito desse atraso é mais perceptível na situação de transição entre setores, pois supondo que um comando tenha sido dado referente a um setor e logo em seguida, a corrente mude de setor o comando dado já não corresponde mais a ação desejada. Esse efeito pode ser mitigado considerando o atraso da reconstrução da corrente, cuja função de transferência é dada por (\ref{eq:i-reconstrucao}).
+
+\begin{equation}
+\label{eq:i-reconstrucao}
+F_{re}(s)=e^{-s \frac{T_a}{2}}
+\end{equation}
+
+A partir de (\ref{eq:faa}), (\ref{eq:atraso-computacional}) e (\ref{eq:i-reconstrucao}), pode-se calcular o atraso total em um ciclo da frequência síncrona ($f_e$) dado por (\ref{eq:atraso-total}). Observa-se que nesse caso a função arco tangente pode ser aproximada pelo seu argumento\footnote{Isto é, $\textrm{arctan}(\phi)\approx\phi$.}, pois os ângulos são muito pequenos nessa região (menores que $1^\circ$).  Na Fig.~\ref{modulacao:atrasos} é ilustrado o atraso total em função da frequência síncrona para várias frequências de comutação ($f_s=f_a/2$). Observa-se que à medida que a frequência diminui, o atraso total torna-se elevado. Portanto, deve-se compensar os atrasos para identificar corretamente os setores de corrente e na próxima seção será apresentado um comparativo das técnicas de identificação de setores de corrente investigadas no decorrer deste trabalho.
+
+\begin{equation}
+\label{eq:atraso-total}
+\phi_T(f_e,f_a)=\textrm{arctan}\left(\dfrac{2f_e}{f_a} \right)+\left(\dfrac{3}{2}\right)\left(\dfrac{f_e}{f_a}\right)\times 2 \pi
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/atrasos.eps}
+	\caption{Atraso total em função da frequência síncrona.}
+	\label{modulacao:atrasos}   
+\end{figure}
+
+%word
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Identificação dos Setores de Corrente} \label{section:identicao-I}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No estudo do VSR$_{\Delta}$ verificou-se a necessidade de identificar com precisão os setores de correntes, devido à necessidade de se obter correntes com alta qualidade, isto é, com baixa distorção harmônica. São apresentadas quatro alternativas implementadas e comparadas por resultados da simulação númerica do circuito comutado do VSR$_\Delta$ no programa PSIM\textregistered. A comparação dessas estratégias é feita a partir do cálculo da distorção harmônica total\footnote{De acordo com a norma IEC 61000-3-2 que define critérios para medição de harmônicas em equipamentos com correntes entre 16 e 75~A \cite{IEC-61000}. Dessa forma, a THD é calculada até a 40$^\circ$ harmônica.} (THD $-$ \textit{total harmonic distortion}) das correntes. 
+
+Observa-se que, para analisar as estratégias de identificação dos setores de corrente é necessário que o VSR$_\Delta$ seja pelo menos controlado em corrente. Portanto, esse estudo comparativo foi realizado empregando a estratégia de controle de corrente investigada neste trabalho, isto é, o autocontrole de corrente com compensação. Esta estratégia de controle será analisada em detalhes no Capítulo~\ref{chapter-auto}. Nos testes realizados, foi implementada uma estratégia de controle digital. A estratégia de modulação vetorial empregada foi a SVM~II. Além disso, considera-se que o sistema opera conectado ao circuito elétrico equivalente do GSIP (ver Fig.~\ref{msip:regime}) e que os pontos de operação para simulação foram obtidos a partir da análise teórica do Capítulo~\ref{chapter-gsip-controle}. Estas são apresentadas no estudo da viabilidade de emprego do autocontrole de corrente no WECS deste trabalho. Dessa forma, são consideradas duas condições de operação para comparação das técnicas de identificação, a condição de mínima carga e de carga nominal. Como a turbina eólica conectada ao GSIP opera com velocidade variável, há duas condições de frequência elétrica do rotor para serem analisadas. Estas condições, assim como o ganho de referência do autocontrole com compensação e as condições de vento para as quais foram obtidas, são apresentadas na Tabela~\ref{tab:ide-autoq}.
+
+\begin{table}[!htb]
+\caption[Condições para as simulações das estratégias de identificação de setores de corrente com a técnica de autocontrole]{Condições para as simulações das estratégias de identificação de setores de corrente com a técnica de autocontrole de corrente com compensação}
+\label{tab:ide-autoq}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c | c }
+\hline
+ Condição & $v_w$ [m/s] & $k_I$ [m$\Omega$/V] &  $f_r$ [Hz]\\
+\hline
+\hline
+Carga mínima  & 3  &  54,08 & 22,44 \\ 
+\hline
+Carga nominal & 12 & 8,40 & 60 \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia I: Comparação das Correntes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Essa é a estratégia mais intuitiva, pois é baseada na definição no domínio do tempo dos setores de corrente. Conforme demonstrado em \cite{Artigos-05-01}, é possível aplicar com sucesso a identificação a partir da comparação das correntes no VSR$_\Delta$ operando com modulação analógica. No entanto, a estratégia tem o seu desempenho bastante degradado na implementação digital devido aos atrasos existentes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia II: Cálculo da Função Arco Tangente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A determinação do ângulo pelo cálculo da função arco tangente é mais intuitiva quando se aplica à modulação vetorial, pois os setores de corrente e tensão são apresentados em termos de relações angulares. Dessa forma, calcula-se o ângulo da corrente a partir das suas componentes $\alpha\beta$ (\ref{eq:atan-ab}). 
+
+\begin{equation}
+\label{eq:atan-ab}
+\theta_{i_k}=\textrm{arctan}\left(\dfrac{i_{\beta,k}}{i_{\alpha,k}}\right)
+\end{equation}
+
+Após calcular o ângulo da corrente é possível compensar o atraso total, adicionando uma fase igual a $\phi_T$, isto é, $\theta_{i,c}\!=\!\theta_{i,k}\!+\!\phi_T$. O setor de corrente pode então ser determinado a partir das relações entre as correntes no domínio do tempo (Fig.~\ref{modulacao:setores}) e/ou do mapa de vetores (Fig.~\ref{modulacao:mapa1}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia III: PLL de Corrente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nesse caso o cálculo da função arco tangente é substituído por uma malha de captura de fase (PLL) aplicada às correntes da máquina. A metodologia de projeto e análise são apresentadas no Apêndice~\ref{apendice:pll}, em que é apresentado um novo PLL normalizado (PLL$_\textrm{N}$) para garantir a robustez do rastreamento frente às grandes variações de amplitude das correntes. Nesse estudo, ainda foi observada uma importante característica do PLL digital que influencia significativamente a identificação do setor de corrente. Essa característica faz com que a fase rastreada pelo PLL esteja sempre adiantada em uma amostra, reduzindo o ângulo de compensação ($\phi_T$) necessário para a identificação dos setores de corrente. Portanto, ao contrário do caso anterior, o sinal de fase determinado pelo PLL deve ser compensado por $\phi'_T$ dado por (\ref{eq:atraso-meio}), em que este é igual a $\phi_T$ menos o ângulo referente a um período de amostragem. Dentre os algoritmos de PLL para normalizar o sinal de entrada, emprega-se o que utiliza a amplitude estimada pelo conceito de potência ativa.
+
+\begin{equation}
+\label{eq:atraso-meio}
+\phi'_T(f_e,f_a)=\textrm{arctan}\left(\dfrac{2f_e}{f_a} \right)+\left(\dfrac{1}{2}\right)\left(\dfrac{f_e}{f_a}\right)\times 2 \pi
+\end{equation}
+
+Entre outros aspectos de implementação discutidos no Apêndice~\ref{apendice:pll}, verifica-se por simulação que a largura de banda do PLL$_\textrm{N}$ é um fator determinante no desempenho do transitório de partida e na operação com baixa carga. Enquanto um rastreamento lento tem um desempenho degradado no transitório de partida, um muito rápido fica muito susceptível às harmônicas de corrente na operação com baixa carga e, portanto, a THD da corrente aumenta. Dessa forma, a escolha da largura de banda do PLL$_\textrm{N}$ é realizada a partir de uma comparação entre os transitórios de partida e as THDs das correntes obtidas. Para essa análise, considera-se que a inicialização do GSIP é feita após a tensão do barramento CC ter sido estabilizada no seu valor nominal, isto é, considera-se que o barramento é uma fonte de tensão constante.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/start-up-auto.eps}
+	\caption[Processo de inicialização do PLL$_\textrm{N}$.]{Processo de inicialização do PLL$_\textrm{N}$ com largura de banda de: (a) 40 Hz, (b) 100 Hz e (c) 200 Hz.} 
+	\label{modulacao:start-up-auto} 
+\end{figure}
+
+Na Fig.~\ref{modulacao:start-up-auto} estão ilustrados os processos de inicialização do VSR$_\Delta$ para diferentes larguras de banda do PLL$_\textrm{N}$. Observa-se que, em todos os casos o processo de inicialização é suficientemente rápido e menor que um quarto do período da senóide. E, que à medida que a largura de banda aumenta, esse processo é mais rápido e menos perceptível. No entanto, o aumento da largura também acarreta no aumento da THD, pois as distorções em baixa frequência das correntes não são mais compensadas na malha de controle do PLL. Para as condições simuladas a THD\footnote{As THDs foram calculadas com as correntes em regime permanente.} da corrente da Fig.~\ref{modulacao:start-up-auto}(a) foi de 3,99\%, para a da  Fig.~\ref{modulacao:start-up-auto}(b) foi de 4,30\% e para a da Fig.~\ref{modulacao:start-up-auto}(c) foi de 5,04\%. Portanto, verifica-se que há um compromisso entre obter uma boa resposta no transitório de partida e uma baixa THD das correntes da máquina. Dessa forma, com base nos resultados obtidos na Fig.~\ref{modulacao:start-up-auto} e por não haver uma redução significativa da THD com largura de 40~Hz, foi selecionada uma largura de banda de 100~Hz no PLL$_\textrm{N}$ para prosseguir com os estudos neste trabalho. De acordo com metodologia desenvolvida no Apêndice~\ref{apendice:pll}, os parâmetros deste PLL são apresentados na Tabela~\ref{tab:ipll-100}.
+
+\begin{table}[!htb]
+\caption{Parâmetros do controlador do PLL$_\textrm{N}$ com $BW\!=\!100$~Hz}
+\label{tab:ipll-100}
+
+\centering
+
+\begin{center}
+\begin{tabular}{ c || c }
+\hline
+$k_C$ & $-431,7$ 1/s \\
+\hline
+
+$T_i$ & $4,6$ ms \\
+\hline
+
+$\Delta\omega_L$ & $2\pi$(108 Hz) \\
+\hline
+
+$\Delta\omega_{PO}$ & $2\pi$(162 Hz) \\
+\hline
+
+$T_L$ & $20,6$ ms \\
+\hline
+
+$T_P$ & 2,0$\cdot10^{-8}(\Delta\omega_0)^2$ \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estratégia IV: Predição Linear das Correntes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A quarta possibilidade considerada é obter uma estimativa linear das correntes. A metodologia para obter a corrente estimada é considerar que a diferença ($\Delta i_{k}$) entre a corrente atual ($i_k$) e a anterior ($i_{k-1}$) irá se manter ao longo da senóide. Como se deseja obter uma corrente adiantada em uma amostra e meia, faz-se com que a corrente estimada ($\hat{i}_k$) seja a atual mais três meios da diferença atual conforme apresentado na Fig.~\ref{modulacao:preditor}.  
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/preditor.eps}
+	\caption{Representação gráfica do preditor linear aplicado nas correntes.}  
+	\label{modulacao:preditor} 
+\end{figure}
+
+ Essa metodologia é aplicada em todas as correntes de fase medidas. Dessa forma, a partir das correntes estimadas, derteminam-se os setores de corrente aplicando a estratégia~I.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparação das Estratégias de Identificação}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os resultados de simulação obtidos para a condição de carga nominal estão ilustrados\footnote{$T_r\!=\!1/f_r$, em que $f_r$ é a frequência elétrica do rotor na condição de vento simulada.} na Fig.~\ref{modulacao:thd-pmax}. Nesta figura, observa-se claramente a degradação da qualidade da corrente devido aos atrasos digitais não compensados na estratégia I, cuja THD é de 5,07\%. Essa distorção ocorre na troca dos setores de corrente e por isso verifica-se a distorção na passagem por zero (Fig.~\ref{modulacao:setores}). Com as estratégias II e III foi possível obter as menores THDs e as correntes obtidas têm a característica senoidal desejada. Com o algoritmo de predição linear a THD obtida foi de 3,44\%. Nesse caso, verifica-se que há distorção na corrente próximo aos picos (antes e depois dos picos), pois este é o momento em que há mudança de derivada. Isso se deve à aproximação linear para predição da corrente passar a ser incoerente, devido à operação com relativa baixa frequência de comutação. Dessa forma, verificam-se também distorções nas passagens por zero, devido à influência das outras fases. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/thd-pmax.eps}
+	\caption[THDs das correntes com carga nominal.]{THDs das correntes com carga nominal com a estratégia: (a) I, (b) II, (c) III e (d) IV.}  
+	\label{modulacao:thd-pmax} 
+\end{figure}
+
+
+Na Fig.~\ref{modulacao:thd-pmin} estão mostradas  as correntes obtidas na condição de carga mínima. Verifica-se que a menor THD é obtida com a estratégia III (PLL$_\textrm{N}$) e que esta é a única em que se obtém uma corrente com simetria de quarto de onda. Para todos os outros casos, há distorções e assimetrias na corrente. Portanto, a escolha da estratégia III para a identificação de setores de corrente é a escolha mais adequada dentre as possibilidades investigadas neste trabalho.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modulacao/thd-pmin.eps}
+	\caption[THDs das correntes com carga mínima.]{THDs das correntes com carga mínima com a estratégia: (a) I, (b) II, (c) III e (d) IV.}  
+	\label{modulacao:thd-pmin} 
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo foi analisada a modulação vetorial para o VSR$_\Delta$. Foram apresentadas duas estratégias de modulação, em que foi proposta uma modulação capaz de minimizar as perdas em condução do retificador. Também foi apresentada e aplicada a metodologia para que seja possível implementar a modulação vetorial por portadoras triangulares, o 	que por sua vez facilita a implementação em DSCs. 
+
+Foram observados os efeitos das técnicas de amostragem nas harmônicas das tensões de linha e no controle, em que o efeito do modulador digital com dupla atualização foi comparado com o ZOH. A partir dos seus modelos, verificou-se que o comportamento dos dois é bastante parecido e igual no que diz respeito ao atraso de fase introduzido. Os efeitos dos atrasos foram levados em consideração ao serem definidas as estratégias de identificação de setores de correntes. Dessas estratégias, conclui-se que o melhor desempenho é obtido com a aplicação de um PLL normalizado nas correntes para a determinação do ângulo das correntes no plano $\alpha\beta$.
+

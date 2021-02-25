@@ -1,0 +1,2220 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Modelagem dos Componentes do WECS]{Modelagem dos Componentes do Sistema de Conversão de Energia Eólica} \label{chapter-modelagem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{flushright}
+%{\it \small Keep it simple, stupid!}
+%\end{flushright}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os objetivos deste capítulo são descrever e modelar os principais componentes do WECS para fins de análise em regime transitório e permanente. Esses componentes estão ilustrados na Fig.~\ref{modelagem}, em que se observa a turbina eólica, o GSIP e o retificador ativo trifásico.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/modelagem.eps}
+	\caption{Componentes do WECS que serão estudados nesse capítulo.}
+	\label{modelagem}
+\end{figure}
+
+Serão expostos os principais mecanismos das turbinas eólicas responsáveis pela conversão da energia cinética dos ventos em energia mecânica no eixo do gerador, seu modelo, formas de controlar e proteger a turbina quando se atinge os limites mecânicos para operação segura.  Em seguida, o GSIP será abordado, os seus aspectos construtivos, as principais topologias empregadas em geração de energia eólica, os seus modelos nos sistemas de referência estacionário (\textit{abc}) e síncrono (\textit{dq0}), e as limitações impostas no seu funcionamento. Assim como para o GSIP, são apresentados os modelos do retificador ativo trifásico utilizado neste trabalho e as restrições que devem ser impostas para seu funcionamento com correntes de entrada senoidais. Por fim, será proposta uma metodologia para dimensionamento desses componentes a partir das suas características de funcionamento em regime permanente.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Turbina Eólica} \label{sec:turbina}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O objetivo desta modelagem é entender os fenômenos básicos envolvidos na captação de potência dos ventos. Dessa forma, serão apresentados os princípios aerodinâmicos que regem o movimento de rotação das turbinas. Em seguida, será determinado o modelo que fornece a potência extraída dos ventos dada as condições de operação da turbina. Esse modelo será a base para os estudos do comportamento do sistema eletromecânico. Por fim, serão apresentados os sistemas de controle aerodinâmico e suas influências para o controle do sistema do gerador elétrico com o retificador trifásico.          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Princípios Aerodinâmicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seja a Fig.~\ref{turb:vento01} ilustrativa da incidência dos ventos na turbina. Os ventos incidem na turbina com uma velocidade relativa $v_w$ nas pás das turbinas, em que o fluxo na seção da pá é exibido em detalhe na Fig.~\ref{turb:vento02}. A seção das pás apresenta perfil laminado (aerofólios) similares às turbinas de avião \cite{Livros-Custodio,Teses-04-01,Livros-16}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/ventos-turbina.eps}
+	\caption{Incidência dos ventos na turbina eólica.}
+	\label{turb:vento01}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/linha-de-corda.eps}
+	\caption{Incidência dos ventos na pá da turbina eólica.}
+	\label{turb:vento02}
+\end{figure}
+
+O vento relativo é o movimento de vento causado pela combinação com o movimento das pás na direção do plano de rotação. Este tem uma inclinação $\varphi$ com relação ao plano de rotação. O vento relativo incide com uma inclinação $\alpha$ em relação ao eixo da pá (linha de corda), esse ângulo é conhecido como ângulo de ataque. O ângulo $\beta$ é conhecido como ângulo de passo e será importante para o controle de posição das pás. Devido à mudança de direção causada pela pá, o vento varia de velocidade, o que pela segunda lei de Newton implica em uma reação dada pela força de empuxo $\vec{F}_e$. Essa força pode ser decomposta em duas parcelas: uma perpendicular a direção do vento chamada de força de sustentação ${F}_s$ (\textit{lift force}) e outra na direção do vento chamada de força de arraste ${F}_a$ (\textit{lift drag}).
+
+A força de sustentação é responsável pela sustentação aerodinâmica da pá e só existe se o escoamento for laminar, isto é, para ângulos de ataque menores que $90^{\circ}$. A força de arraste gera uma parcela que empurra a estrutura da turbina e não gera torque nesse tipo de turbina, portanto, é uma parcela indesejável. As forças de sustentação e de arraste sobre a seção da pá podem ser obtidas a partir de (\ref{eq:sustentacao}) e (\ref{eq:arraste}), respectivamente.
+
+\begin{equation}
+\label{eq:sustentacao}
+F_s=\dfrac{1}{2} \rho v_w^2 C_s A_p = |\vec{F}_e| \cos \alpha
+\end{equation}
+
+\begin{equation}
+\label{eq:arraste}
+F_a= |\vec{F}_e| \textrm{sen}{\alpha}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\rho$: é a densidade volumétrica do ar, que é igual a 1,225 kg/m$^3$ a 1 atm e $15^{\circ}$C. Esta pode ser recalculada para diferentes condições atmosféricas a partir de (\ref{eq:densidadeT}) \cite{Livros-Custodio};
+
+$C_s$: é o coeficiente de sustentação, que depende das dimensões e das características aerodinâmicas da seção da pá;
+
+$A_p$: é a área da superfície superior da pá.
+
+\begin{equation}
+\label{eq:densidadeT}
+\rho(z,T) = \dfrac{353,4\left(1-\dfrac{z}{45271}\right)^{5,2624}}{273,15+T}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$z$: é a altitude do local com relação ao nível do mar em metros;
+
+$T$: a temperatura ambiente do local em grau Celsius.
+
+Deve-se notar que a relação linear entre as forças não é válida para qualquer condição de ângulo de ataque. A medida que este aumenta, a pá entra em uma região conhecida como região de perda, em que há perda da sustentação aerodinâmica ocorrendo um fenômeno de turbulência no fluxo de ar. Este fenômeno é conhecido como \textit{Efeito de Bernoulli} e está ilustrado na Fig.~\ref{turb:turbulencia}. Isso acontece porque há um aumento da velocidade do ar em um dos lados das pás, o que resulta em uma queda de pressão neste.  O perfil laminado é escolhido para aumentar a aderência do fluxo laminar e diminuir a incidência do fluxo turbulento, esse é o motivo pela escolha dessa geometria na seção da pá \cite{Livros-Custodio,Teses-04-01}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/turbulencia.eps}
+	\caption{Geração de fluxos turbulentos nas pás.}
+	\label{turb:turbulencia}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extração de Potência dos Ventos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A energia cinética contida na massa de ar em movimento pode ser calculada por (\ref{eq:ene-cinetica}).
+
+\begin{equation}
+\label{eq:ene-cinetica}
+E_c=\dfrac{1}{2} m_w v_w^2
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$m_w$: é massa do ar em movimento.
+
+Como a passagem da massa de ar pela turbina sofre a ação de forças, há uma redução na velocidade do vento e a energia extraída do vento (\ref{eq:en-vento}) é dada pela diferença das energias cinéticas antes e depois da turbina. Para determinar a velocidade do vento depois da turbina considera-se a equação da continuidade de Bernoulli, em que a vazão de fluido é constante ao longo do volume de controle. Isto é, o fluxo de ar é nulo fora do volume de controle. E, considerando que a densidade volumétrica do ar é constante, isto é, que o fluido é incompressível\footnote{Aproximação válida para velocidades de vento menores que 100 m/s \cite{Livros-Custodio}.}, tem-se que a vazão antes e depois da turbina é dada por (\ref{eq:vazao}). O fluxos de ar e o volume estão representados na Fig.~\ref{turb:volume-de-controle} para o caso da turbina eólica. Segundo (\ref{eq:vazao}), conclui-se que o tamanho do volume de controle tem que ser maior após a passagem do ar pela turbina. 
+
+\begin{equation}
+\label{eq:en-vento}
+E_{ce}=E_c-E_{cs}=\dfrac{1}{2} m_w (v_{w}^2-v_{ws}^2)
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$E_{cs}$: é a energia  cinética do vento depois da turbina;
+
+$v_{ws}$: é a velocidade do vento depois da turbina.
+
+\begin{equation}
+\label{eq:vazao}
+Q=A_{w} v_{w}=A_{ws} v_{ws}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$Q$: é a vazão do vento;
+
+$A_{w}$: é a seção do volume de controle antes da turbina, calculada segundo (\ref{eq:secao});
+
+$A_{ws}$: é a seção do volume de controle depois da turbina.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/volume-de-controle.eps}
+	\caption{Fluxos de ar no volume de controle.}
+	\label{turb:volume-de-controle}
+\end{figure}
+
+\begin{equation}
+\label{eq:secao}
+A_w=\pi R^2
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$R$: é o raio da turbina.
+
+A potência extraída é obtida pela variação de energia de (\ref{eq:en-vento}) e pelo intervalo de tempo correspondente conforme (\ref{eq:Pvento01}).
+
+\begin{equation}
+\label{eq:Pvento01}
+P_{we}=\dfrac{\Delta E}{\Delta t}=\dfrac{E_{ce}}{\Delta t}=\dfrac{1}{2} \dfrac{m_w}{\Delta t} (v_{w}^2-v_{ws}^2)
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\Delta t$: é variação de tempo necessária para percorrer o comprimento $d$ (Fig.~\ref{turb:volume-de-controle}). Esta pode ser obtida a partir da velocidade média do vento $v_{w,avg}$ ao longo do comprimento da coluna de ventos $d$ e obtida a partir de (\ref{eq:vvento-med}).
+
+\begin{equation}
+\label{eq:vvento-med}
+\Delta t= \dfrac{d}{v_{w,avg}} = \dfrac{2 d }{v_w + v_{ws}}
+\end{equation}
+
+A massa do ar em movimento ($m_w$) é obtida considerando que a área ao longo do volume de controle é constante, cujo resultado é apresentado em (\ref{eq:massa-ar}).
+
+\begin{equation}
+\label{eq:massa-ar}
+m_w=\rho A_w d
+\end{equation}
+
+Substituindo (\ref{eq:vvento-med}) e (\ref{eq:massa-ar}) em (\ref{eq:Pvento01}) obtém-se a expressão da potência  extraída do vento (\ref{eq:Pvento02}). Observa-se essa potência varia com o cubo da velocidade do vento.
+
+\begin{equation}
+\label{eq:Pvento02}
+P_{we}=\dfrac{1}{2} \rho A_w v_w^3 \dfrac{\left[1+\left(v_{ws}/v_w\right)\right]\left[1-\left(v_{ws}/v_w\right)^2\right]}{2}
+\end{equation}
+
+A equação (\ref{eq:Pvento02}) pode ser reescrita em função do coeficiente de potência da turbina $C_p$ e da potência contida no vento $P_w$ em (\ref{eq:Pvento03}), dados por (\ref{eq:Cp01}) e (\ref{eq:Pv}), respectivamente. O coeficiente de potência da turbina representa a potência extraída pela turbina da potência contida no vento.
+
+\begin{equation}
+\label{eq:Pvento03}
+P_{we}= C_p P_w
+\end{equation}
+
+\begin{equation}
+\label{eq:Cp01}
+C_p= \dfrac{\left[1+\left(v_{ws}/v_w\right)\right]\left[1-\left(v_{ws}/v_w\right)^2\right]}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:Pv}
+P_w= \dfrac{1}{2} \rho A_w v_w^3
+\end{equation}
+
+O valor máximo do coeficiente de potência é obtido calculando a derivada de (\ref{eq:Cp01}) em relação a $k\!=\!v_{ws}/v_{w}$ e igualando-a a zero (condição de otimalidade de 1ª ordem ). O valor obtido é $C_p\!\!=16/27\!\approx\!59,3\%$. Esse valor é conhecido na literatura como \textit{máximo de Betz} ou \textit{coeficiente de Betz} e corresponde ao valor máximo teórico do rendimento de uma turbina. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Característica da Turbina Eólica} \label{sec:turbina-Cp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A característica de extração de potência de uma turbina eólica, dada pelo coeficiente de potência, não pode ser obtida a partir dos resultados teóricos. Esta será uma função dos aspectos construtivos da turbina, da velocidade angular do rotor eólico, da velocidade do vento, do ângulo de ataque, entre outros.  Tipicamente, o coeficiente de potência é obtido de maneira experimental pelos fabricantes e neste trabalho foi considerada  a aproximação proposta por \cite{Livros-Heier} para turbinas eólicas de três pás dada por\footnote{É importante ressaltar que essa equação é normalmente apresentada no seu formato ``experimental'', em que $\beta$ é considerado diretamente em graus.} (\ref{eq:Cp}).  
+
+\begin{equation}
+\label{eq:Cp}
+C_p(\lambda,\beta)= c_1\left[ \dfrac{c_2}{ \lambda_i} - c_3 \left(\dfrac{180 \beta}{\pi}\right) - c_4 \left(\dfrac{180 \beta}{\pi}\right)^{c_5}-c_6 \right]e^{- \dfrac{c_7}{ \lambda_i}}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$C_p(\lambda,\beta)\geq0$;
+
+$\lambda_i$: é definido conforme (\ref{eq:lambda1});
+
+$\lambda$: é a velocidade de ponta da turbina (TSR: \textit{tip-speed-ratio}) definida de acordo com (\ref{eq:tsr});
+
+$c_i$: são os coeficientes da turbina, em que $i~\in~\{1,2,\ldots,9\}$.
+
+\begin{equation}
+\label{eq:lambda1}
+\dfrac{1}{\lambda_i}=\dfrac{1}{\lambda+c_8\left(\dfrac{180 \beta}{\pi}\right)}-\dfrac{c_{9}}{\left(\dfrac{180 \beta}{\pi}\right)^3+1}
+\end{equation}
+
+\begin{equation}
+\label{eq:tsr}
+\lambda=\dfrac{\omega_{m} R}{v_w}
+\end{equation}
+
+Onde: 
+\nopagebreak
+
+$\omega_{m}$: é a velocidade angular do rotor eólico.
+
+A velocidade de ponta da turbina é a relação entre a velocidade tangencial na ponta da pá do rotor eólico e a velocidade do vento incidente. Esse é um importante parâmetro da turbina, pois o ponto de máxima extração de potência é função direta desse parâmetro quando a turbina opera com ângulo de passo fixo. Como ilustrado na Fig.~\ref{turb:cp} as curvas de potência para diferentes ângulos de passo, em que os parâmetros na Tabela~\ref{tab:cp} foram propostos por Slootweg \cite{Artigos-12-04} que representam com mais precisão turbinas eólicas modernas a velocidade variável. Nota-se que está ilustrado o ponto de máximo rendimento dado por $C_{p,max}=44\%$ que é obtido para $\beta=0$ e $\lambda_{opt}=7,2$.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/cp.eps}
+	\caption[Curvas de extração de potência.]{Curvas de extração de potência para diferentes ângulos de passo.}
+	\label{turb:cp}
+\end{figure}
+
+\begin{table}[!htb]
+\caption{Coeficientes da característica da turbina eólica}
+\label{tab:cp}
+\begin{center}
+\begin{tabular}{c |c | c | c | c |c | c | c | c }
+\hline
+$c_1$&$c_2$&$c_3$&$c_4$&$c_5$&$c_6$&$c_7$&$c_8$ &$c_9$\\
+\hline
+\hline
+\small{0,73} & \small{151} & \small{0,58} & \small{0,002} & \small{2,14} & \small{13,2} & \small{18,4} & \small{-0,02} & \small{-0,003}  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+É importante ressaltar que os coeficientes dados na Tabela~\ref{tab:cp} são dados de uma turbina específica comercial analisada por Slootweg \cite{Artigos-12-04}. No entanto, como estes coeficientes são difíceis de serem obtidos e se a turbina eólica que for adotada tiver um valor do máximo coeficiente de potência menor do que 44\%, a obtenção exata desses dados não representa um problema de modelagem, pois o sistema de conversão de energia será modelado para processar esse valor máximo. Como visto anteriormente, o valor máximo teórico do coeficiente de potência é 59,3\% para todos os tipos de turbina. Entretanto, devido às não idealidades e às limitações práticas, esse valor pode ser no máximo $50\%$ para turbinas de alta velocidade (turbinas de duas pás) e entre $20\%$ e $40\%$ para turbinas de baixa velocidade com mais pás \cite{Livros-17}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Curvas de Potência}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As curvas de potência mecânica extraída para diferentes velocidades de vento podem ser obtidas a partir da aplicação de (\ref{eq:Cp}) em (\ref{eq:Pvento03}), cujo resultado é apresentado em (\ref{eq:Pw}). Considerando um ângulo de passo igual a zero e uma turbina com um raio de 2,3 m são ilustradas  as curvas de potência para diferentes condições de vento\footnote{O sobrescrito na velocidade do vento indica a sua velocidade em m/s.} na Fig.~\ref{turb:pv-curvas}. Observa-se a curva de máxima potência mecânica $P_{we,max}$ em função da velocidade de vento obtida para a condição de máximo rendimento da Fig.~\ref{turb:cp}.
+
+\begin{equation}
+\label{eq:Pw}
+P_{we}= \dfrac{1}{2} \rho \pi R^2 C_p(\lambda,\beta) v_w^3
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalasim]{Figuras/turbina/pv-curvas.eps}
+	\caption[Curvas da potência extraída.]{Curvas da potência extraída para diferentes velocidades de ventos.}
+	\label{turb:pv-curvas}
+\end{figure}
+% D:\My Dropbox\Dissertação\MATLAB\ok\Figuras(LateX)\TURBINE_run.m
+% arrumar
+
+\begin{equation}
+\label{eq:pv-cpmax}
+P_{we,max} =  \dfrac{1}{2} \rho \pi R^2 C_{p,max} v_w^3
+\end{equation}
+
+A equação (\ref{eq:Pw}) descreve o comportamento da potência extraída pela turbina, mas não descreve como a potência é limitada. Para limitar essa potência no eixo do gerador elétrico deve-se aplicar alguma técnica de controle aerodinâmico \cite{Livros-15}. A aplicação do controle aerodinâmico tem como objetivo operar a turbina dentro da curva de operação ideal \cite{Livros-15} ilustrada na Fig.~\ref{turb:Pv-funcionamento}, em que se observa que o funcionamento é descrito em função da velocidade de vento. A geração de energia será a partir de uma velocidade de vento mínima $V_{w,min}$, da qual os custos operacionais iniciais são compensados, até uma velocidade máxima $V_{w,max}$, em que a turbina é desligada para prevenir danos estruturais causados pelos esforços mecânicos. Além do mais, são apresentadas três regiões de operação: 
+
+\begin{itemize}
+
+\item \textit{Região} I:  caracteriza-se pelo máximo aproveitamento da potência fornecida pelo vento, cuja operação se dá desde a velocidade mínima até a velocidade vento em que o rotor atinge a sua velocidade angular nominal $\omega_N$($V_{w,\omega_N}$);
+
+\item \textit{Região} II: essa é uma região de transição que se estende até a velocidade em que a potência atinge o valor nominal ($V_{w,N}$). Nessa região não é mais possível extrair a máxima potência do vento devido à restrição de velocidade nominal ter sido atingida. Essa região pode não existir em casos que o limite de velocidade angular não é alcançado até se atingir a potência nominal;
+
+\item \textit{Região} III: região de potência nominal, sendo que a potência deve se controlada aerodinamicamente para evitar a sobrecarga da turbina.
+
+\end{itemize}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/Pv-funcionamento.eps}
+	\caption{Curva de potência na operação ideal de uma turbina eólica.}
+	\label{turb:Pv-funcionamento}
+\end{figure}
+% D:\My Dropbox\Dissertação\MATLAB\ok\Figuras(LateX)\curva_Pvfuncionamento.m
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Comportamento Dinâmico da Turbina}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A turbina tem uma grande inércia que deve ser levada em consideração nos estudos do WECS, pois esta armazena uma grande quantidade de energia cinética. O que faz com que a mudança de potência no eixo do gerador não ocorra de maneira instantânea, pois não é possível variar a velocidade instantaneamente. Essa massa é representada nos estudos dinâmicos pela constante de inércia $J_m$, em que para uma turbina eólica de três pás pode ser estimada pelo  raio e por sua massa em (\ref{eq:inercia-turbina}) \cite{Artigos-12-05}.
+
+\begin{equation}
+\label{eq:inercia-turbina}
+J_{m} = \dfrac{M_m R^2}{9} 
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$M_m$: é a massa total das pás da turbina.
+
+A conexão da turbina eólica com o gerador elétrico por meio de uma caixa de engrenagens é representada de maneira simplificada na Fig.~\ref{turb:conexao} \cite{Livros-15}. Considera-se que a turbina e o gerador são representados por corpos rígidos \footnote{Por simplicidade, estão sendo desconsideradas os coeficientes de amortecimento e as constantes de mola. Maiores detalhes podem ser encontrados em \cite{Artigos-12-01}.}, cujos parâmetros são as constantes de inércia da turbina e do gerador elétrico $J_{rm}$; as velocidades angulares da turbina e do gerador elétrico $\omega_{rm}$; o torque proveniente do vento $T_L$ obtido pela divisão da potência extraída pela velocidade angular do rotor eólico e o torque eletromagnético $T_e$; e a relação de velocidade $n_m$ da caixa de engrenagens, em que para um sistema com acionamento direto $n_m$ é igual a um. O sistema é descrito na sua forma final por (\ref{eq:turbina-gerador}).
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/inercia-turbina.eps}
+	\caption{Representação da conexão entre a turbina e o gerador.}
+	\label{turb:conexao}
+\end{figure}
+
+\begin{equation}
+\label{eq:turbina-gerador}
+J_{eq} \dfrac{d\omega_{rm}}{dt} = T_e -\dfrac{T_L}{n_m}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$J_{eq}$: é a constante de inércia equivalente do sistema, dada por (\ref{eq:jeq}).
+
+\begin{equation}
+\label{eq:jeq}
+J_{eq} = \dfrac{J_m}{n_m^2} + J_{rm}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controle e Limitação de Potência Aerodinâmica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Das turbinas de pequeno porte às de grande porte, é necessária a limitação da potência extraída para proteção contra danos estruturais na região III. Diferentes métodos podem ser empregados de acordo com os requisitos do WECS e, em geral, são utilizados de maneira redundante para aumentar a segurança. As principais técnicas são o controle por ângulo de passo e o controle por estol. Há também os sistemas de frenagem que servem como proteção quando a velocidade do vento atinge $V_{w,max}$ e atuam fazendo a turbina parar. 
+
+O objetivo de se apresentar esses métodos neste trabalho é destacar que a limitação de potência deve ser feita por sistemas aerodinâmicos. Além disso, os limites que devem ser considerados para cada estratégia e que a dinâmica desses controladores não precisa ser considerada neste trabalho, devido ao foco estar no comportamento do GSIP e do retificador trifásico. Isso se deve às constantes de tempo envolvidas no controle aerodinâmico serem muito maiores que as dinâmicas elétricas. A partir dessas informações será possível dimensionar adequadamente o GSIP e o retificador.
+
+Em todas as técnicas de controle aerodinâmico que serão consideradas neste trabalho é possível operar na região I com máximo aproveitamento da potência. Isto é, o ângulo de passo é fixado de forma que seja possível atingir o ponto de máximo rendimento aerodinâmico \cite{Livros-15}. Para a turbina deste trabalho, este ponto é obtido para $\beta=0$.  A seguir serão explicados os princípios de funcionamento das técnicas de controle aerodinâmico. 
+
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle por Estol}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O controle por estol (\textit{stall control}) pode ser implementado de duas maneiras: estol passivo (\textit{passive stall}) e estol ativo (\textit{active stall}). No estol passivo o ângulo de passo é fixo (FP $-$ \textit{fixed pitch}) e no estol ativo o controle se dá por variação do ângulo de passo (VP $-$ \textit{variable pitch}). Embora, o controle por estol ativo e o controle por ângulo de passo se baseiem na variação do ângulo de passo, estes funcionam a partir de princípios físicos completamente diferentes \cite{Livros-15}. 
+
+Para entender o mecanismo de atuação do estol a Fig.~\ref{turb:vento02} deve ser novamente observada. Considerando inicialmente que a velocidade angular e o ângulo de passo estão fixos, ao aumentar a velocidade do vento nessa condição o ângulo de incidência aumenta e com isso o ângulo de ataque também aumenta até que este exceda um determinado valor (valor de estol), que irá gerar fortes turbulências e a turbina trabalhará na região de perda. O problema desta técnica são as fortes cargas aerodinâmicas causadas pelas turbulências na região de perdas, o que faz com que as turbinas devam ser mais resistentes para suportar tais cargas mecânicas. No controle por estol passivo o ângulo de passo é mantido fixo em todo o processo, já no estol ativo a partir de uma dada velocidade de vento o ângulo de passo é diminuído para induzir o efeito estol com mais rapidez. Assim, os esforços mecânicos são diminuídos pela zona de turbulência ser antecipada e os níveis de potência serem menores.
+
+O controle por estol passivo foi muito utilizado em turbinas de velocidade fixa (FS $-$ \textit{fixed speed}) e também é utilizado em sistemas a velocidade variável (VS $-$ \textit{variable speed}) de baixa potência que operam com FP. O sistema funciona maximizando a potência gerada até uma velocidade de vento pré-determinada $V_E$ (abaixo da nominal para evitar que haja grandes variações potência acima do valor nominal), em que se limita a velocidade angular e o controle por estol passivo começa a atuar \cite{Livros-15}. Essa estratégia é ilustrada na Fig.~\ref{turb:estol-passivo}. O segmento $AE$ é a região em que se dá a operação da turbina para velocidades de vento abaixo do valor $V_E$ e essa região corresponde a operação\footnote{$T_{C_{p,max}}$ é a curva de torque extração da máxima potência.} na região I. A partir desse ponto a turbina opera até o ponto de potência nominal\footnote{$T_{P_N}$ é a curva de torque para potência nominal.} $D$ conhecido como \textit{front stall} e corresponde a torque máximo $T_{max}$ da turbina. A partir do \textit{front stall} o efeito estol é reforçado com perda de torque e a turbina deixa de operar com potência nominal indo em direção ao ponto $G$, onde a turbina é desconectada. A trajetória $ABCG'$ corresponde a trajetória ideal da curva da estratégia de estol passivo e é também a curva de operação ideal da turbina. É importante ressaltar que devido à baixa qualidade de regulação de potência do método, a potência da turbina pode exceder valor nominal \cite{Artigos-04-16,Artigos-04-21}, o que faz com que todo o WECS seja superdimensionado.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/estol-passivo.eps}
+	\caption[Característica de $T\times\omega$ do controle por estol passivo.]{Característica de torque-velocidade do controle por estol passivo.}
+	\label{turb:estol-passivo}
+\end{figure} 
+
+O controle por estol ativo é bastante utilizado tanto em turbinas com velocidade fixa ou com velocidade variável. O funcionamento na região de máxima potência se dá até a velocidade de vento nominal e a partir desta o controle por estol ativo atua. A estratégia de estol ativo corresponde à operação ideal da estratégia de estol passivo e só haverá redução de torque caso o sistema atinja o \textit{front stall}. A sua característica de regulação de potência é bem melhor que o estol passivo, não havendo grandes excursões de potência além do valor nominal \cite{Artigos-04-16,Artigos-04-21}. Esse método requer um esforço de controle menor que o controle por ângulo de passo, o que faz com que seja bastante atrativo devido à diminuição dos custos dos servomecanismos, acionamentos pneumáticos ou sistemas mecânicos embutidos na turbina. Enquanto esse método tem uma variação do ângulo de passo por volta de -5$^{\circ}$, o controle por ângulo de passo é por volta de 35$^{\circ}$ \cite{Livros-15}. 
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controle por Ângulo de Passo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O controle por ângulo de passo é a técnica de controle mais utilizada em turbinas eólicas modernas. A complexidade do controle pode ser reduzida se utilizada em sistemas com velocidade variável, devido aos tempos de resposta dos controladores poderem ser maiores pela flexibilidade permitida ao controle de velocidade \cite{Artigos-12-06}.
+
+Seu princípio de funcionamento pode ser retratado observando a Fig.~\ref{turb:vento02}, em que dado um aumento de velocidade do vento e consequente aumento do ângulo de incidência, o ângulo de passo é  aumentado para compensar o aumento do ângulo de ataque. O objetivo deste controle é limitar o ângulo de ataque para gerar menos turbulências. Uma desvantagem desse método é que a regulação do ângulo de passo requer um esforço de controle considerável, uma vez que grandes variações de ângulo de passo são necessárias para compensar as variações de potência. A regulação de potência é parecida com o controle por estol ativo \cite{Artigos-04-16,Artigos-04-21}, apenas ocorrendo transições um pouco mais lentas, devido à maior necessidade de variar o ângulo de passo e as limitações dos servomecanismos, em que tem-se variações máximas do ângulo de passo de $\pm10^{\circ}$ por segundo \cite{Livros-15}. 
+
+Na Fig.~\ref{turbina:sa-torque} é ilustrada a curva característica de torque-velocidade em regime permanente desse método. Essa curva corresponde à curva de operação ideal da turbina, onde o segmento $AB$ corresponde à operação na região I da curva de potência, o segmento $BC$ corresponde à operação na região II da curva de potência e o ponto $C$ corresponde à operação na região III da curva de potência. O sistema deve operar em regime permanente nesse ponto até a velocidade vento máxima, quando os sistemas de frenagem atuam parando a turbina. O ponto $C'$ corresponde à intersecção da curva de potência nominal com a trajetória de máxima potência. Este só é alcançado se o ponto $B$ é igual ao ponto $C$, isto é, o limite de torque e de velocidade são atingidos juntos.
+ 
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/turbina/sa-torque.eps}
+	\caption[Característica de $T\times\omega$ do controle por ângulo de passo.]{Característica de torque-velocidade do controle por ângulo de passo.}
+	\label{turbina:sa-torque}
+\end{figure} 
+ 
+Ressalta-se que esta não é a única estratégia de limitar a potência no controle por ângulo de passo. De fato, caso seja possível podem ser definidas diversas estratégias dentro dos limites operacionais da turbina, cujas restrições impostas ao projetista do controle aerodinâmico são o torque máximo, a velocidade angular máxima e a potência nominal \cite{Livros-15}. 
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section[GSIP]{Gerador Síncrono a Ímãs Permanentes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Histórico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Em 1831 M. Faraday descobriu o conceito da indução eletromagnética e fundamentou as bases para a construção de máquinas elétricas. Ainda no início da década de 1830 o primeiro motor a ímãs permanentes foi utilizado, mas a baixa qualidade dos materiais magnéticos desencorajou o seu uso \cite{Livros-05}. A primeira máquina elétrica de corrente alternada, o motor de indução, foi inventada por N. Tesla em 1883, a qual é considerada o primeiro motor elétrico moderno. A máquina síncrona também foi inventada por Tesla. No entanto, as máquinas a ímãs permanentes só passaram a ser utilizadas efetivamente a partir da década de 1950 com o surgimento de materiais magnéticos de melhor qualidade, isto é, de elevado magnetismo remanente e força coerciva. Como o Alnico (liga feita basicamente de alumínio, níquel e cobalto) inventado em 1931, a ferrite de bário na década de 1950, o samário-cobalto inventado no início da década de 1970 e o neodímio-ferro-boro (NdFeB) em 1983 \cite{Livros-05, Teses-01-12}.
+
+Nas aplicações industriais de máquinas a ímãs permanentes (PM $-$ \textit{permanent magnet}) foram utilizados inicialmente na década de 1950 os motores síncronos a ímãs permanentes  (MSIP) com uma gaiola de esquilo para auxiliar na partida\footnote{Este motor é conhecido como \textit{line-start} MSIP \cite{Teses-01-12}.}, pois estes sistemas operavam apenas na velocidade síncrona da rede. No entanto, esse sistema tinha um alto custo o que limitou sua difusão na indústria. O motor CC sem escovas (BLDC $-$ \textit{brushless dc motor}) teve sua consolidação na década de 1960 para diversas aplicações de baixa potência e seu formato atual (enrolamentos no estator e ímãs no rotor) só foi possível graças ao advento da eletrônica de potência. O que possibilitou também que os MSIPs fossem eficientes em qualquer velocidade. E, nas eventuais aplicações a velocidade variável que foram surgindo, este era o mais vantajoso. Este só foi consolidado a partir da década de 1970 com o surgimento das técnicas de controle vetorial, que permitiam o controle linear e simples dos acionamentos elétricos \cite{Teses-01-12}.
+
+Dentre as vantagens de se utilizar motores a ímãs permanentes frente a motores de indução, pode-se citar: melhor rendimento, maior fator de potência, alta densidade de potência e melhor transferência de calor. E, em aplicações abaixo de 7~kW o produto do rendimento com o fator de potência é de 30\% a 40\% maior que o do motor de indução \cite{Teses-01-12}. Os BLDC e os MSIPs se diferenciam pelo formato da força contra-eletromotriz geradas, que são trapezoidais para os BLDC e senoidais para os MSIP. Os BLDC são em geral utilizados em aplicações de baixa potência (<10 kW), onde têm uma performance melhor que os MSIP \cite{Livros-01}. Os MSIP podem ser utilizados tanto em baixas potências quanto em altas potências, em que as aplicações foram impulsionadas pela diminuição dos preços dos ímãs de melhor qualidade (NdFeB). Estes são amplamente utilizados como geradores em aplicações de geração de energia eólica, chegando a potências de 7,5~MW \cite{Enercon-Overview}. O foco deste trabalho é a aplicação de um GSIP de 6,5~kVA a um WECS.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aspectos Construtivos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Segundo \cite{Teses-09-02}, a utilização de ímãs permanentes para construção de máquinas elétricas permitiu construí-las de diversas maneiras, dando espaço a inúmeras possibilidades de disposição, tamanho, formato e orientação. Os aspectos construtivos dessas máquinas podem ser divididos em quatro principais categorias:
+
+\begin{enumerate}
+
+\item Orientação do entreferro com relação ao eixo de rotação\footnote{Existe a possibilidade de serem realizadas estruturas mistas, isto é, R/A.}: radial (R) ou axial (A);
+
+\item Orientação dos enrolamentos do estator com relação à direção do movimento de rotação do rotor: longitudinal (L) ou transversal (T);
+
+\item Orientação dos ímãs permanentes com relação ao entreferro: montados na superfície (SM $-$ \textit{surface mounted}) ou fluxos concentrados (FC $-$ \textit{flux-concentrating});
+
+\item Encaixe para os enrolamentos (\textit{copper house}): com ranhuras (S $-$ \textit{slotted}) ou sem ranhuras (SL $-$ \textit{slotless}).
+
+\end{enumerate}
+
+Nas Fig.~\ref{msip:radial} e Fig.~\ref{msip:axial} estão ilustradas as configurações radial e axial, respectivamente. O vetor normal à superfície do entreferro é perpendicular ao eixo de rotação na configuração radial e paralelo na axial.  
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[Radial]{
+	\label{msip:radial}
+	\includegraphics[scale=\escalafig]{Figuras/msip/radial.eps}}
+	
+	\subfigure[Axial]{
+	\label{msip:axial}
+	\includegraphics[scale=\escalafig]{Figuras/msip/axial.eps}}
+	}
+	\caption{Orientações do entreferro.}
+\end{figure}
+
+Na passagem da corrente elétrica pelos enrolamentos do estator há a criação de um fluxo magnético, cujo sentido e orientação são dados pela regra da mão direita. Se a orientação desse fluxo magnético é paralela à direção de rotação, a máquina é do tipo longitudinal e se a orientação é perpendicular, é do tipo transversal como representado nas Fig.~\ref{msip:longitudinal} e Fig.~\ref{msip:transversal}, respectivamente.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[Longitudinal]{
+	\label{msip:longitudinal}
+	\includegraphics[scale=\escalafig]{Figuras/msip/longitudinal.eps}}
+	
+	\subfigure[Transversal]{
+	\label{msip:transversal}
+	\includegraphics[scale=\escalafig]{Figuras/msip/transverso.eps}}
+	}
+	\caption{Orientações dos enrolamentos do estator.}
+\end{figure}
+
+Duas possibilidades de ímãs montados no ferro do rotor são ilustradas na Fig.~\ref{msip:montagem}.  A direção de magnetização dos ímãs pode ser paralela ao vetor normal à superfície do entreferro como ilustrado na Fig.~\ref{msip:sm} para a configuração de ímãs montados na superfície. Na segunda configuração (Fig.~\ref{msip:fc}), a direção de magnetização é perpendicular com os ímãs montados de forma que os fluxos estão concentrados. É importante ressaltar que outras configurações de montagem podem ser realizadas como a montagem na superfície interna (\textit{inset} PM) e interior à superfície (\textit{buried} PM), resultando em diversas possibilidades de topologias.
+	
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[Montados na superfície]{
+	\label{msip:sm}
+	\includegraphics[scale=\escalafig]{Figuras/msip/sm.eps}}
+	
+	\subfigure[Fluxo concentrado]{
+	\label{msip:fc}
+	\includegraphics[scale=\escalafig]{Figuras/msip/fc.eps}}
+	}
+	\caption{Orientação dos ímãs permanentes.}
+	\label{msip:montagem}
+\end{figure}
+
+As laminações do estator podem ser produzidas com ranhuras (saliências) ou sem ranhuras (sem saliências) como representado nas Fig. \ref{msip:slotted} e  Fig.~\ref{msip:slotless}, respectivamente. Na configuração sem ranhuras os fios são colocados no entreferro, o que faz com que o caminho magnético do fluxo dos ímãs no ar seja muito maior e que sejam necessários ímãs maiores ou se terá um fluxo menos intenso a vazio. A escolha do tipo de laminação depende de diversos fatores, como a dificuldade de produção, em que é mais fácil produzir sem ranhuras; as perdas no ferro, que são maiores quando há ranhuras, mas abaixo da velocidade base podem ser desprezadas; as perdas no cobre, que são maiores na configuração sem ranhuras devido à passagem do fluxo magnético mesmo a vazio; problemas de resfriamento, em que na configuração sem ranhuras há uma diminuição da superfície resfriável, entre outros \cite{Teses-09-02, Teses-09-03}.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[Com ranhuras]{
+	\label{msip:slotted}
+	\includegraphics[scale=\escalafig]{Figuras/msip/slotted.eps}}
+	
+	\subfigure[Sem ranhuras]{
+	\label{msip:slotless}
+	\includegraphics[scale=\escalafig]{Figuras/msip/slotless.eps}}
+	}
+
+	\caption{Laminações do estator.}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Topologias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As principais topologias resultantes da combinação dessas quatro principais características encontradas na literatura aplicadas à geração de energia eólica são apresentadas na Tabela \ref{tab:gsip} \cite{Teses-09-02, Artigos-17-02, Artigos-17-03, Artigos-04-20, Teses-09-01}. Alguns geradores podem ter mais de uma variação topológica e não foram apresentados casos específicos na tabela. Observa-se que há um grande número de possibilidades e se classifica também os geradores quanto à característica construtiva principal em: GSIP de fluxo axial (AFPM $-$  \textit{axial flux permanent magnet}), GSIP de fluxo radial (RFPM $-$ \textit{radial flux permanent magnet}) e GSIP de fluxo transversal (TFPM $-$  \textit{transverse flux permanent magnet}).
+
+\begin{table}[!htb]
+\caption{Principais topologias de GSIP aplicados a geração eólica}
+\label{tab:gsip}
+\centering
+
+\begin{center}
+\begin{tabular}{c | c | c | c | c | c }
+
+\hline
+Gerador & Sigla & 1 & 2  & 3 & 4 \\  
+
+\hline
+\hline
+
+\small{GSIP convencional} & \small{RFPM} & \small{R} & \small{L} & \small{SM} & \small{S} \\
+\hline
+
+\small{GSIP convencional com FC} & \small{RFPM} & \small{R} & \small{L} & \small{FC} & \small{S} \\
+\hline
+
+\small{GSIP de fluxo axial}  & \small{AFPM} & \small{A} & \small{L} & \small{SM} & \small{SL} \\
+\hline
+
+\small{GSIP de fluxo axial interior} & \small{AFIPM} & \small{A} & \small{L} & \small{SM} & \small{S} \\
+\hline
+
+\small{GSIP de fluxo transversal} & \small{TFPM} & \small{R} & \small{T} & \small{SM} & \small{S} \\
+\hline
+
+\small{GSIP de fluxo transversal com FC}& \small{TFPM} & \small{R} & \small{T} & \small{FC} & \small{S} \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+As referências \cite{Teses-09-02, Artigos-17-02}  apresentam em detalhes uma metodologia de comparação baseada nos seguintes índices de desempenho: custo por torque e torque por massa. Nesse contexto são comparadas as topologias RFPM, AFPM e TFPM com diferentes aspectos construtivos. Conclui-se que o GSIP de fluxo axial tem o dobro da densidade de torque dos RFPM, no entanto a necessidade por materiais magnéticos de maior espessura faz com que seu custo por torque seja o dobro dos RFPM. Conclui-se de uma maneira geral que os geradores terão menores diâmetros e custos se forem utilizadas as topologias TFPM e AFIPM. Ressalta-se que à medida que a potência aumenta o custo por torque diminui e a densidade de torque aumenta para todas as topologias. 
+
+Em \cite{Artigos-17-03} são comparadas diferentes topologias de RFPM e AFPM em potências que vão desde 1~kW a 200~kW para turbinas eólicas com acionamento direto, velocidade angular nominal de 100~rpm para geradores de potência nominal abaixo de 50~kW e de 50~rpm acima de 50~kW. Todas as máquinas são projetadas para tensão nominal de 220~V e fator de potência igual a 0,9.  Nas conclusões são apresentados os seguintes resultados: para uma dada potência a topologia AFIPM tem as maiores densidades de potência; a configuração para um tipo especial de AFPM com ranhuras e duplo estator é superior a que utiliza um único estator; e, as topologias RFPM com rotor externo são mais vantajosas na aplicação em WECSs frente aos RFPM com rotor interno, além de facilitar a instalação e o resfriamento da máquina. Afirma-se também que o AFPM é mais conveniente para aplicações de baixa potência por ser simples de construir, mas requer mais material magnético e enrolamentos. Em altas potências a quantidade de material a ser utilizado nos ímãs e nos enrolamentos torna-se muito grande, não sendo mais vantajosa. Portanto, conclui-se que são preferidas topologias com baixa velocidade angular nominal e consequente aumento do número de pólos.
+
+A seguir serão apresentados alguns detalhes do GSIP de fluxo axial, pois essa é a topologia que será utilizada neste trabalho. Maiores detalhes das outras topologias podem ser encontrados nas referências citadas ou em literatura específica.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{GSIP de Fluxo Axial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Esse gerador ou máquina tem o formato de disco ou de um toróide e por esse motivo é também conhecido como Torus. Os primeiros trabalhos com máquinas a disco datam do final da década de 1970. No entanto, somente a partir da década de 1990 cresceram os interesses do setor industrial em substituir as convencionais máquinas de fluxo radial na aplicações domésticas e navais. As vantagens sobre as máquinas de fluxo radial são: maior densidade de potência resultando em menor utilização de cobre e maior eficiência, formato compacto em disco, presença de entreferros planares e ajustáveis, facilidade de bobinagem, menor \textit{cogging torque} (torque que faz o rotor girar com relação ao estator a vazio) e consequente dimuição dos ruídos e vibrações acústicas. A maior desvantagem é a grande força axial dos ímãs no estator, que pode quebrar a estrutura facilmente (é mais crítico em máquinas com ranhuras) \cite{Artigos-14-06, Artigos-04-20}. As máquinas de fluxo axial são classificadas quanto à estrutura do rotor, cuja combinação entre estator e rotor pode ser feita em diversas camadas como ilustrado na Fig.~\ref{msip:axial-msips} \cite{Artigos-14-06}. 
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=\escalafig]{Figuras/msip/axial_msips.eps}
+\caption{Máquina de fluxo axial com diversas camadas.}
+\label{msip:axial-msips}
+\end{figure}
+
+A mais comum é a máquina do tipo Torus sem ranhuras, cuja topologia apresenta dois rotores e um estator, conforme ilustrado na Fig.~\ref{msip:torus} \cite{Artigos-14-06}. As direções dos fluxos dos ímãs são mostradas na Fig.~\ref{msip:fluxo-2D}, em que se observa que os fluxos percorrem os dois entreferros para chegar ao estator. A Torus tem como características alta densidade de potência, devido ao pequeno comprimento axial. Os enrolamentos são reduzidos, o que resulta em baixas perdas no cobre e facilidade de transferência de calor. E, devido aos enrolamentos estarem no entreferro esta máquina tem baixos valores de indutâncias de dispersão, mútuas e próprias.  Como não há nas ranhuras efeitos como a ondulação (\textit{ripple}) no fluxo, \textit{cogging torque}, perdas em alta frequências no rotor e saturação das ranhuras são eliminados o que resulta em uma operação com baixo ruído no GSIP. E, ao utilizar ímãs de NdFeB, o efeito de desmagnetização dos ímãs \cite{Artigos-14-06} é muito reduzido, devido ao grande entreferro e por ser possível ter ímãs com alta densidade de fluxo no entreferro.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=\escalafig]{Figuras/msip/torus.eps}
+\caption{Máquina do tipo Torus sem ranhuras.}
+\label{msip:torus}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=\escalafig]{Figuras/msip/torus_2d.eps}
+\caption{Direções dos fluxos na Torus.}
+\label{msip:fluxo-2D}
+\end{figure}
+
+Outras configurações de máquinas Torus podem ser encontradas, algumas projetadas com características especiais para funcionar na região de enfraquecimento de campo. Uma vasto estudo sobre máquinas de fluxo axial pode ser encontrado em \cite{Artigos-14-06}.
+
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modelagem no Sistema Estacionário (\textit{abc})}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O objetivo desta modelagem é obter as equações que regem o comportamento dinâmico do gerador e que fornecem as principais características do seu funcionamento. A principal referência utilizada nesta etapa de modelagem foi \cite{Livros-03}, em que a máquina síncrona a ímãs permanentes é modelada na convenção motor. Aqui é mantida essa convenção, pois grande parte das referências de máquinas elétricas \cite{Livros-01, Livros-02, Artigos-01-47, Livros-IVO} adotam esta convenção e programas de simulação como o MATLAB\textregistered  e  PSIM\textregistered  também a adotam. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/abc-eixos.eps}
+	\caption{Modelo do GSIP.}
+	\label{msip:eixos}
+\end{figure}
+
+Inicialmente, considera-se um GSIP com rotor de dois pólos, com enrolamentos trifásicos distribuídos senoidalmente, dispostos  em $120^{\circ}$ e conectados em estrela, conforme ilustrado na Fig.~\ref{msip:eixos}. Os subscritos $s$ indicam variáveis do estator, $r$ indicam variáveis do rotor referidas ao sistema elétrico e $rm$ variáveis mecânicas do rotor. Observam-se os eixos estacionários dos enrolamentos para correntes positivas e os eixos girantes do rotor, que giram a uma velocidade angular mecânica $\omega_{rm}$ e sua posição angular mecânica é dada por $\theta_{rm}$. A relação entre a posição angular do rotor e posição angular elétrica $\theta_r$ é dada por \ref{eq:thetam}, em que o número de pares de pólos funciona como um multiplicador da velocidade angular elétrica \cite{Livros-03}.
+
+\begin{equation}
+\label{eq:thetam}
+\theta_r=\left(\dfrac{P}{2}\right)\theta_{rm}=\int _{t_0}^t\omega_r (\tau )d\tau +\theta_r \left(t_0\right)
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$P$: é o número de pólos;
+
+$\omega_r$: é a velocidade angular elétrica do rotor;
+
+$\tau$: é uma variável de integração qualquer;
+
+$t_0$: é o tempo inicial.
+
+Na Fig.~\ref{msip:maquina} a convenção de sinais adotada é apresentada, em que se observa que o sentido das correntes está na convenção motor. O equivalente elétrico é mostrado na Fig.~\ref{msip:circuito}, em que $N_s$ é o número de espiras do estator e $r_s$ é a resistência do estator.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/abc-convencoes.eps}
+	\caption{Convenção de sinais para modelagem do GSIP.}
+	\label{msip:maquina}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/abc_circuitoY.eps}
+	\caption{Circuito elétrico equivalente do GSIP.}
+	\label{msip:circuito}
+\end{figure}
+
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Equações de Tensão e Fluxo Magnético}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Aplicando a lei de Kirchoff das tensões no circuito do GSIP, obtêm-se as equações de tensão em variáveis do gerador dadas por (\ref{eq:Mtensaoabc}). E, considerando o circuito magnético linear, expressam-se os enlaces de fluxo segundo (\ref{eq:Mfluxoabc}).
+
+\begin{equation}
+\label{eq:Mtensaoabc}
+\vec{v}_{abc,s}=\left[\mathbf{r}_s\right]\vec{i}_{abc,s}+\frac{d}{dt}\vec{\lambda}_{abc,s}
+\end{equation}
+
+\begin{equation}
+\label{eq:Mfluxoabc}
+\vec{\lambda}_{abc,s}=\left[\mathbf{L}_s\right]\vec{i}_{abc,s}+\vec{\lambda}_{m}'
+\end{equation}
+
+Onde:
+\nopagebreak
+
+os vetores de variáveis no sistema $abc$ são definidos de acordo com a (\ref{eq:fabc}), em que $\vec{f}_{abc}$ representa tensões, correntes ou enlaces de fluxos;
+
+$\vec{v}_{abc,s}$: é o vetor de tensões do estator no sistema $abc$;
+
+$\vec{i}_{abc,s}$: é o vetor de correntes do estator no sistema $abc$;
+
+$\vec{\lambda}_{abc,s}$: é o vetor de enlaces de fluxo do estator no sistema $abc$;
+
+$\vec{\lambda}_{m}'$: é o vetor de enlaces de fluxo dos ímãs permanentes vistos pelos enrolamentos do estator dado por (\ref{eq:lambda}). E $\lambda_m'$ é a amplitude do enlace do fluxo dos ímãs permanentes visto pelos enrolamentos do estator a vazio;
+
+$\left[\mathbf{r}_s\right]$: é a matriz de resistências do estator conforme $\ref{eq:rs}$;
+
+$\left[\mathbf{L}_s\right]$: é a matriz de indutâncias do estator. Em (\ref{eq:Ls}) observa-se que esta matriz é composta das indutâncias próprias do estator $L_{ii,ss}$ e das indutâncias mútuas entre os enrolamentos do estator $L_{ij,ss}$ com $i \neq j$, ambas podem ser obtidas de (\ref{eq:Ls1}), (\ref{eq:Ls2}) e (\ref{eq:Ls3}), respectivamente.
+
+\begin{equation}
+\label{eq:fabc}
+\vec{f}_{abc}=\left[\begin{matrix}f_{a} &f_{b} &f_{c}\end{matrix}\right]^T
+\end{equation}
+
+\begin{equation}
+\label{eq:lambda}
+\vec{\lambda}_{m}'=\lambda_m'\left[
+\begin{matrix}
+ \textrm{sen}(\theta_r) & \textrm{sen}\left(\theta_r-\frac{2\pi}{3}\right) & \textrm{sen}\left(\theta_r+\frac{2\pi}{3}\right)
+\end{matrix}
+\right]^T
+\end{equation}
+
+\begin{equation}
+\label{eq:rs}
+[\mathbf{r}_s]=\left[
+\begin{matrix}
+ r_s & 0 & 0 \\
+ 0 & r_s & 0 \\
+ 0 & 0 & r_s
+\end{matrix}
+\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:Ls}
+[\mathbf{L}_s]=\left[
+\begin{matrix}
+L_{11,ss} & L_{12,ss} & L_{13,ss} \\
+L_{21,ss} & L_{22,ss} & L_{23,ss} \\
+L_{31,ss} & L_{32,ss} & L_{33,ss} 
+\end{matrix}
+\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:Ls1}
+L_{ii,ss}=L_{l,s}+L_A-L_B\cos\left[2\theta_r + (1-i)\dfrac{4\pi}{3}\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:Ls2}
+L_{ij,ss}=-\dfrac{1}{2}L_A-L_B\cos\left[2\theta_r + (2-i)(1-j)\dfrac{2\pi}{3}\right] \text{, com } j>i
+\end{equation}
+
+\begin{equation}
+\label{eq:Ls3}
+L_{ji,ss}=L_{ij,ss}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$L_{l,s}$: é a indutância de dispersão do estator;
+
+$L_A$ e $L_B$ são coeficientes das indutâncias mútuas e suas relações com parâmetros físicos são feitas por meio das indutâncias magnetizantes. Estas podem ser de eixo direto $L_{m,d}$ ou de eixo em quadratura $L_{m,q}$ dadas por (\ref{eq:Lmd}) e (\ref{eq:Lmq}), respectivamente.
+
+\begin{equation}
+\label{eq:Lmd}
+L_{m,d}=\frac{3}{2}(L_A+L_B)
+\end{equation}
+
+\begin{equation}
+\label{eq:Lmq}
+L_{m,q}=\frac{3}{2}(L_A-L_B)
+\end{equation}
+
+Com $L_A \geq L_B$ e $L_B=0$ em máquinas síncronas de rotor liso \cite{Livros-03}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Equações de Torque}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O torque eletromagnético em sistemas rotacionais é dado pela relação entre a variação de energia mecânica por variação de posição angular. Este resultado é apresentado em (\ref{eq:Te1}). 
+
+\begin{equation}
+\label{eq:Te1}
+dW_{rm}=-T_e d\theta_{rm}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$W_{rm}$: é a energia mecânica;
+
+$T_{e}$: é o torque elétrico.
+
+Desconsiderando-se as perdas, tem-se que a soma da energia mecânica $W_{rm}$ e da coenergia magnética $W_c$ é igual a zero. A coenergia magnética é obtida considerando que o sistema magnético é linear, pois neste caso ela torna-se igual à energia armazenada nos campos magnéticos $W_f$. Essa energia está armazenada nas indutâncias próprias dos enrolamentos do estator e nos enlaces de fluxos gerados pelos ímãs permanentes, cuja expressão é dada por (\ref{eq:Wf}).
+
+\begin{equation}
+\label{eq:Wf}
+W_f=W_c=\dfrac{1}{2}(\vec{i}_{abc,s})^T(\left[\mathbf{L}_s\right]-L_{l,s}\mathbf{I}_3)\vec{i}_{abc,s}+(\vec{i}_{abc,s})^T\vec{\lambda}_m'
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\mathbf{I}_3$: é a matriz identidade de dimensão três.
+
+Portanto, a partir de (\ref{eq:Te1}) e (\ref{eq:Wf}) pode-se reescrever o torque elétrico em função das correntes e da posição do rotor como (\ref{eq:Te2}) em sua forma matricial ou (\ref{eq:Te3}) na forma expandida. O torque elétrico é definido como positivo para operação da máquina como motor.
+
+\begin{flalign}
+\label{eq:Te2}
+&T_e(\vec{i}_{abc,s},\theta_r)  =  \nonumber\\
+& =\left(\dfrac{P}{2}\right)\dfrac{\partial{W_c(\vec{i}_{abc,s},\theta_r)}}{\partial{\theta_r}}  \nonumber\\
+&= \left(\dfrac{P}{2}\right)\Bigg[ \dfrac{1}{2}\left(\vec{i}_{abc,s}\right)^T\dfrac{\partial{(\left[\mathbf{L}_s\right]-L_{l,s}\mathbf{I}_3)}}{\partial{\theta_r}}(\vec{i}_{abc,s}) + (\vec{i}_{abc,s})^T\dfrac{\partial{\vec{\lambda'_m}}}{\partial{\theta_r}} \Bigg]
+\end{flalign}
+
+\begin{flalign}
+\label{eq:Te3}
+&T_e(\vec{i}_{abc,s},\theta_r) = \left(\dfrac{P}{2}\right)\Bigg\{\dfrac{(L_{m,d}-L_{m,q})}{3}\Bigg[\nonumber\\
+&\textrm{sen}(2\theta_r)\left(i_{a,s}^2-\dfrac{1}{2}i_{b,s}^2-\dfrac{1}{2}i_{c,s}^2-i_{a,s}i_{b,s}-i_{a,s}i_{c,s}+2i_{b,s}i_{c,s}\right)+ \nonumber\\
+&\dfrac{\sqrt{3}}{2}\cos(2\theta_r)(i_{b,s}^2-i_{c,s}^2-2i_{a,s}i_{b,s}+2i_{a,s}i_{c,s})\Bigg]+ \nonumber\\
+& \lambda_m'\Bigg[\cos(\theta_r)\left(i_{a,s}-\dfrac{1}{2}i_{b,s}-\dfrac{1}{2}i_{c,s}\right) + \dfrac{\sqrt{3}}{2}\textrm{sen}(\theta_r)(i_{b,s}-i_{c,s})\Bigg]\Bigg\}
+\end{flalign}
+
+A equação de balanço de torque\footnote{Por simplicidade, estão sendo desconsideradas os coeficientes de amortecimento e as constantes de mola. Maiores detalhes podem ser encontrados em \cite{Artigos-12-01}.} (\ref{eq:Tmecanica}) fornece a relação entre a velocidade angular mecânica e os torques, em que $T_{L,rm}$ é a amplitude do torque de carga, definido como positivo para torque de carga, ou seja, operação como motor. Portanto, para obter o torque de geração proveniente da turbina eólica aplica-se um sinal negativo na potência extraída do vento conforme apresentado em (\ref{eq:Tw}). A constante de inércia do gerador pode ser estimada por (\ref{eq:jrm}), em que o gerador é considerado como um disco maçico de massa total $M_g$ e raio $R_g$ \cite{Livros-05}.
+
+\begin{equation}
+\label{eq:Tmecanica}
+T_e=J_{rm}\frac{d\omega_{rm}}{dt}+T_{L,rm}
+\end{equation}
+
+\begin{equation}
+\label{eq:Tw}
+T_{L,rm}=\dfrac{-P_{we}}{\omega_{rm}}
+\end{equation}
+
+\begin{equation}
+\label{eq:jrm}
+J_{rm} = \dfrac{M_g R_g^2}{2}
+\end{equation}
+
+Os resultados obtidos até então para as equações de tensão e torque elétrico são não lineares e dependentes da posição angular do rotor, dificultando a análise e a aplicação de técnicas de controle linear. A transformação que será apresentada a seguir é capaz de eliminar essa dependência da posição angular do rotor e, sob certas condições, pode-se considerar a aplicação de técnicas de controle linear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection[Transformação para um Sistema de Referência]{Transformação para um Sistema de Referência Arbitrário}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A transformação de variáveis da máquina síncrona para um sistema de referência girante foi feita pela primeira vez por R. H. Park em 1928 \cite{Artigos-01-Park,Artigos-Park02}. Ele fixou o sistema de referência girante do estator no rotor e obteve equações de tensão e torque elétrico independentes da posição angular do rotor. Como será mostrado a seguir, a escolha da velocidade adequada do sistema de referência é tal que todas as indutâncias variantes no tempo, isto é, dependentes da posição angular do rotor, sejam eliminadas. Na Tabela \ref{tab:sist-ref} estão as possíveis velocidades para os sistemas de referência e como são conhecidos na literatura\footnote{Em eletrônica de potência é comum se referir a transformação para o sistema de referência síncrono como Transformada de Park, embora que no caso de máquinas síncronas isso só seja equivalente em regime permanente senoidal quando $\omega_r=\omega_e$.}.
+
+\begin{table}[!htb]
+\caption{Sistemas de referência possíveis}
+\label{tab:sist-ref}
+\begin{center}
+\begin{tabular}{c |c | c}
+\hline
+$\omega$ & Sistema de referência & Conhecido como\\
+\hline
+\hline
+$\omega=0$ & estacionário & Transformada de Clarke ($\alpha\beta0$)\\
+\hline
+$\omega=\omega_r$ & no rotor & \multirow{2}{*}{Transformada de Park ($dq0$)}\\
+\cline{1-2}
+$\omega=\omega_e$ & síncrono &  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/dq0-eixos.eps}
+	\caption{Eixos do sistema de referência arbitrário.}
+	\label{msip:eixosref}
+\end{figure}
+
+Seja a Fig.~\ref{msip:eixosref} em que são apresentados os eixos $d$ e $q$ do sistema de referência arbitrário \cite{Livros-03}. Nota-se que a projeção dos eixos dos enrolamentos trifásicos do gerador é feita em um sistema bifásico de velocidade $\omega$ e posição $\theta$ arbitrárias. Essa transformação para ser inversível deve gerar uma terceira componente, tradicionalmente é escolhida a componente de sequência zero. Esta é escolhida porque as variáveis do sistema bifásico só contêm informação das sequências positiva e negativa, o que tornaria o modelo não representativo em condições desbalanceadas. No caso de sistemas equilibrados a componente de sequência zero deve ser nula, o que facilita o processo de inversão de variáveis. A velocidade e posição angular do sistema de referência arbitrário são definidas de acordo com (\ref{eq:Momega}) e (\ref{eq:Mtheta}), respectivamente.
+
+\begin{equation}
+\label{eq:Momega}
+\omega=\dfrac{d\theta}{dt}
+\end{equation}
+
+\begin{equation}
+\label{eq:Mtheta}
+\theta=\int _{t_0}^t\omega (\tau )d\tau +\theta \left(t_0\right)
+\end{equation}
+
+Matematicamente, a transformação\footnote{Essa transformação é ligeiramente diferente da transformação originalmente proposta por Park, mas o seu uso é bastante difundido na área de acionamentos elétricos.} é definida conforme (\ref{eq:fdq0abc}) \cite{Livros-03}.
+
+\begin{equation}
+\label{eq:fdq0abc}
+\vec{f}_{dq0}=\left[\mathbf{K}_{s}\right]\vec{f}_{abc}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+os vetores de variáveis no plano $dq0$ são definidos de acordo com (\ref{eq:fdq0}), em que $\vec{f}_{dq0}$ representa tensões, correntes ou enlaces de fluxos;
+
+$\left[\textbf{K}_s\right]$: é a matriz de transformação direta definida em (\ref{eq:Ks}), cuja inversa é dada por (\ref{eq:invKs}).
+
+\begin{equation}
+\label{eq:fdq0}
+\vec{f}_{dq0}=\left[\begin{matrix}f_{d} &f_{q} &f_{0}\end{matrix}\right]^T
+\end{equation}
+
+\begin{equation}
+\label{eq:Ks}
+\left[\mathbf{K}_s\right]=\dfrac{2}{3}\left[
+\begin{matrix}
+ \textrm{sen}(\theta) & \textrm{sen}\left(\theta-\frac{2\pi}{3}\right) & \textrm{sen}\left(\theta+\frac{2\pi}{3}\right) \\
+  \cos(\theta) & \cos\left(\theta-\frac{2\pi}{3}\right) & \cos\left(\theta+\frac{2\pi}{3}\right) \\
+ 1/2 & 1/2 & 1/2
+\end{matrix}
+\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:fabcdq0}
+\vec{f}_{abc}=\left[\mathbf{K}_{s}\right]^{-1}\vec{f}_{dq0}
+\end{equation}
+
+\begin{equation}
+\label{eq:invKs}
+\left[\mathbf{K}_s\right]^{-1}=\left[
+\begin{matrix}
+ \textrm{sen}(\theta) & \cos(\theta) &  1 \\
+ \textrm{sen}\left(\theta-\frac{2\pi}{3}\right) & \cos\left(\theta-\frac{2\pi}{3}\right) & 1 \\
+ \textrm{sen}\left(\theta+\frac{2\pi}{3}\right) & \cos\left(\theta+\frac{2\pi}{3}\right) & 1
+\end{matrix}
+\right]
+\end{equation}
+
+Aplicando a transformação (\ref{eq:Ks}) na matriz de indutâncias (\ref{eq:Ls}) e no vetor de enlaces de fluxos dos ímãs (\ref{eq:lambda}) obtêm-se os resultados apresentados em (\ref{eq:Lsdq0}) e (\ref{eq:lambdadq0}), respectivamente. Nota-se que se, e somente se, $\theta=\theta_r$ e $\omega=\omega_r$ esses resultados não dependerão da posição angular do rotor para qualquer instante de tempo. Isso justifica o emprego da transformada de Park na análise do GSIP. 
+
+\begin{flalign}
+\label{eq:Lsdq0}
+&\left[\mathbf{K}_s\right]\left[\mathbf{L}_s\right]\left[\mathbf{K}_s\right]^{-1}=\nonumber \\
+&=\left[
+\begin{matrix}
+  L_{11,dq0} & \frac{3}{2}L_B\textrm{sen}[2(\theta_r-\theta)] &  0 \\
+ \frac{3}{2}L_B\textrm{sen}[2(\theta_r-\theta)] & L_{22,dq0} & 0 \\
+ 0 & 0 & L_{l,s}
+\end{matrix}
+\right]
+\end{flalign}
+
+\begin{equation}
+\label{eq:lambdadq0}
+\left[\mathbf{K}_s\right]\vec{\lambda}_{m}'=\lambda_m'\left[
+\begin{matrix}
+ \cos(\theta_r-\theta) & \textrm{sen}(\theta_r-\theta) & 0
+\end{matrix}
+\right]^T
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$L_{11,dq0}$ e $L_{22,dq0}$: dados por (\ref{eq:L11dq0}) e (\ref{eq:L22dq0}), respectivamente.
+
+\begin{equation}
+\label{eq:L11dq0}
+L_{11,dq0}=\frac{3}{2}L_A+\frac{3}{2}L_B\cos[2(\theta_r-\theta)]+L_{l,s}
+\end{equation}
+
+\begin{equation}
+\label{eq:L22dq0}
+L_{22,dq0}=\frac{3}{2}L_A-\frac{3}{2}L_B\cos[2(\theta_r-\theta)]+L_{l,s}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modelo no Sistema de Referência do Rotor (\textit{dq0})}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Equações de Tensão e Fluxo Magnético}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O resultado da aplicação da transformação $dq0$ em (\ref{eq:Mtensaoabc}) é exibido em (\ref{eq:Mtensaodq0}). Para denotar a transformação no sistema de referência do rotor utiliza-se o sobrescrito $r$. Nota-se o aparecimento do termo $\omega_r\boldsymbol{\lambda}^r_{qd,s}$ conhecido como tensão de velocidade. Este gera um acoplamento entre as equações de eixo direto e de eixo em quadratura. Os enlaces de fluxo no plano $dq0$ são expressos de acordo com ($\ref{eq:Mfluxodq0}$). O vetor de enlaces de fluxo no estator é composto de três parcelas nos eixos $dq$: o enlace de fluxo dos ímãs, o enlace de fluxo de reação de armadura $\lambda_{d,re}=L_d i_{d,s}^r$ de eixo direto e o enlace de fluxo de reação de armadura de eixo em quadratura $\lambda_{q,re}=L_q i_{q,s}^r$.
+
+\begin{equation}
+\label{eq:Mtensaodq0}
+\vec{v^r}_{dq0,s}=\left[\mathbf{r}_s\right]\vec{i}^r_{dq0,s}+\omega_r\vec{\lambda}^r_{qd,s}+\frac{d}{dt}\vec{\lambda}^r_{dq0,s}
+\end{equation}
+
+\begin{equation}
+\label{eq:Mfluxodq0}
+\vec{\lambda}^r_{dq0,s}=\left[\mathbf{L}^r_s\right]\vec{i}^r_{dq0,s}+\lambda'^r_m\left[
+\begin{matrix}
+ 1\\
+ 0\\
+ 0
+\end{matrix}
+\right]
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\vec{v^r}_{dq0,s}$: é o vetor de tensões do estator no plano $dq0$;
+
+$\vec{i}^r_{dq0,s}$: é o vetor de correntes do estator no plano $dq0$;
+
+$\vec{\lambda}^r_{dq0,s}$: é o vetor de enlaces de fluxo do estator no plano $dq0$;
+
+$\vec{\lambda}^r_{qd,s}$: é definido conforme (\ref{eq:lambdaqd});
+
+$\left[\textbf{L}^r_s\right]$: é a matriz de indutâncias do estator no plano $dq0$, definida segundo (\ref{eq:Ldq0}). Nela estão as indutâncias de eixo direto $L_d$ e de eixo em quadratura $L_q$ definidas em (\ref{eq:Ld}) e (\ref{eq:Lq}), respectivamente. A matriz $[\mathbf{K}^r_s]$ é obtida fazendo $\theta=\theta_r$ em (\ref{eq:Ks}), o mesmo se aplica à sua inversa (\ref{eq:invKs}).
+
+\begin{equation}
+\label{eq:lambdaqd}
+\vec{\lambda}^r_{qd,s}=\left[
+\begin{matrix}
+ -\lambda^r_{q,s} & \lambda^r_{d,s} & 0
+\end{matrix}
+\right]^T
+\end{equation}
+
+\begin{equation}
+\label{eq:Ldq0}
+\left[\mathbf{L}^r_s\right]=\left[\mathbf{K}^r_s\right]\left[\mathbf{L}_s\right]\left[\mathbf{K}^r_s\right]^{-1}=\left[
+\begin{matrix}
+ L_d & 0 & 0 \\
+ 0 & L_q & 0 \\
+ 0 & 0 & L_{l,s}
+\end{matrix}
+\right]
+\end{equation}
+
+\begin{equation}
+\label{eq:Ld}
+L_d=L_{l,s}+L_{m,d}
+\end{equation}
+
+\begin{equation}
+\label{eq:Lq}
+L_q=L_{l,s}+L_{m,q}
+\end{equation}
+
+O circuito elétrico equivalente do GSIP no plano $dq0$ é mostrado na Fig.~\ref{msip:circuito-dq0}. Observa-se as tensões de velocidade nos circuitos $dq$ e o acoplamento existente pela dependência dessas tensões nas correntes $i_{d,s}^r$ e $i_{q,s}^r$. Esse circuito pode ser utilizado para analisar o comportamento elétrico do GSIP em transitórios e em regime permanente.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/modelo-dinamico.eps}
+	\caption{Circuito equivalente do GSIP no plano $dq0$.}
+	\label{msip:circuito-dq0}
+\end{figure}
+
+A seguir será determinada a expressão do torque elétrico. Este juntamente com a equação mecânica (\ref{eq:Tmecanica}) e o circuito equivalente no plano $dq0$ torna possível a análise do comportamento eletromecânico do GSIP.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Equações de Torque}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Aplicando a transformação $dq0$ em (\ref{eq:Te2}) obtém-se (\ref{eq:Tedq01}). Nela estão presentes dois termos: um termo referente ao torque gerado pelo enlace de fluxo dos ímãs e outro referente ao torque de relutância. O primeiro termo é devido à interação entre o sistema magnético produzido pelas correntes dos enrolamentos do estator e o sistema magnético gerado pelos ímãs permanentes, este é conhecido como torque de reação. O segundo termo é o torque de relutância, que é devido à saliência dos pólos e para máquinas síncronas de rotor liso é nulo, pois $L_d\!=\!L_q$.
+
+\begin{equation}
+\label{eq:Tedq01}
+T_e=\left(\dfrac{3}{2}\right)\left(\dfrac{P}{2}\right)[\lambda'^r_{m}i^r_{q,s}+(L_d-L_q)i^r_{d,s}i^r_{q,s}]
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\left(\frac{3}{2}\right)\left(\frac{P}{2}\right)\lambda'^r_{m}i^r_{q,s}$: é a parcela referente ao torque de reação;
+
+$\left(\frac{3}{2}\right)\left(\frac{P}{2}\right)(L_d-L_q)i^r_{d,s}i^r_{q,s}$: é a parcela referente ao torque de relutância.
+
+A equação de torque também pode ser expressa em função dos enlaces de fluxo do estator, como apresentado em (\ref{eq:Tedq02}).
+
+\begin{equation}
+\label{eq:Tedq02}
+T_e=\left(\dfrac{3}{2}\right)\left(\dfrac{P}{2}\right)(\lambda^r_{d,s}i^r_{q,s}-\lambda ^r_{q,s} i^r_{d,s})
+\end{equation}
+
+Por fim, pode-se reescrever (\ref{eq:Tmecanica}), (\ref{eq:Mtensaodq0}) e (\ref{eq:Tedq01}) obtendo-se o sistema de equações (\ref{eq:EDOdq0}). Esse é um sistema de 4ª ordem que representa a dinâmica eletromecânica do GSIP, cujos resultados são válidos para transitórios e regime permanente.
+
+\begin{equation}
+\label{eq:EDOdq0}
+\left\{\begin{array}{c l}
+ L_d \dfrac{di^r_{d,s}}{dt} &=  v^r_{d,s}-r_s i^r_{d,s}+L_q \omega_r i^r_{q,s} \\
+ \\
+ L_q \dfrac{di^r_{q,s}}{dt} &=  v^r_{q,s}-r_s i^r_{q,s}-L_d \omega_r i^r_{d,s}-\lambda'^r_m \omega_r \\
+ \\
+ L_{l,s} \dfrac{di^r_{0,s}}{dt} &=  v^r_{0,s}-r_s i^r_{0,s} \\
+ \\
+ J_{rm} \dfrac{d\omega_r}{dt}    &=  \left(\dfrac{P}{2}\right)\left(T_e-T_{L,rm} \right)
+ \end{array} 
+ \right.
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modelo em Regime Permanente}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Análise Vetorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para entender melhor as relações entre os ângulos das grandezas do gerador, propõe-se uma análise do gerador operando em regime permanente senoidal balanceado. Nessa condição de operação a velocidade do rotor é constante e igual à velocidade do sistema de referência síncrono $\omega_e$ e, portanto, pode-se considerar que as variações dos enlaces de fluxo são desprezíveis. Então, dados uma velocidade angular e um torque de carga pode-se reescrever (\ref{eq:EDOdq0}) em termos de valores de regime permanente\footnote{Letras maiúsculas denotam grandezas constantes.} em (\ref{eq:ERdq0}). As tensões dos eixos $dq$ são compostas das quedas de tensão nos enrolamentos do estator e das forças eletromotrizes ($back$ EMF) induzidas pelos fluxos dos imãs e de reação de armadura. A tensão gerada por: $ \lambda'^r_m \omega_r$ é conhecida com força eletromotriz a vazio, por $L_d \omega_r I^r_{d,s}$ é a força eletromotriz de reação de armadura de eixo direto e por $- L_q \omega_r I^r_{q,s}$ é a força eletromotriz de reação de armadura de eixo em quadratura \cite{Livros-05}.
+
+\begin{equation}
+\label{eq:ERdq0}
+\left\{
+\begin{array}{c l}
+ V^r_{d,s} &=  r_s I^r_{d,s} - L_q \omega_r I^r_{q,s} \\
+ \\
+ V^r_{q,s} &=  r_s I^r_{q,s} + L_d \omega_r I^r_{d,s} + \lambda'^r_m \omega_r 
+\end{array}
+\right.
+\end{equation}
+
+Seja o conjunto de tensões trifásicas cossenoidais definidas segundo (\ref{eq:Vabcsin3ph}), em que a aplicação da transformação $dq0$ resulta em (\ref{eq:Vdq0sin3ph}).
+
+\begin{equation}
+\label{eq:Vabcsin3ph}
+\begin{array}{c l}
+ v_{a,s} &=  \sqrt{2}V_{s,rms}\cos(\theta_v) \\
+ v_{b,s} &=  \sqrt{2}V_{s,rms}\cos\left(\theta_v-\frac{2\pi}{3}\right) \\
+ v_{c,s} &=  \sqrt{2}V_{s,rms}\cos\left(\theta_v+\frac{2\pi}{3}\right) 
+ \end{array}
+\end{equation}
+
+\begin{equation}
+\label{eq:Vdq0sin3ph}
+\begin{array}{c l}
+ v^r_{d,s} &= V^r_{d,s} =  \sqrt{2}V_{s,rms}\textrm{sen}(\phi_v) \\
+ v^r_{q,s} &=V^r_{q,s} =  \sqrt{2}V_{s,rms}\cos(\phi_v)
+  \end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$V_{s,rms}$: é o valor eficaz da tensão de fase do estator;
+
+$\theta_v$: é o ângulo da tensão da fase $a$ definido segundo (\ref{eq:thetav});
+
+$\phi_v$: é o ângulo de carga, dado pela diferença entre o ângulo do rotor e da tensão terminal da fase $a$ conforme (\ref{eq:ang-carga}).
+
+\begin{equation}
+\label{eq:thetav}
+\theta_v=\int _{t_0}^t\omega_e (\tau )d\tau +\theta_v \left(t_0\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:ang-carga}
+\phi_v=\theta_r-\theta_v
+\end{equation}
+
+De maneira análoga às tensões, definem-se um conjunto de correntes trifásicas cossenoidais conforme (\ref{eq:Iabcsin3ph}), em que a aplicação da transformação $dq0$ gera o resultado apresentado em (\ref{eq:Idq0sin3ph}).
+
+\begin{equation}
+\label{eq:Iabcsin3ph}
+\begin{array}{c l}
+ i_{a,s} &=  \sqrt{2}I_{s,rms}\cos(\theta_i)  \\
+ i_{b,s} &=  \sqrt{2}I_{s,rms}\cos\left(\theta_i-\frac{2\pi}{3}\right) \\
+ i_{c,s} &=  \sqrt{2}I_{s,rms}\cos\left(\theta_i+\frac{2\pi}{3}\right) 
+ \end{array}
+\end{equation}
+
+\begin{equation}
+\label{eq:Idq0sin3ph}
+\begin{array}{c l}
+ i^r_{d,s} &= I^r_{d,s} =  \sqrt{2}I_{s,rms}\textrm{sen}(\phi_i) \\
+ i^r_{q,s} &= I^r_{q,s} =  \sqrt{2}I_{s,rms}\cos(\phi_i)
+ \end{array}
+\end{equation}
+
+%\clearpage
+
+Onde:
+\nopagebreak
+
+$I_{s,rms}$: é o valor eficaz da corrente de fase do estator;
+
+$\theta_i$: é o ângulo da corrente da fase $a$ definido segundo ($\ref{eq:thetai}$);
+
+$\phi_i$: é a diferença angular entre o ângulo do  rotor e da corrente da fase $a$ conforme (\ref{eq:ang-corrente}).
+
+\begin{equation}
+\label{eq:thetai}
+\theta_i=\int _{t_0}^t\omega_e (\tau )d\tau +\theta_i \left(t_0\right)
+\end{equation}
+
+\begin{equation}
+\label{eq:ang-corrente}
+\phi_i=\theta_r-\theta_i
+\end{equation}
+
+Para as condições de operação apresentadas é interessante obter os fasores do gerador, pois em um diagrama fasorial as relações de ângulo são facilmente obtidas. A relação entre as variáveis do plano $dq0$ e os fasores é bem compreendida se forem observados	os eixos do sistema de referência ilustrados na Fig.~\ref{msip:complexo1}. A projeção do sistema de referência para o diagrama fasorial é um ``retrato'' dos fasores que seriam obtidos naquele instante de tempo, e para a condição de regime permanente esse ``retrato'' é constante. Quando o eixo em quadratura é tomado como referência angular, obtém-se o diagrama fasorial da Fig.~\ref{msip:complexo2}. Observando as figuras, obtêm-se a relação entre o fasor de tensão e as tensões de eixo direto e de eixo em quadratura, e a relação para o fasor de corrente dadas por (\ref{eq:Vascomp}) e (\ref{eq:Iascomp}), respectivamente.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\subfigure[]{
+	\label{msip:complexo1}
+	\includegraphics[scale=\escalafig]{Figuras/msip/eixos-complexo01.eps}}
+	
+	\subfigure[]{
+	\label{msip:complexo2}
+	\includegraphics[scale=\escalafig]{Figuras/msip/eixos-complexo02.eps}}
+	
+	\caption{Representação e obtenção dos fasores.}
+	\label{msip:complexo}
+\end{figure}
+
+\begin{equation}
+\label{eq:Vascomp}
+\sqrt{2}\dot{V}_{a,s}=V^r_{q,s}-jV^r_{d,s}
+\end{equation}
+
+\begin{equation}
+\label{eq:Iascomp}
+\sqrt{2}\dot{I}_{a,s}=I^r_{q,s}-jI^r_{d,s}
+\end{equation}
+
+De (\ref{eq:Vascomp}), (\ref{eq:Iascomp}) e (\ref{eq:ERdq0}) obtêm-se as relações da tensão interna do gerador, a tensão de excitação $\dot{E}_a$, e a tensão terminal do gerador dadas em (\ref{eq:ERVas}) e (\ref{eq:Ea}). A tensão de excitação contém a potência ativa no eixo do GSIP, que é igual ao torque elétrico vezes a velocidade angular mecânica do gerador. A partir de (\ref{eq:ERVas}), ilustra-se o diagrama fasorial para condição de gerador na Fig.~\ref{msip:fasores}. Observam-se as principais relações angulares, em que o ângulo $\delta_i=\phi_v-\varphi_i=(\theta_i+\pi)-\theta_v$ será utilizado na estratégia de modulação do retificador ativo trifásico utilizado neste trabalho. 
+
+\begin{equation}
+\label{eq:ERVas}
+\dot{E}_a=\dot{V}_{a,s}-(r_s+j\omega_rL_q)\dot{I}_{a,s}
+\end{equation}
+
+\begin{equation}
+\label{eq:Ea}
+\dot{E}_a=\dfrac{\omega_r}{\sqrt{2}}[\lambda'^r_m+(L_d-L_q)I^r_{d,s}]
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/fasores.eps}
+	\caption{Diagrama fasorial para operação em regime permanente.}
+	\label{msip:fasores}
+\end{figure}
+
+O circuito equivalente do gerador operando em regime permanente senoidal pode ser obtido notando (\ref{eq:ERVas}). Este resultado deve ser apropriadamente defasado de 120º por fase ($\dot{E}_b=\dot{E}_ae^{-j\frac{2\pi}{3}}$ e $\dot{E}_c=\dot{E}_ae^{j\frac{2\pi}{3}}$). Na Fig.~\ref{msip:regime} está ilustrado o circuito equivalente trifásico.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/modelo-regime.eps}
+	\caption{Circuito equivalente do GSIP em regime permanente senoidal.}
+	\label{msip:regime}
+\end{figure}
+
+Uma observação que deve ser feita é que embora essa análise tenha sido feita para operação em regime permanente, as relações de ângulos obtidas são válidas também para operação em regime transitório \cite{Livros-03}. A visualização por meio de fasores é um caso particular da teoria de vetores (ou fasores) espaciais para análise de máquinas elétricas proposta por P. K. Kovacs em 1959 \cite{Livros-Kovacs,Artigos-01-30}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Potência Elétrica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A potência elétrica em regime permanente de cada fase do GSIP pode ser obtida pelo produto do fasor de tensão do estator e do fasor de corrente do estator.  Como o circuito é equilibrado, a potência aparente trifásica nos terminais $\dot{S}_t$ é três vezes o valor da potência de fase dada por (\ref{eq:st}), em que o sobrescrito c* indica a operação de complexo conjugado. Observa-se que, só foram levadas em consideração as perdas de condução nos enrolamentos (no cobre) e, como comentado anteriormente, pode-se desprezar algumas perdas como as perdas no núcleo de ferro e outras perdas adicionais. Uma modelagem completa incluindo tais perdas e a metodologia experimental para obtê-las pode ser encontrada em \cite{Artigos-01-49}.
+
+\begin{equation}
+\label{eq:st}
+\dot{S}_t=3 \dot{V}_{a,s} \dot{I}^{c*}_{a,s} = P_t + j Q_t
+\end{equation}
+
+Onde:
+
+$P_t$: é a potência ativa nos terminais do GSIP dada por (\ref{eq:pt}), em que suas parcelas são explicitamente identificadas;
+
+$Q_t$: é a potência reativa nos terminais do GSIP dada por (\ref{eq:qt}).
+
+\begin{equation}
+\label{eq:pt}
+P_t= \genfrac{}{}{0pt}{1}{\underbrace{\dfrac{3}{2}r_s\left[I_{d,s}^{r2}+I_{q,s}^{r2}\right]}}{\genfrac{}{}{0pt}{1}{\textrm{Perdas joule}}{\textrm{nos enrolamentos}}} + \genfrac{}{}{0pt}{1}{\underbrace{\dfrac{3}{2}\omega_r I_{q,s}^{r} [\lambda'^r_m + (L_d-L_q)I_{d,s}^{r}]}}{\textrm{Potência no eixo do rotor } (P_e)} 
+\end{equation}
+
+\begin{equation}
+\label{eq:qt}
+Q_t= \dfrac{3}{2} \omega_r (\lambda'^r_m I_{d,s}^r +  L_d I_{d,s}^{r2} + L_q I_{q,s}^{r2})
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limites Operacionais} \label{sec:gsip-limites}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Os limites operacionais são funções das máximas perdas na máquina, que são função do limite térmico \cite{Teses-01-12}. Estes por sua vez podem ser particularizados pelos limites de corrente e tensão supondo operação em condições nominais fornecidas pelo fabricante e que outras perdas são desprezíveis frente às perdas no cobre. O limite de corrente é dado pelo máximo valor eficaz da corrente de fase $I_{s,max}$ e o de tensão é dado pelo máximo valor eficaz da tensão de linha $V_{L,max}$. A partir dessas informações e dos parâmetros nominais da máquina (obtidos de maneira experimental ou dados pelo fabricante) pode-se determinar os limite operacionais de duas regiões operacionais da máquina: a região de torque constante e a região de enfraquecimento de campo, ilustradas na Fig.~\ref{msip:limites}. A região de torque constante tem como limites o máximo torque ($T_{e,max}$) e a velocidade base ($\omega_B$). A região de enfraquecimento de campo é delimitada pela máxima velocidade ($\omega_{r,max}$) que se pode operar acima da velocidade base. A curva $T_{P_{e,max}}$ representa a curva de torque máximo em função da máxima potência no eixo.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/limites-fw.eps}
+	\caption{Limites operacionais da máquina.}
+	\label{msip:limites}
+\end{figure}
+
+Segundo \cite{Teses-01-12}, a velocidade base é definida como sendo a velocidade angular em que a força eletromotriz gerada pelos enlaces de fluxo do entreferro do estator (\textit{back} EMF) atinge o máximo valor na curva de torque máximo por velocidade, para uma dada estratégia de controle das correntes do GSIP. Isso faz com que a velocidade base e a velocidade angular nominal sejam as mesmas apenas em máquinas com ímãs montados na superfície operando em condições nominais. Tradicionalmente, calcula-se a velocidade base para a estratégia de controle das correntes de torque máximo por ampère \cite{Livros-20,Teses-Voltoni}. A seguir será utilizada essa abordagem para ilustrar o comportamento do GSIP além da velocidade base.
+
+O torque máximo por ampère é obtido reescrevendo (\ref{eq:Iascomp}) em função da corrente máxima, e reescrevendo (\ref{eq:Tedq01}) em função da corrente máxima e da corrente de eixo direto, conforme apresentado em (\ref{eq:temax}). Como o torque passa a ser função de apenas uma variável, o seu valor máximo é obtido derivando a expressão resultante pela corrente de eixo direto, cujo resultado é dado por (\ref{eq:idsr}). A solução válida é a corrente negativa de menor módulo e é função apenas dos parâmetros da máquina \cite{Livros-20}. Para o caso particular em que $L_d\!=\!L_q$ o torque máximo é obtido aplicando corrente de eixo direto nula.
+
+\begin{equation}
+\label{eq:temax}
+T_{e,max} (I_{d,s}^r) = \left( \dfrac{3P}{4} \right) \left[ \lambda'^r_m  + (L_d-L_q) I_{d,s}^r \right] \sqrt{2I_{s,max}^2-I_{d,s}^{r2}}
+\end{equation}
+ 
+\begin{equation}
+\label{eq:idsr}
+2 (L_d-L_q) I_{d,s}^{r2} + \lambda'^r_m I_{d,s}^{r} - 2 (L_d-L_q) I_{s,max}^2 = 0 
+\end{equation}
+
+Para obter a velocidade base utiliza-se a tensão do estator (\ref{eq:Vascomp}) e é comum desprezar a resistência para o cálculo da velocidade, pois a queda de tensão é, em geral, desprezível. Esse resultado é apresentado em (\ref{eq:wbase}), em que esta foi escrita de uma forma conveniente para introduzir o conceito de região de enfraquecimento de campo (\textit{flux-weakening region}). Desprezar as resistências do estator para estimar a velocidade base é o mesmo que dizer que esta é função da força eletromotriz gerada pelos enlaces de fluxo no entreferro do estator.  Os enlaces de fluxo são determinados para a corrente máxima, em que a relação entre as correntes de eixo direto e quadratura são dadas pela estratégia de controle de corrente adotada.
+
+\begin{equation}
+\label{eq:wbase}
+\omega_{B}=\dfrac{\sqrt{2} V_{L,max} / \sqrt{3}} {\sqrt{(\lambda^r_{d,s})^2 + (\lambda^r_{q,s})^2}}
+\end{equation}
+   
+Acima  da velocidade base diz-se que a operação se dá na região enfraquecimento de campo ou região de potência constante\footnote{Só é possível operar com potência constante caso sejam desconsideradas as perdas no núcleo \cite{Teses-01-12}.}, isto é, deve-se regular o produto velocidade por torque para limitar a potência no eixo do rotor no seu valor máximo. Esta regulação é feita por meio do enfraquecimento do campo no entreferro para manter o produto velocidade com enlace de fluxo (campo) constante \cite{Teses-Voltoni, Livros-LIPO, Artigos-14-16}. Ressalta-se que diferentes estratégias de controle podem ser implementadas nessa região \cite{Teses-01-12}. 
+
+O limite de velocidade da região de enfraquecimento de campo é obtido quando a corrente de eixo em quadratura é zero e a máxima corrente de eixo direto é utilizada para enfraquecer o campo do enteferro. Portanto, pode-se calcular o limite de velocidade a partir de (\ref{eq:wr-max}).
+
+\begin{equation}
+\label{eq:wr-max}
+\omega_{r,max}=\dfrac{\sqrt(2)V_{L,max}/\sqrt{3}}{|\lambda'^r_m-L_d\sqrt(2)I_{s,max}|}
+\end{equation}
+
+%Na Fig.~\ref{msip:enfraquecimento} estão ilustradas as curvas típicas de torque por velocidade de MSIP com diferentes aspectos construtivos \cite{Teses-Voltoni}. A curva $\textrm{FW}_1$ é a curva típica de um MSIP de fluxo axial e observa-se que a região de enfraquecimento de campo da mesmo é praticamente inexistente. Isso se deve à dificuldade de enfraquecer o campo em um entreferro grande, em que o fluxo resultante é praticamente o fluxo gerado pelos ímãs e o fluxo de reação de armadura não é suficiente para enfraquecer o campo. As outras curvas representam máquinas que não serão abordadas neste trabalho e que têm características especiais de projeto para permitir a operação na região de enfraquecimento.
+%
+%%corrigir
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[scale=\escalafig]{Figuras/msip/curvas-fw.eps}
+%	\caption{Curvas típicas de torque por velocicdade de MSIP.}
+%	\label{msip:enfraquecimento}
+%\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Retificador Ativo Trifásico}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Escolha da Topologia}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A topologia de retificador ativo trifásico que será estudada foi proposta em \cite{Artigos-03-25,Artigos-05-10}. Trata-se de uma variação topológica do retificador bidirecional trifásico \textit{boost} (será referido como VSR - \textit{voltage source rectifier}) ilustrado na Fig. \ref{retificador:boost-ideal}, em que os interruptores são reposicionados entre as fases (formando uma conexão em delta) no caminho entre os indutores e a ponte de diodos, conforme ilustrado na Fig.~\ref{retificador:conversor}. A ponte de diodos garante que o fluxo de potência é unidirecional e pelo formato da conexão dos interruptores ativos este retificador é conhecido como retificador unidirecional trifásico com interruptores CA em delta e será refererido como $\textrm{VSR}_{\Delta}$. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/boost3ph-ideal.eps}
+	\caption{Retificador trifásico bidirecional.}
+	\label{retificador:boost-ideal}
+\end{figure}
+
+Na Fig.~\ref{retificador:etapaboost} estão ilustradas duas etapas de operação do $\textrm{VSR}_{\Delta}$ para a condição em que $i_b=-i_a$ e $i_c=0$ com $i_a>0$, sendo uma etapa de acumulação de energia (Fig.~\ref{retificador:etapa01}) e outra de transferência de energia (Fig.~\ref{retificador:etapa02}). Nota-se que o funcionamento do conversor é do tipo \textit{boost}.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/conversor.eps}
+	\caption{Retificador trifásico unidirecional em delta.}
+	\label{retificador:conversor}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+		
+	\subfigure[]{
+	\label{retificador:etapa01}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/etapa01.eps}}
+	
+	\subfigure[]{
+	\label{retificador:etapa02}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/etapa02.eps}}
+		
+	\caption{Possíveis etapas de operação do $\textrm{VSR}_{\Delta}$.}
+	\label{retificador:etapaboost}
+\end{figure}
+
+Os interruptores do $\textrm{VSR}_{\Delta}$ devem ser bidirecionais em corrente e em tensão por processarem correntes alternadas e serem submetidos a tensões alternadas. O $\textrm{VSR}_{\Delta}$ tem como características baixas perdas em condução e em comutação, principalmente se ``verdadeiros'' interruptores bidirecionais forem produzidos \cite{Artigos-03-06}. Estes podem ser implementados pelas configurações apresentadas na Fig.~\ref{retificador:interruptores} \cite{Artigos-03-25,Artigos-05-05,Artigos-03-16}, em que há possibilidades que podem ser implementadas com MOSFETs (\textit{metal oxide semiconductor field effect transistor}) e todas podem ser implementadas com IGBTs (\textit{insulated gate bipolar transitor}). A configuração de IGBTs em anti-paralelo da Fig~\ref{retificador:int-a} é a que possibilita as menores perdas em condução e é a única não pode ser implementada com MOSFETs. No entanto, nessa configuração os circuitos de comando devem ser isolados e os IGBTs devem ser do tipo \textit{reverse blocking}, ou seja, ter capacidade de bloquear tensão no sentido reverso. A configuração de MOSFETs em anti-série da Fig.~\ref{retificador:int-c} é mais simples de ser implementada do que a configuração da Fig.~\ref{retificador:int-b} e apresenta perdas menores que a configuração de MOSFET com ponte de diodos da Fig.~\ref{retificador:int-d}, devido ao número de semicondutores na passagem da corrente ser menor (dois semicondutores).
+
+\begin{figure}[!htb]
+	\centering
+	
+	\mbox{
+	\subfigure[]{
+	\label{retificador:int-a}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/int-a.eps}}
+	
+	\subfigure[]{
+	\label{retificador:int-b}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/int-b.eps}}
+	}
+	
+	\mbox{
+	\subfigure[]{
+	\label{retificador:int-c}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/int-c.eps}}
+	
+	\subfigure[]{
+	\label{retificador:int-d}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/int-d.eps}}
+	}
+	\caption[Configurações para implementação do interruptor bidirecional.]{Configurações possíveis para implementação do interruptor bidirecional.}
+	\label{retificador:interruptores}
+\end{figure}
+
+Como vantagens com relação ao VSR pode-se citar a grande robustez da estrutura, pois não há possibilidade de curto de braço e, portanto, não há necessidade de implementação de tempo-morto (\textit{dead-time}). Como desvantagens estão o fluxo unidirecional de energia, limitação do processamento de energia reativa e aumento da complexidade da estratégia de modulação, questões que serão analisadas mais adiante neste capítulo. As técnicas de modulação serão analisadas no Capítulo~\ref{chapter-modulacao}.
+
+Uma vasta quantidade de topologias de retificadores trifásicos unidirecionais podem ser encontradas na literatura. Em \cite{Artigos-Kolar-Y} também é proposta uma implementação com interruptores CA em estrela. No entanto, nessa estrutura as perdas em condução são maiores porque na etapa de acumulação de energia há sempre dois interruptores bidirecionais no caminho da corrente \cite{Artigos-05-05}. Um estudo do funcionamento de diversas topologias de retificadores trifásicos de dois níveis e três níveis é apresentada em \cite{Artigos-03-17,Artigos-03-06,Artigos-03-16} e mais recentemente em \cite{Teses-05-01} há uma revisão das principais topologias de retificadores trifásicos unidirecionais de dois níveis. Quando comparado ao VSR ou a outros retificadores trifásicos com interruptores do lado CA \cite{Artigos-03-23,Teses-03-14}, concluiu-se que a melhor escolha é o $\textrm{VSR}_{\Delta}$. E, para os níveis de tensão e potência utilizados neste projeto e dada a grande robustez, baixo custo e baixa complexidade \cite{Artigos-05-01}, o $\textrm{VSR}_{\Delta}$ aparenta ser a melhor topologia para o acionamento do GSIP utilizado neste trabalho. Os interruptores bidirecionais foram implementados com MOSFETs e na configuração em anti-série. A primeira aplicação desta topologia em geração de energia eólica foi realizada em \cite{Artigos-03-23}, em que é proposta uma estratégia de modulação e são apresentadas vantagens da topologia frente a outras topologias de retificadores ativos trifásicos com interruptores CA.
+
+Uma vez que foram apresentadas as justificativas para a escolha da topologia, será estudada a modelagem de retificadores trifásicos para a obtenção das equações diferenciais que regem o seu comportamento dinâmico. O estudo será introduzido apresentando a modelagem do VSR pelas facilidades que se encontram ao analisar esse conversor e por esta já ser bem conhecida na literatura \cite{Artigos-03-14,Teses-03-05}. Em seguida, são apresentadas as particularidades para o caso unidirecional já estudadas em \cite{Teses-03-06} e aplicadas aqui ao $\textrm{VSR}_{\Delta}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modelagem do VSR}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Modelagem no Sistema \textit{abc}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inicialmente, supõe-se que os interruptores são ideais, comutações instantâneas e as variáveis do circuito definidas conforme apresentado na Fig.~\ref{retificador:boost-ideal}. As funções de comutação dos interruptores $S_{xy}$ são definidas de acordo com (\ref{eq:Sxy}) e (\ref{eq:Sabc}). Para garantir que não haja curto-circuito de braço deve-se fazer com que os comandos dos interruptores de um mesmo braço sejam complementares e isto é expresso em (\ref{eq:Sxpn}).  
+
+\begin{equation}
+\label{eq:Sxy}
+s_{xy}=\left\{
+\begin{array}{c l}
+ 1 & \textrm{, $S_{xy}$ fechado }\\
+ 0 & \textrm{, $S_{xy}$ aberto } \quad \raisebox{1.1ex}[1.1ex][1.1ex]{com $x\in\{a,b,c\}$ e  $y\in\{p,n\}$}
+\end{array}\right.
+\end{equation}
+
+\begin{equation}
+\label{eq:Sabc}
+ s_{xy} =  s_{xy}(t) \quad \text{, com } x\in\{a,b,c\} \text{ e }  y\in\{p,n\}
+\end{equation} 
+
+\begin{equation}
+\label{eq:Sxpn}
+s_{xp}+s_{xn}=1 \quad \text{, com } x\in\{a,b,c\}
+\end{equation}
+
+Como em (\ref{eq:Sxpn}) garante-se que não haverão dois interruptores em condução no mesmo instante, pode-se redefinir as funções de comutações dos interruptores conforme apresentado em (\ref{eq:Sx}). Então, circuito equivalente do VSR é representado, sem perdas de generalidade, de forma simplificada na Fig.~\ref{retificador:circuito-modelagem}.
+
+\begin{equation}
+\label{eq:Sx}
+s_x=s_{xp}=1-s_{xn} \qquad \text{, com } x\in\{a,b,c\}
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/boost3ph-modelagem.eps}
+	\caption{Circuito equivalente para modelagem do VSR.}
+	\label{retificador:circuito-modelagem}
+\end{figure}
+
+As tensões entre os terminais $x$ e $n$ são dadas por (\ref{eq:Vabcn}).
+
+\begin{equation}
+\label{eq:Vabcn}
+ v_{xn} =  s_xv_{dc} \qquad \text{, com } x\in\{a,b,c\}
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$s_x$: é a função de comutação da fase $x$, com $x\in\{a,b,c\}$.
+
+Aplicando a Lei de Kirchoff das tensões e expressando as variáveis por valores de linha obtém-se (\ref{eq:eL}).
+
+\begin{equation}
+\label{eq:eL}
+ \vec{e}_{L} =  3r\vec{i}_L+3L\dfrac{d\vec{i}_L}{dt} + \vec{v}_L
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$\vec{e}_L$: é o vetor de tensões de linha  da rede elétrica, definido por (\ref{eq:vetor-eL});
+
+$\vec{i}_L$: é o vetor de correntes de linha, definido por (\ref{eq:vetor-iL});
+
+$\vec{v}_L$: é o vetor de tensões de linha nos terminais do retificador, definido por (\ref{eq:vetor-vL});
+
+$L$: é a indutância $boost$;
+
+$r$: é a soma das resistências do ramo.
+
+\begin{flalign}
+\label{eq:vetor-eL}
+ \vec{e}_{L} &=  \left[\begin{matrix}e_{ab} & e_{bc} & e_{ca}\end{matrix}\right]^T \nonumber \\
+ & =\left[\begin{matrix}e_{a}-e_b & e_{b}-e_c & e_{c}-e_a\end{matrix}\right]^T
+\end{flalign} 
+
+\begin{flalign}
+\label{eq:vetor-iL}
+ \vec{i}_{L} &=  \left[\begin{matrix}i_{ab} & i_{bc} & i_{ca}\end{matrix}\right]^T \nonumber\\
+ &= \dfrac{1}{3}\left[\begin{matrix}i_{a}-i_b & i_{b}-i_c & i_{c}-i_a\end{matrix}\right]^T
+\end{flalign} 
+
+\begin{flalign}
+\label{eq:vetor-vL}
+ \vec{v}_{L}&=  \left[\begin{matrix}v_{ab} & v_{bc} & v_{ca}\end{matrix}\right]^T \nonumber\\
+ &= \left[\begin{matrix}v_{an}-v_{bn} & v_{bn}-v_{cn} & v_{cn}-v_{an}\end{matrix}\right]^T\nonumber\\
+ &= \left[\begin{matrix}(s_a-s_b)v_{dc} & (s_b-s_c)v_{dc} &(s_c-s_a)v_{dc}\end{matrix}\right]^T\nonumber\\
+ &= \vec{s}_L v_{dc}  
+\end{flalign} 
+
+Onde:
+\nopagebreak
+
+$\vec{s}_L$ : o vetor de funções de comutação definido segundo (\ref{eq:sL});
+
+$v_{dc}$: é a tensão do barramento CC.
+
+\begin{flalign}
+\label{eq:sL}
+ \vec{s}_{L} &=  \left[\begin{matrix}s_a-s_b & s_b-s_c & s_c-s_a\end{matrix}\right]^T \nonumber\\
+ 						&=	\left[\begin{matrix}s_{ab} & s_{bc} & s_{ca}\end{matrix}\right]^T
+\end{flalign}
+
+E, aplicando-se a Lei de Kirchoff das correntes no nó $p$ obtém-se a expressão da corrente no barramento CC $i_{dc}$ em função das variáveis do lado CC (\ref{eq:Vdc}) e em função das variáveis do lado CA (\ref{eq:Idc}). Essa pode ser reescrita em termos das variáveis de linha (\ref{eq:IdcL}). Observa-se que foi desprezada a resistência série equivalente (RSE) do capacitor.
+
+\begin{equation}
+\label{eq:Vdc}
+ i_{dc} =  C\dfrac{dv_{dc}}{dt} + i_{Lo}
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$C$: é a capacitância do barramento CC;
+
+$i_{Lo}$: é a corrente de carga.
+
+\begin{equation}
+\label{eq:Idc}
+ i_{dc} =  s_ai_a+s_bi_b+s_ci_c
+\end{equation} 
+
+\begin{equation}
+\label{eq:IdcL}
+ i_{dc} =  s_{ab}i_{ab}+s_{bc}i_{bc}+s_{ca}i_{ca}=(\vec{s}_L)^T(\vec{i}_L)
+\end{equation} 
+
+Assim, a partir de (\ref{eq:eL}), (\ref{eq:vetor-vL}), (\ref{eq:Vdc}) e (\ref{eq:IdcL}) obtém-se o modelo instantâneo do VSR conectado à rede elétrica através de um indutor $boost$ dado por (\ref{eq:boost-instantaneo}).
+
+\begin{equation}
+\label{eq:boost-instantaneo}
+\left\{
+\begin{array}{c l}
+ 3L\dfrac{d\vec{i}_L}{dt}&=\vec{e}_{L} - 3r\vec{i}_L - \vec{s}_Lv_{dc}\\
+ \\
+ C\dfrac{dv_{dc}}{dt}&= (\vec{s}_L)^T(\vec{i}_L) - i_{Lo}
+ \end{array}
+ \right.
+\end{equation} 
+
+Utilizar o modelo (\ref{eq:boost-instantaneo}) requer o conhecimento instantâneo do estado topológico do VSR e do tempo de duração do mesmo, o que, em geral, é uma tarefa muito difícil devido aos pequenos períodos de comutação utilizados em eletrônica de potência. Para conversores operando por modulação PWM é comum então, para fins de análise dinâmica e estática, aproximar os valores do modelo instantâneo pela média dos valores em um\footnote{No caso de conversores PWM com portadora triangular pode-se utilizar meio período de comutação. Mais adiante serão apresentadas as diferenças entre modular o conversor por portadora dente-de-serra e por portadora triangular.} período de comutação (\ref{eq:xTs}), técnica esta conhecida (localmente) como \textit{modelagem por valores médios quase-instantâneos} \cite{Livros-Erickson}. Portanto, definem-se as funções de razão cíclica pelos valores médios quase-instantâneos (VMQI) das funções de comutação segundo (\ref{eq:duty-cycles}). 
+
+\begin{equation}
+\label{eq:xTs}
+ \left\langle x \right\rangle_{T_s} = \dfrac{1}{T_s} \int_{t-T_s}^{t} x(\tau)d\tau
+\end{equation} 
+
+\begin{equation}
+\label{eq:duty-cycles}
+ d_x=\left\langle s_x \right\rangle_{T_s} = \dfrac{1}{T_s} \int_{t-T_s}^{t} s_x(\tau) d\tau \qquad \text{, com } x\in\{a,b,c\}
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$T_s$: é o período de comutação.
+
+Para manter a simplicidade, evita-se a notação de (\ref{eq:xTs}) e adota-se que nas equações em que se utilizam funções de razão cíclica para descrever o comportamento médio do conversor, as variáveis do conversor também expressam VMQI. O modelo não linear (\ref{eq:boost-nl}) é obtido aplicando (\ref{eq:xTs}) nas variáveis do VSR e considerando que as aproximações (\ref{eq:vlTs}) e (\ref{eq:ilTs}) são válidas, pois o conteúdo harmônico da tensão do barramento CC $v_{dc}$ e das correntes de linha $\vec{i}_L$ está predominantemente bem abaixo da frequência de comutação \cite{Livros-Erickson}. 
+
+\begin{equation}
+\label{eq:boost-nl}
+\left\{
+\begin{array}{c l}
+ 3L\dfrac{d\vec{i}_L}{dt}=&\vec{e}_{L} - 3r\vec{i}_L - \vec{d}_Lv_{dc} \\
+ \\
+ C\dfrac{dv_{dc}}{dt}= &(\vec{d}_L)^T(\vec{i}_L) - i_{Lo}
+ \end{array}
+ \right.
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$\vec{d}_L$: é o vetor funções de razão cíclica de linha, definido conforme (\ref{eq:vetordL}).
+
+\begin{flalign}
+\label{eq:vetordL}
+ \vec{d}_{L} &= \left[\begin{matrix}d_{ab} & d_{bc} & d_{ca}\end{matrix}\right]^T \nonumber \\
+ &= \left[\begin{matrix}d_{a}-d_b & d_{b}-d_c & d_{c}-d_a\end{matrix}\right]^T
+\end{flalign}
+
+\begin{equation}
+\label{eq:vlTs}
+ \dfrac{1}{T_s} \int_{t-T_s}^{t} \vec{s}_L v_{dc} d\tau \approx \left\langle \vec{s}_L \right\rangle_{T_s} \left\langle v_{dc} \right\rangle_{T_s} = \vec{d}_L v_{dc}
+\end{equation} 
+
+\begin{equation}
+\label{eq:ilTs}
+ \dfrac{1}{T_s} \int_{t-T_s}^{t} (\vec{s}_L)^T (\vec{i}_{L}) d\tau \approx \left(\langle \vec{s}_L \rangle_{T_s}\right)^T \langle \vec{i}_{L} \rangle_{T_s} = (\vec{d}_L)^T (\vec{i}_{L})
+\end{equation} 
+
+Esse modelo não linear também é conhecido como modelo de grandes sinais e pode ser utilizado para análise, simulação e projeto de controladores independentemente da estratégia de modulação que será utilizada. O modelo é de 4ª ordem, não linear e é válido para frequências abaixo da frequência de comutação \cite{Livros-Erickson}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Validade do Modelo de Grandes Sinais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A partir do tipo de portadora utilizada na modulação do conversor PWM pode-se deduzir a frequência máxima para qual o modelo de grandes sinais é válido. Para demonstrar de maneira intuitiva esse limite, considera-se primeiramente o caso da portadora dente-de-serra $V_{ds}$ ilustrado na Fig.~\ref{modulacao:dente-de-serra}.
+
+\begin{figure}[!htb]
+  	
+  \centering
+	\mbox{
+	
+	\subfigure[Portadora dente-de-serra]{
+	\label{modulacao:dente-de-serra}
+	\includegraphics[scale=\escalasim]{Figuras/retificador/dente-de-serra.eps}}
+	
+	\subfigure[Portadora triangular]{
+	\label{modulacao:triangular}
+	\includegraphics[scale=\escalasim]{Figuras/retificador/triangular.eps}}
+	}
+	\caption{Efeitos das portadoras sobre os VMQI.}
+	\label{modulacao:portadoras-analogico}
+\end{figure}
+
+A partir de (\ref{eq:xTs}) sabe-se que o efeito da modelagem é equivalente a ter um VMQI por período de comutação, ou seja, amostra-se os VMQIs na mesma taxa que a frequência de comutação. Portanto, pelo teorema da amostragem de Shannon-Nyquist (\ref{eq:amostragem}) tem-se que a frequência máxima do sinal é metade da frequência de comutação.
+
+\begin{equation}
+\label{eq:amostragem}
+f_a\geq 2B_{{max}}
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$f_a$: é a frequência de amostragem;
+
+$B_{{max}}$: é a frequência máxima do sinal.
+ 
+No caso da portadora triangular da Fig.~\ref{modulacao:triangular} é possível diminuir o tempo de amostragem do VMQI para meio período de comutação. Isso se deve à simetria nos comandos a cada meio período, que não existe com portadora dente-de-serra. Portanto, nesse caso a frequência máxima é igual à frequência de comutação. 
+
+Na Fig.~\ref{modulacao:portadoras-analogico} estão também ilustrados o sinal de controle $d$, a corrente instantânea $i$ e o seu VMQI $\left\langle i \right\rangle_{T_s}$ obtidos na simulação de um conversor $boost$ (o VMQI foi obtido a partir da simulação do modelo de grandes sinais). É importante ressaltar que no caso da portadora triangular a corrente instantânea é igual ao VMQI a cada meio período de comutação e que exatamente a cada meio período de comutação o VMQI é igual à corrente instantânea. Enquanto que na portadora dente-de-serra seria necessário esperar todo o período de comutação para calcular o VMQI a partir de (\ref{eq:xTs}), pois a posição em que a corrente instantânea é igual ao VMQI não se repete devido à natureza assimétrica do comando.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Modelo no Sistema \textit{dq0}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assim como no GSIP, é conveniente transformar as variáveis do sistema~$abc$ para um sistema de referência cuja velocidade angular, nesse caso, escolhida é tal que as variáveis em regime permanente senoidal balanceado são grandezas constantes. Para esse fim, utiliza-se a velocidade angular elétrica no sistema de referência síncrono, cujos resultados facilitam a análise do sistema e o projeto de sistemas de controle \cite{Artigos-03-15,Teses-03-05}.
+
+Aplicando a transformação $dq0$ com $\omega=\omega_e$ e $\theta_e(t_0)$ igual ao ângulo inicial da tensão\footnote{$E_{pk}$ é o valor de pico da tensão de linha da rede elétrica.} $e_{ab}=E_{pk}cos(\omega_e t)$ em (\ref{eq:boost-nl}), é obtido o modelo do VSR no plano $dq0$ (\ref{eq:boost-dq0}). O sobrescrito $e$ denota que as variáveis estão no sistema de referência síncrono.
+
+\begin{equation}
+\label{eq:boost-dq0}
+\left\{
+\begin{array}{c l}
+ 3L\dfrac{d\vec{i}^e_{dq0}}{dt}&=\vec{e^e}_{dq0} - 3r\vec{i}^e_{dq0} - 3\omega_e L \vec{i}^e_{qd} - \vec{d}^e_{dq0}v_{dc}\\
+ C\dfrac{dv_{dc}}{dt} &=  (\vec{d}^e_{dq0})^T\left[\begin{matrix}3/2 &0 &0\\ 0 &3/2 &0 \\ 0 &0 & 3 \end{matrix}\right](\vec{i}^e_{dq0}) - i_{Lo}
+ \end{array}
+ \right.	
+\end{equation} 
+
+Onde:
+\nopagebreak
+
+$\vec{i}_{qd}^e$: é definido por (\ref{eq:vetor-iqd}).
+
+\begin{equation}
+\label{eq:vetor-iqd}
+ \vec{i}^e_{qd} =  \left[\begin{matrix}-i^e_{q} & i^e_{d} & 0\end{matrix}\right]^T
+\end{equation}
+
+Observa-se, assim como no GSIP, o aparecimento da tensão de velocidade $3 \omega_e L \vec{i}^e_{qd}$. De fato, o modelo obtido do VSR é semelhante ao do GSIP como pode ser observado no circuito equivalente\footnote{As parcelas referentes à sequência ``zero'' da Fig.~\ref{retificador:circuito-dq0} foram omitidas, pois não apresentam significado físico e são todas nulas. Isto se deve ao fato da transformação $dq0$ ter sido aplicada nas variáveis de linha do VSR, em que uma informação é redundante, pois $f_{ab}+f_{bc}+f_{ca}=0$. A verdadeira sequência zero será obtida mais adiante neste capítulo.}  da Fig.~\ref{retificador:circuito-dq0} (para tensões de entrada senoidais e equilibradas: $e_d^e=0$ e $e_q^e=E_{pk}$). 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/boost3ph-modelo.eps}
+	\caption{Circuito equivalente do VSR no plano $dq0$.}
+	\label{retificador:circuito-dq0}
+\end{figure}
+
+Nesse ponto, é interessante comparar o modelo obtido do VSR com o modelo do GSIP. Devem ser observadas as seguintes diferenças entre os modelos:
+
+\begin{enumerate}
+
+\item O modelo no plano $dq0$ do GSIP foi obtido a partir de variáveis de fase, enquanto que o modelo do VSR foi obtido a partir de variáveis de linha;
+
+\item O modelo do VSR na verdade é composto de dois modelos: o modelo da rede e o do VSR propriamente dito. O modelo da rede é equivalente ao modelo do GSIP; 
+
+\item As tensões da rede são equivalentes às tensões internas do GSIP. No entanto, no gerador não é possível medir esses valores;
+
+\item As correntes do GSIP estão na convenção motor, enquanto no VSR na convenção gerador.
+\end{enumerate}
+
+A diferença mais significativa para o que se pretende analisar é o primeiro item. Não é possível substituir diretamente o modelo do GSIP  pelo modelo da rede, pois existe a diferença na forma que foram obtidos os modelos $dq0$. Para tanto, é necessário entender as relações para obtenção do modelo em variáveis de fase. Este pode ser obtido redesenhando o circuito do VSR com a inserção de um ponto médio $MP$ virtual no barramento CC, conforme ilustrado na Fig.~\ref{retificador:boost-ideal-MP}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/boost3ph-ideal-MP.eps}
+	\caption{VSR com ponto médio servindo como referência.}
+	\label{retificador:boost-ideal-MP}
+\end{figure}
+
+A tensão entre o terminal $x$ e o ponto médio virtual $MP$ é dada por (\ref{eq:vxr-abc}), em que $x\!=\!\{a,b,c\}$. Dessa forma, aplicando a lei de Kirchoff das tensões no circuito descrito por variáveis de fase obtém-se (\ref{eq:vf-abc}). Observa-se que, $v_{sr}$ é a tensão entre os pontos $n_s$ e $n_r$ (\ref{eq:vsr-MP}) e $\vec{u}$ é um vetor em que todas as componentes são unitárias dado por (\ref{eq:vsr}). A corrente do barramento CC em variáveis de fase é dada por (\ref{eq:Idc}). Portanto, o modelo instantâneo do VSR em variáveis de fase é dado por (\ref{eq:vsr-abc}). 
+
+\begin{equation}
+\label{eq:vsr-MP}
+ v_{sr}=v_{n_s}-v_{n_r}
+\end{equation}
+
+\begin{equation}
+\label{eq:vxr-abc}
+ v_{x,r}=s_x v_{dc}-\dfrac{v_{dc}}{2}
+\end{equation}
+
+\begin{equation}
+\label{eq:vf-abc}
+ L\dfrac{d\vec{i}_{abc}}{dt}=\vec{e}_{abc}-r\vec{i}_{abc}-\vec{v}_{abc,r}+v_{sr}\vec{u}
+\end{equation}
+
+\begin{equation}
+\label{eq:vsr}
+\vec{u}=[\begin{matrix} 1 & 1 & 1 \end{matrix}]^T
+\end{equation}
+
+\begin{equation}
+\label{eq:vsr-abc}
+\left\{
+\begin{array}{c l}
+ L\dfrac{d\vec{i}_{abc}}{dt}=&\vec{e}_{abc} - r\vec{i}_{abc} - \vec{s}_{abc}v_{dc}+\dfrac{v_{dc}}{2}\vec{u} + v_{sr}\vec{u} \\
+ \\
+ C\dfrac{dv_{dc}}{dt}= &(\vec{s}_{abc})^T(\vec{i}_{abc}) - i_{Lo}
+ \end{array}
+ \right.
+\end{equation}
+
+Dessa forma, aplicando o conceito de VMQI em (\ref{eq:vsr-abc}), obtém-se o modelo de grandes sinais do VSR em variáveis de fase, dado por (\ref{eq:vsr-abc-vmqi}). 
+
+\begin{equation}
+\label{eq:vsr-abc-vmqi}
+\left\{
+\begin{array}{c l}
+ L\dfrac{d\vec{i}_{abc}}{dt}=&\vec{e}_{abc} - r\vec{i}_{abc} - \vec{d}_{abc}v_{dc}+\dfrac{v_{dc}}{2}\vec{u} + v_{sr}\vec{u} \\
+ \\
+ C\dfrac{dv_{dc}}{dt}= &(\vec{d}_{abc})^T(\vec{i}_{abc}) - i_{Lo}
+ \end{array}
+ \right.
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\vec{d}_{abc}$: é o vetor de funções de razão cíclica de fase. Caso se deseje um conjunto de equações que não tenha a componente contínua $v_{dc}/2\vec{u}$, o vetor de funções de razão cíclica pode ser substituído pelo vetor de funções de modulação de fase $\vec{m}_{abc}$, uma vez que (\ref{eq:d-m}).
+
+\begin{equation}
+\label{eq:d-m}
+\vec{m}_{abc} = \vec{d}_{abc} - \dfrac{1}{2} \vec{u}
+\end{equation} 
+
+E, aplicando a transformada $dq0$ no modelo (\ref{eq:vsr-abc-vmqi}) com $\omega\!=\!\omega_e$ e $\theta_e(t_0)$ igual ao ângulo inicial da tensão\footnote{$E_{pk,f}$ é o valor de pico da tensão de fase da rede elétrica.} de fase ($e_a=E_{pk,f}\cos(\omega_e t)$), obtém-se o modelo do VSR em variáveis de fase no plano $dq0$ (\ref{eq:vsr-dq0}). Deste modelo obtém-se o circuito equivalente de fase do VSR conectado à rede apresentado na Fig.~\ref{retificador:vsr-fase}. Nota-se que esse é muito semelhante ao obtido para variáveis de linha. O que difere as variáveis $dq0$ de cada modelo são os limites das variáveis, a posição inicial do eixo síncrono do sistema de referência e o significado físico de cada componente.
+
+\begin{equation}
+\label{eq:vsr-dq0}
+\left\{
+\begin{array}{c l}
+ L\dfrac{d\vec{i}^e_{dq0}}{dt}=&\vec{e}^e_{dq0} - r\vec{i}^e_{dq0} -\omega_e L i_{qd}^e - \vec{d}^e_{dq0}v_{dc}+\dfrac{v_{dc}}{2}\vec{u}_{dq0}^e + v_{sr}\vec{u}_{dq0}^e \\
+ \\
+ C\dfrac{dv_{dc}}{dt}= &(\vec{d}^e_{dq0})^T \left[\begin{matrix}3/2 &0 &0\\ 0 &3/2 &0 \\ 0 &0 & 3 \end{matrix}\right] (\vec{i}^e_{dq0}) - i_{Lo}
+ \end{array}
+ \right.
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\vec{u}_{dq0}^e$: é o resultado da multiplicação de (\ref{eq:Ks}) por (\ref{eq:vsr}). Este resultado é apresentado em (\ref{eq:u-dq0}).
+
+\begin{equation}
+\label{eq:u-dq0}
+\vec{u}^e_{dq0}=[\mathbf{K}^e_s]\vec{u}=[\begin{matrix} 0 & 0 & 1 \end{matrix}]^T
+\end{equation}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/vsr-fase.eps}
+	\caption{Circuito equivalente do VSR conectado à rede elétrica no plano $dq0$ obtido a partir de variáveis de fase.}
+	\label{retificador:vsr-fase}
+\end{figure}
+
+Do circuito equivalente do VSR no plano $dq0$ da Fig.~\ref{retificador:vsr-fase} e de (\ref{eq:u-dq0}), verifica-se uma propriedade da transformada $dq0$, que é a capacidade de rejeição das componentes de modo comum nos circuitos de eixo direto e de eixo em quadratura. E, como o sistema é a três condutores, a tensão de modo comum gerada pelo VSR não interfere no comportamento das correntes do VSR, que são de modo diferencial, pois, $i_a\!+\!i_b\!+i_c\!=\!0$. Portanto, desde que o valor da tensão de modo comum gerada pelo conversor não diminua o valor do máximo índice de modulação que pode ser sintetizado pelo conversor, não há limitações impostas ao controle do VSR \cite{Teses-Jack}. Dessa forma, como a corrente de sequência zero $i^e_0$ é sempre nula, não serão mais ilustradas ou apresentadas equações relativas à sequência zero no modelo do VSR e do GSIP. Assim, substituindo a parcela do VSR no modelo $dq$ do GSIP e observando a convenção das correntes, obtém-se o circuito equivalente ilustrado na Fig.~\ref{msip:msip-conversor}.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/msip/msip-conversor.eps}
+	\caption{Circuito equivalente do GSIP conectado ao VSR no plano $dq$.}
+	\label{msip:msip-conversor}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Limites Operacionais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Limite para a Tensão do Barramento CC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para que seja possível controlar as correntes no VSR, deve-se garantir que é possível impor as derivadas de corrente necessárias sobre os indutores \cite{Teses-03-06}. 
+
+Seja (\ref{eq:eL}) que descreve o comportamento instantâneo do VSR, reescrevendo a parcela referente à corrente $i_{ab}$ e desprezando as resistências do ramo obtém-se (\ref{eq:eab}).
+
+\begin{equation}
+\label{eq:eab}
+3L\dfrac{di_{ab}}{dt} = e_{ab}-s_{ab} v_{dc}	
+\end{equation}
+
+Como $s_{ab}$ pode assumir os valores -1, 0 e 1, a condição (\ref{eq:inequacao-vdc-boost}) deve ser atendida para impor quaisquer derivadas sobre o indutor.
+
+\begin{equation}
+\label{eq:inequacao-vdc-boost}
+\left|e_{ab}\right|-v_{dc}<0
+\end{equation}
+
+Conclui-se que $v_{dc}$ deve ser maior que o valor máximo tensão de linha da entrada $E_{pk}$ (\ref{eq:limite-vdc-boost}). 
+
+\begin{equation}
+\label{eq:limite-vdc-boost}
+v_{dc}>E_{pk}
+\end{equation}
+
+Realizando este procedimento para outras fases obtém-se o mesmo resultado. Observa-se que desprezar as resistências do ramo na análise é benéfico, pois sempre haverá uma queda de tensão sobre o resistor e, portanto, o limite em (\ref{eq:limite-vdc-boost}) seria inferior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Limites para o Processamento de Energia}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Como demonstrado anteriormente, desde que se garanta que (\ref{eq:limite-vdc-boost}) seja satisfeito pode-se impor as derivadas de corrente do VSR. Portanto, desde que sejam respeitados os limites físicos dos componentes não há nenhuma limitação para o processamento de energia ativa ou reativa no VSR.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Limites para as Funções de Razão Cíclica}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pela definição das funções de comutação (\ref{eq:Sxy}), conclui-se que os limites das funções de razão cíclica de linha são os mesmos e expressos por (\ref{eq:dL-limite}). No entanto, como se deseja controlar o VSR para obter correntes senoidais e com conteúdo harmônico somente em alta frequência, não é possível atender esse requisito apenas limitando os valores das razões cíclicas para que estejam dentro dos limites (\ref{eq:dL-limite}). Será apresentada a condição adicional para satisfazer esse requisito.
+
+\begin{equation}
+\label{eq:dL-limite}
+\left[\begin{matrix} -1 \\-1 \\-1 \end{matrix}\right] \leq \vec{d}_L\leq \left[\begin{matrix} 1 \\1 \\1 \end{matrix}\right]
+\end{equation}
+
+Para gerar correntes senoidais livre de harmônicas de baixa ordem o VSR deve operar na chamada região de modulação linear, caracterizada pela relação linear entre a amplitude da tensão fundamental e a amplitude da função de modulação \cite{Artigos-05-14,Artigos-05-20}. A relação algébrica que determina o limite da região de modulação linear pode ser obtido a partir de relações vetoriais no plano $\alpha\beta$\footnote{Maiores detalhes da análise no plano $\alpha\beta$ serão apresentados no Capítulo~\ref{chapter-modulacao}.}. Na região de sobremodulação é possível aumentar o valor da tensão fundamental de forma não linear, pois ao tentar gerar tensões senoidais que ultrapassam o círculo inscrito há uma saturação do vetor de tensão e consequente distorção da tensão de saída. Essa distorção irá causar o surgimento de harmônicas de baixa ordem nas correntes, comprometendo o controle e aumentando as perdas no gerador \cite{Artigos-05-14,Artigos-05-20}.
+
+Na Fig.~\ref{retificador:limite-mdq} está ilustrado o plano $\alpha\beta$, o vetor de tensões do VSR $\vec{v}^*_{\alpha\beta}=v^*_\alpha+jv^*_\beta$ e as regiões de modulação linear e de sobremodulação. Pode-se mostrar que a amplitude (isto é, a norma euclidiana) do vetor $\vec{v}^*_{\alpha\beta}$ pode ser expressa em termos das variáveis $dq$ conforme (\ref{eq:vref_dq0}). É importante ressaltar que esta amplitude é independente do valor da componente de sequência zero ($d^{e*}_0$), isto é, o valor instantâneo da tensão de modo comum, que é inerente ao processo de modulação.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/limite_mdq.eps}
+	\caption{Plano das tensões $\alpha\beta$ e regiões de modulação.}
+	\label{retificador:limite-mdq}
+\end{figure}
+
+\begin{equation}
+\label{eq:vref_dq0}
+\left|\!|\vec{v}^*_{\alpha\beta}|\!\right|\!=\!\sqrt{(v^*_\alpha)^{2}\!+\!(v^*_\beta)^{2}}\!=\!\sqrt{(v^{e*}_d)^{2}\!+\!(v_q^{e*})^2}\!=\!v_{dc}\sqrt{(d_d^{e*})^2\!+\!(d_q^{e*})^2}
+\end{equation}
+
+O limite da região de modulação linear é o círculo inscrito ao hexágono, cujas arestas representam os limites de tensão do VSR. Esse limite independe da estratégia de modulação e tem valor igual a $V_{dc}$ para tensões de linha e $V_{dc}/\sqrt{3}$ para tensões de fase. Definindo o índice de modulação $M$ por (\ref{eq:M}), em que as variáveis $dq$ foram obtidas do modelo em variáveis de fase do VSR, conclui-se que o seu valor máximo é um.  No entanto, a condição de limitar o índice de modulação não permite o controle independente do vetor funções de razão cíclica. Deve-se, portanto, derivar uma expressão geral para essa condição. Aplicando o limite do índice de modulação obtém-se (\ref{eq:mref-limite}).
+
+\begin{equation}
+\label{eq:M}
+M=\sqrt{3}\dfrac{|\!|\vec{v}^*_{\alpha\beta}|\!|}{v_{dc}}=(\sqrt{3})\sqrt{(d_d^{e*})^2+(d_q^{e*})^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:mref-limite}
+\sqrt{(d_d^{e*})^2+(d_q^{e*})^2}\leq\dfrac{M}{\sqrt{3}}=\dfrac{1}{\sqrt{3}}
+\end{equation}
+
+Pode-se expressar (\ref{eq:mref-limite}) em termos de variáveis de fase aplicando a inversa da transformada $dq0$, cujo resultado é (\ref{eq:mabc-limite}). 
+
+\begin{equation}
+\label{eq:mabc-limite}
+\sqrt{(d_a^*)^{2} + (d_b^*)^{2} + (d_c^*)^{2} - d_a^* d_b^* - d_a^* d_c^* - d_b^* d_c^*}\leq\dfrac{\sqrt{3}}{2}
+\end{equation}
+
+Para entender melhor esse limite, consideram-se funções de razão cíclica cossenoidais para as tensões de linha expressas por (\ref{eq:mL-senoides}). As funções de razão cíclica de fase são dadas por (\ref{eq:mabc-senoides}).
+
+\begin{equation}
+\label{eq:mL-senoides}
+\begin{array}{c l}
+d_{ab}^*=&M \cos\left(\theta_d\right) \\
+d_{bc}^*=&M \cos\left(\theta_d -\frac{2\pi}{3}\right) \\
+d_{ca}^*=&M \cos\left(\theta_d +\frac{2\pi}{3}\right)
+\end{array}
+\end{equation}
+
+\begin{equation}
+\label{eq:mabc-senoides}
+\begin{array}{c l}
+d_{a}^*=&\dfrac{M}{\sqrt{3}} \cos\left(\theta_d - \frac{\pi}{6}\right) +\dfrac{1}{2} \\
+\\
+d_{b}^*=&\dfrac{M}{\sqrt{3}} \cos\left(\theta_d -\frac{5\pi}{6}\right) +\dfrac{1}{2} \\
+\\
+d_{c}^*=&\dfrac{M}{\sqrt{3}} \cos\left(\theta_d +\frac{\pi}{2}\right)  +\dfrac{1}{2} 
+\end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$\theta_d$: é o ângulo da função de razão cíclica de linha $d_{ab}^*$, definido de acordo com (\ref{eq:thetaM}).
+
+\begin{equation}
+\label{eq:thetaM}
+\theta_d=\int _{t_0}^t\omega_e (\tau )d\tau +\theta_d \left(t_0\right)
+\end{equation}
+
+Aplicando (\ref{eq:mabc-senoides}) em (\ref{eq:mabc-limite}) obtém-se o limite do índice de modulação\footnote{Por definição o índice de modulação é maior ou igual a zero.} em (\ref{eq:M-limite}) que já era esperado pela sua definição em (\ref{eq:M}).
+
+\begin{equation}
+\label{eq:M-limite}
+M \leq 1
+\end{equation}
+
+É interessante notar que com modulação PWM senoidal no VSR não é possível operar com o máximo índice de modulação, pois as funções de razão cíclica devem estar entre 0 e 1, cujo limite é atingido com $M=\sqrt{3}/2$. Isso significa que é possível utilizar estratégias de modulação para elevar o limite da modulação senoidal em cerca de $15,6\%$, resultado este já bem difundido na literatura técnica como, por exemplo, tratado em \cite{Livros-07}. Observa-se que é possível ter modulação senoidal em convesores em que o comando é feito diretamente em variáveis de linha, como é o caso do VSR$_{\Delta}$ estudado nesse trabalho. A sua modulação senoidal foi tratada em \cite{Artigos-05-01} e será comprovada que a aplicação de uma modulação vetorial gera uma equivalente à mesma.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection[Modelagem do VSR Delta]{Modelagem do VSR$_\Delta$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Análise dos Estados Topológicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Devido à presença da ponte trifásica de diodos, os sentidos das correntes são fundamentais para a determinação do modo de funcionamento do  VSR$_\Delta$. Na Fig.~\ref{retificador:sentidos} estão ilustradas duas situações em que se observa a influência dos sentidos das correntes, pois ao aplicar os comandos de conduzir ($=1$) no interruptor $S_{ab}$, e bloquear ($=0$) em $S_{bc}$ e $S_{ca}$ não foi possível impor as mesmas tensões de linha nos terminais da máquina. No caso da Fig.~\ref{retificador:+100} tem-se que $v_{ab}\!=\!0$, $v_{bc}\!=\!+V_{dc}$ e $v_{ca}\!=-\!V_{dc}$, enquanto que na Fig.~\ref{retificador:-100} tem-se que $v_{ab}\!=\!0$, $v_{bc}\!=\!-V_{dc}$ e $v_{ca}\!=\!+V_{dc}$, ou seja, foram gerados comandos completamente opostos.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\subfigure[]{
+	\label{retificador:+100}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/setorA+100.eps}}
+	
+	\subfigure[]{
+	\label{retificador:-100}
+	\includegraphics[scale=\escalafig]{Figuras/retificador/setorA-100.eps}}
+	
+	\caption{Estados toplógicos do VSR$_\Delta$ para duas condições de corrente e com mesmo comando.}
+	\label{retificador:sentidos}
+\end{figure}
+
+É então necessário definir uma metodologia de análise que leva em consideração os sentidos das correntes. Na Fig.~\ref{retificador:setores} estão ilustrados todas as combinações possíveis entre os sentidos das correntes, em que cada combinação recebe a denominação de  ``setor e corrente de maior amplitude'' como em \cite{Teses-05-01}. Para entender o funcionamento da topologia do VSR$_\Delta$ é necessária apenas análise de um setor de corrente, podendo suas implicações serem generalizadas para os outros setores \cite{Teses-03-06}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/setoresI.eps}
+	\caption{Definição dos setores de corrente.}
+	\label{retificador:setores}
+\end{figure}
+
+Seja então o  VSR$_\Delta$ operando no setor $A_+$ e seus estados topológicos possíveis ilustrados na Fig.~\ref{retificador:estados} e na Tabela \ref{tab:estados} as tensões de linha obtidas em cada estado. Observa-se que:
+
+\begin{itemize}
+\item Quatro comandos implicam em tensões nulas nos terminais do gerador;
+\item É possível aplicar apenas tensão positiva ou nula entre os terminais $a$ e $b$;
+\item É possível aplicar qualquer tensão entre os terminais $b$ e $c$;
+\item É possível aplicar apenas tensão negativa ou nula entre os terminais $c$ e $a$.
+\end{itemize}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/estados.eps}
+	\caption{Estados topógicos do VSR$_\Delta$ no setor $A_+$.}
+	\label{retificador:estados}
+\end{figure}
+
+\begin{table}[!htbp]
+\caption{Informação dos estados topológicos no setor $A_+$}
+\label{tab:estados}	
+\centering
+
+\begin{center}
+\begin{tabular}{c | c c c | c c c}
+\hline
+Estado & \multicolumn{3}{c|}{Comandos} & \multicolumn{3}{|c}{Tensões de Linha}  \\
+\cline{2-7}
+Topológico & $S_{ab}$ & $S_{bc}$ & $S_{ca}$ & $v_{ab}$ & $v_{bc}$& $v_{ca}$ \\
+\hline
+\hline
+
+$1^{\circ}$& $0$& $0$& $0$& $+V_{dc}$& $0$& $-V_{dc}$\\
+\hline
+
+$2^{\circ}$& $0$& $0$& $1$& $+V_{dc}$& $-V_{dc}$& $0$\\
+\hline
+
+$3^{\circ}$& $0$& $1$& $0$& $+V_{dc}$& $0$& $-V_{dc}$\\
+\hline
+
+$4^{\circ}$& $0$& $1$& $1$& $0$& $0$& $0$\\
+\hline
+
+$5^{\circ}$& $1$& $0$& $0$& $0$& $+V_{dc}$& $-V_{dc}$\\
+\hline
+
+$6^{\circ}$& $1$& $0$& $1$& $0$& $0$& $0$\\
+\hline
+
+$7^{\circ}$& $1$& $1$& $0$& $0$& $0$& $0$\\
+\hline
+
+$8^{\circ}$& $1$& $1$& $1$& $0$& $0$& $0$\\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+%\begin{table}[!htb]
+%\caption{Informação dos estados topológicos no setor $A_+$}
+%\centering
+%
+%\begin{center}
+%\begin{tabular}{c c c | c c c}
+%\hline
+%\multicolumn{3}{c|}{Switching States} & \multicolumn{3}{|c}{Line Voltages}  \\
+%\hline
+% $S_{ab}$ & $S_{bc}$ & $S_{ca}$ & $v_{ab}$ & $v_{bc}$& $v_{ca}$ \\
+%\hline
+%\hline
+%
+% $0$& $0$& $0$& $+V_{dc}$& $0$& $-V_{dc}$\\
+%\hline
+%
+% $0$& $0$& $1$& $+V_{dc}$& $-V_{dc}$& $0$\\
+%\hline
+%
+%$0$& $1$& $0$& $+V_{dc}$& $0$& $-V_{dc}$\\
+%\hline
+%
+% $0$& $1$& $1$& $0$& $0$& $0$\\
+%\hline
+%
+% $1$& $0$& $0$& $0$& $+V_{dc}$& $-V_{dc}$\\
+%\hline
+%
+% $1$& $0$& $1$& $0$& $0$& $0$\\
+%\hline
+%
+%$1$& $1$& $0$& $0$& $0$& $0$\\
+%\hline
+%
+%$1$& $1$& $1$& $0$& $0$& $0$\\
+%\hline
+%
+%\end{tabular}
+%\end{center}
+%\end{table}
+
+Portanto, no setor $A_+$ é possível controlar as correntes, mas há limitações por não ser possível impor algumas derivadas sobre as correntes. Isto significa que as equações obtidas para o VSR são válidas para o VSR$_\Delta$, desde que sejam respeitadas essas limitações. Ou seja, no setor $A_+$ pode-se utilizar (\ref{eq:eL}) e aplicar apenas as tensões mostradas na Tabela \ref{tab:estados}. A análise das sequências de comandos será realizada no Capítulo~\ref{chapter-modulacao}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Limites Operacionais}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph*{Limite para a Tensão do Barramento CC}
+
+No caso anterior era possível impor quaisquer derivadas sobre as correntes das três fases e nesse caso infere-se da Tabela \ref{tab:estados} que pode-se impor livremente apenas uma derivada por setor de corrente. Para o setor $A_+$, isso é possível apenas na corrente $i_{bc}$ e conclui-se, de forma semelhante ao caso anterior, que a tensão do barramento CC deve ser maior que o pico da tensão de linha para que seja possível se impor quaisquer derivadas sobre $i_{bc}$.
+
+\paragraph*{Limites para o Processamento de Energia}
+
+Para esta análise considera-se inicialmente que o VSR$_\Delta$ opera com correntes senoidais e equilibradas dadas por (\ref{eq:iabc}). E, que as componentes fundamentais das tensões geradas pelo VSR$_\Delta$ sejam cossenoidais com um defasamento $\delta_i$ com relação às correntes conforme (\ref{eq:vabc}).
+
+\begin{equation}
+\label{eq:iabc}
+\begin{array}{c l}
+i_{a}=& I_{pk} \cos\left(\omega_e t\right)\\
+i_{b}=& I_{pk} \cos\left(\omega_e t - \frac{2\pi}{3}\right)\\
+i_{c}=& I_{pk} \cos\left(\omega_e t + \frac{2\pi}{3}\right)\\
+\end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$I_{pk}$: é o valor de pico da corrente de fase.
+
+\begin{equation}
+\label{eq:vabc}
+\begin{array}{c l}
+v_{a,r}=& V_{r,pk} \cos\left(\omega_e t -\delta_i\right)\\
+v_{b,r}=& V_{r,pk} \cos\left(\omega_e t -\delta_i - \frac{2\pi}{3}\right)\\
+v_{c,r}=& V_{r,pk} \cos\left(\omega_e t -\delta_i+ \frac{2\pi}{3}\right)\\
+\end{array}
+\end{equation}
+
+Onde:
+\nopagebreak
+
+$V_{r,pk}$: é o valor de pico da tensão fundamental de fase do VSR$_\Delta$.
+
+Como as tensões disponíveis nos terminais VSR$_\Delta$ são dadas em valores de linha, reescreve-se (\ref{eq:vabc}) para valores de linha em (\ref{eq:vLabc}).
+
+\begin{equation}
+\label{eq:vLabc}
+\begin{array}{c l}
+v_{ab}=& \sqrt{3} V_{r,pk} \cos\left(\omega_e t  -\delta_i + \frac{\pi}{6}\right)\\
+v_{bc}=& \sqrt{3} V_{r,pk} \cos\left(\omega_e t -\delta_i - \frac{\pi}{2}\right)\\
+v_{ca}=& \sqrt{3} V_{r,pk} \cos\left(\omega_e t -\delta_i+ \frac{5\pi}{6}\right)\\
+\end{array}
+\end{equation}
+
+Considerando a análise para o setor $A_+$ tem-se que as tensões geradas podem estar entre os intervalos dados por (\ref{eq:v-intervalos}). 
+
+\begin{equation}
+\label{eq:v-intervalos}
+\begin{array}{c c c}
+0 &\leq v_{ab} &\leq +V_{dc}\\
+-V_{dc} &\leq v_{bc} &\leq +V_{dc}\\
+-V_{dc} &\leq v_{ca} &\leq 0
+\end{array}
+\end{equation}
+
+Para determinar os intervalos de $\delta_i$ para os quais as desigualdades em (\ref{eq:v-intervalos}) são válidas, deve-se lembrar que o valor da tensão do barramento CC deve ser maior que o valor máximo da tensão de linha. Portanto, os limites positivos e negativos dados pela tensão $V_{dc}$ sempre serão garantidos. 
+
+O intervalo para o qual a tensão $v_{ab}$ é possível ser gerada é o semi-ciclo positivo da senóide, cuja desigualdade é expressa por (\ref{eq:vabr-deltai-01}).
+
+\begin{equation}
+\label{eq:vabr-deltai-01}
+-\dfrac{\pi}{2} \leq \omega_e t - \delta_i + \dfrac{\pi}{6} \leq \dfrac{\pi}{2}
+\end{equation}
+
+Como no setor $A_+$ $\omega_e t$ está entre $-\pi/6$ e $\pi/6$ (ver Fig.~\ref{retificador:setores}), obtém-se como resultado (\ref{eq:vabr-deltai-02}).
+
+\begin{equation}
+\label{eq:vabr-deltai-02}
+-\dfrac{\pi}{2} \leq -\delta_i \leq  \dfrac{\pi}{6}
+\end{equation}
+
+Para a tensão $v_{bc}$ não é necessária a análise, pois qualquer valor pode ser gerado no setor $A_+$. E, para a tensão $v_{ca}$ (semi-ciclo negativo) tem-se como resultado (\ref{eq:vcar-deltai}).
+
+\begin{equation}
+\label{eq:vcar-deltai}
+-\dfrac{\pi}{6} \leq -\delta_i \leq  \dfrac{\pi}{2}
+\end{equation}
+
+Fazendo a intersecção entre os intervalos (\ref{eq:vabr-deltai-02}) e (\ref{eq:vcar-deltai}), obtém-se o intervalo (\ref{eq:deltai}) para o qual é possível operar o VSR$_\Delta$ gerando tensões senoidais trifásicas e equilibradas.
+
+\begin{equation}
+\label{eq:deltai}
+-\dfrac{\pi}{6} \leq \delta_i \leq  \dfrac{\pi}{6}
+\end{equation}
+
+O resultado (\ref{eq:deltai}) significa que para o VSR$_\Delta$ funcionar deve haver circulação de potência ativa e que o mesmo é capaz de processar potência reativa na frequência fundamental da rede, na entrada da ponte de diodos, ao contrário de retificadores unidirecionais monofásicos \cite{Teses-03-06}. Uma das maneiras de interpretar esse resultado é que a potência ativa funciona como elemento de abertura da ponte de diodos e durante a comutação natural da ponte de diodos, que é a cada $60^{\circ}$, a potência reativa pode circular livremente.
+
+%Deve-se ressaltar que embora esta análise tenha sido baseada na análise proposta por \cite{Teses-03-06}, há uma diferença fundamental na análise realizada neste trabalho, pois é considerada que a defasagem $\delta_i$ é entre a corrente e a tensão fundamental gerada pelo retificador. Ao considerar a tensão de entrada para essa análise em \cite{Teses-03-06}, chega-se a conclusões erradas sobre a capacidade de processamento de energia do retificador. O motivo pelo qual esse erro não foi perceptível é que o sistema de controle (técnica de autocontrole) naturalmente operava os retificadores com fator de potência unitário na entrada do retificador ($\delta_i=0$) e quando o controle era feito para operar com fator de potência unitário na tensão de entrada da rede elétrica o sistemas eram de baixa indutância, típico de fontes de alimentação e que não se aplicam a acionamentos elétricos. 
+
+%De fato, em qualquer retificador desde que haja circulação de potência ativa da fonte para carga não há nenhum problema que a defasagem entre tensão de entrada da rede elétrica e a corrente tenda ao limite de $\pm\pi/2$, embora não se deseje operar os conversores nessas situações. O que diferencia o retificador unidirecional trifásico do caso monofásico unidirecional é que no caso unidirecional as correntes só não sofrerão distorção devido à presença da ponte de diodos quando a corrente e a tensão fundamental gerada pelo retificador tiverem defasagem nula, como demonstrado pelo próprio \cite{Teses-03-06}. Já no caso trifásico essa distorção acontece apenas quando os limites da Eq.~\ref{eq:deltai} são violados.
+%
+%Nos resultados de simulação e experimentais que serão apresentados esse conceito exposto será comprovado, confirmando a análise proposta.
+
+\paragraph*{Limites para as Funções de Razão Cíclica}
+
+Aplicam-se os mesmos limites para as funções de razão cíclica do VSR.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection[Modelo no Plano \textit{dq0} do VSR Delta]{Modelo no Plano \textit{dq0} do VSR$_\Delta$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O modelo do $\textrm{VSR}_{\Delta}$ para análise de regime permanente e transitório é praticamente o mesmo do VSR, exceto pela limitação no processamento de potência ativa. Essa limitação pode ser inserida no circuito elétrico equivalente no plano $dq0$ inserindo diodos no circuito de eixo em quadratura e no lado CC, conforme ilustrado na Fig.~\ref{retificador:circuito-dq0-VSRdelta}. As restrições no processamento de energia reativa são características intrínsecas do VSR$_\Delta$ e não são contempladas no modelo $dq0$. Essas restrições devem ser evitadas na etapa de projeto, em que se evita projetar o retificador para operar além da sua capacidade.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/retificador/msip-delta.eps}
+	\caption{Circuito equivalente do GSIP conectado ao VSR no plano $dq0$.}
+	\label{retificador:circuito-dq0-VSRdelta}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dimensionamento do WECS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+O dimensionamento do WECS deve ser feito de forma que os seus componentes sejam capazes de processar toda a potência disponível na condição nominal, e mesmo durante transitórios. Portanto, as suas capacidades de processamento de potência devem ser maiores que as limitações impostas pelo controle aerodinâmico da turbina eólica. Portanto, devem ser considerados os limites mecânicos e elétricos dos seus componentes.
+
+A turbina eólica tem como limites mecânicos principais o máximo torque e a máxima velocidade angular. Deve-se projetá-la para operar com valores nominais de torque e velocidade angular para uma dada condição de velocidade de vento nominal, conforme discutido na seção \ref{sec:turbina}. E, o controle aerodinâmico deve garantir que a potência extraída pela turbina não exceda o valor nominal, cuja estratégia de controle pode ser combinada com o controle do gerador elétrico. 
+
+O gerador elétrico é escolhido tal que este seja capaz de processar as variações de torque e velocidade angular da turbina eólica em torno do ponto de operação nominal. Portanto, os valores de torque e velocidade nominais da turbina são requisitos mínimos do gerador. Os parâmetros elétricos do gerador podem ser escolhidos a partir de critérios diversos, mas estão, em geral, relacionados a perdas, requisitos de conexão com banco de baterias, barramento CC e rede elétrica CA, dependendo da aplicação do sistema.
+
+O retificador trifásico deve ser capaz de processar toda a energia proveniente do gerador. Outros requisitos, como capacidade de controle de torque e/ou velocidade angular, orientação de campo e perdas, são específicos a um determinado projeto ou norma. Em geral, utilizam-se pelo menos retificadores com capacidade de controle de velocidade. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metodologia de Dimensionamento}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Propõe-se uma metodologia para dimensionamento do WECS baseada nas características de torque-velocidade em regime permanente da turbina eólica, do GSIP e do conversor trifásico, conforme ilustrado na Fig.~\ref{dimensionamento:metodologia}. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/dimensionamento/metodologia.eps}
+	\caption[Características $T\times\omega$ dos componentes do WECS.]{Características torque-velocidade dos componentes do WECS.}
+	\label{dimensionamento:metodologia}
+\end{figure}
+
+De acordo com a análise da operação da turbina eólica, a operação se dá dentro dos limites de torque máximo, velocidade máxima e potência nominal da turbina. Esta característica operacional pode ser realizada pelo gerador e pelo conversor conforme ilustrado na Fig.~\ref{dimensionamento:metodologia}, em que a primeira curva acima da característica da turbina é a do gerador e a segunda é a do conversor. 
+
+O gerador tem como limites o máximo de torque, a máxima velocidade e a máxima potência. Estes estão associados diretamente aos limites de tensão, corrente e perdas conforme discutido na seção~\ref{sec:gsip-limites}. 
+
+Quanto ao conversor, os seus limites para o retificar ativo trifásico, que são os valores nominais de valor eficaz da corrente e do índice de modulação, associam-se a variáveis fictícias de torque ($T_{c,max}$), de velocidade base ($\omega_{c,B}$) e de velocidade máxima ($\omega_{c,max}$). O torque está relacionado, assim como no GSIP, pela expressão do torque eletromagnético dada por (\ref{eq:temax}), em que as correntes de eixo direto e em quadratura são obtidas na condição de máximo valor eficaz da corrente para uma dada estratégia de controle de corrente. A velocidade base do conversor pode ser obtida a partir da relação do índice de modulação nominal com as tensões do estator no plano $dq0$, pois estas tensões são dependentes das correntes e da velocidade angular. O índice de modulação está relacionado com as razões cíclicas por (\ref{eq:M}) e as tensões do estator no plano $dq0$ com as razões cíclicas por (\ref{eq:d-dq0}) (ver Fig.~\ref{retificador:circuito-dq0-VSRdelta}). A velocidade angular máxima do conversor é obtida para a condição de índice de modulação unitário, e está associada com o limite de perdas do conversor e com a máxima tensão dos semicondutores (tensão no barramento CC). Observa-se que a relação das perdas do conversor é uma função não linear da corrente e do índice de modulação. Portanto, para um determinado índice modulação acima do valor nominal, determina-se o valor eficaz da corrente para a qual o limite de perdas no conversor é atingindo. Essa relação pode ser programada para que a cada valor do índice modulação acima do nominal, a corrente de referência do conversor seja limitada para que as perdas no conversor sejam limitadas. Observa-se que é possível simplificar esta programação de referência por uma relação linear, mas nesse caso deve-se aplicar um limite de potência $P_{c,max}$ que mantenha as perdas do conversor abaixo do limite para qualquer índice de modulação acima do valor nominal.
+
+\begin{equation}
+\label{eq:d-dq0}
+\left\{ \begin{matrix} v_{d,s}^r = d_d^r v_{dc} \\ v_{q,s}^r=d_q^r v_{dc}\end{matrix} \right.
+\end{equation}
+
+Observa-se que, tipicamente, projeta-se o conversor com índice de modulação nominal não unitário, pois deseja-se ter alguma margem para variações em torno do ponto de operação nominal. No entanto, em termos de projeto e de controle, deve-se limitar o índice de modulação para que o mesmo não ultrapasse o valor nominal determinado pelo projetista e definido de forma que as perdas nos dissipadores de calor dos semicondutores não ultrapassem o limite projetado. Pode-se então, otimizar o dimensionamento dos dissipadores de calor e manter as margens para variações em torno do ponto de operação nominal pela programação de um limite de potência máxima. Como resultado, tem-se uma limitação da referência de corrente ao aplicar índices de modulação acima do valor nominal. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aplicação ao WECS deste Trabalho}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para o WECS que será simulado, está disponível um GSIP de fluxo axial do tipo Torus com torque máximo\footnote{Obtido com a corrente máxima da Tabela~\ref{tab:gsip-parametros} e com corrente de eixo direto nula.} de $234$~N$\cdot$m e uma velocidade base de $260$~rpm (65~Hz em variáveis elétricas), cujos parâmetros são apresentados na Tabela~\ref{tab:gsip-parametros} obtidos a partir do fabricante e de ensaios.  
+
+\begin{table}[!htb]
+\caption{Parâmetros do GSIP}
+\label{tab:gsip-parametros}
+\begin{center}
+\begin{tabular}{c |c || c | c }
+\hline
+$r_s$ & 0,3 $\Omega$     & $I_{s,max}$ & 32 A \\
+\hline
+$L_d$ & 2,9 mH           & $V_{L,max}$ & 118 V \\ 
+\hline
+$L_q$ & 2,9 mH           & $S_{N}$ & 6,5 kVA \\ 
+\hline
+$\lambda'^r_m$ & 0,23 Wb & $R_g$ & 0,4 m \\ 
+\hline
+$P$ & 30                 & $M_g$ & 60 kg \\ 
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+De acordo com informações do fabricante, a velocidade nominal da turbina eólica é 240~rpm sob velocidade de vento nominal\footnote{Valor típico. E foi considerada como velocidade mínima o valor de 3 m/s e máxima de 16 m/s.} de 12~m/s. A partir dessas informações, dimensionou-se a turbina para um torque nominal de 200~N$\cdot$m (que leva a uma potência nominal de 5~kW), cujo valor pode ser realizado pelo conjunto MSIP/caixa de engrenagens utilizado para emulação da turbina, conforme ilustrado na Fig.~\ref{dimensionamento:bancada}. Embora o MSIP seja conectado ao GSIP por meio de uma caixa de engrenagens, considera-se que o sistema é de acionamento direto, pois às relações da caixa de engrenagens podem ser inclúidas no controle do MSIP. O MSIP em questão é de 11~kW. Assim, a partir de (\ref{eq:Pw}) pode-se estimar o valor do raio da turbina em 2,3~m. A massa da turbina ($M_m$) considerada é de 60~kg, que é a massa de uma turbina do fabricante\footnote{A empresa é a Enersud.} de raio similar. Dessa forma, a partir de (\ref{eq:inercia-turbina}) e de (\ref{eq:jrm}) determinam-se as inércias da turbina e do gerador. E, a partir de (\ref{eq:jeq}) determina-se o valor da inércia equivalente ($J_{eq}$) do WECS igual a 40~kg$\cdot$m$^2$.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/dimensionamento/bancada.eps}
+	\caption{Protótipo de laboratório para emulação do sistema eólico.}
+	\label{dimensionamento:bancada}
+\end{figure}
+
+Para o projeto do retificador ativo trifásico, considerou-se a potência nominal igual a 6,5~kVA, a corrente nominal de 32~A, o índice de modulação nominal de 0,71, o valor médio da tensão do barramento CC de 235~V e a frequência de comutação de 4~kHz. Os parâmetros fictícios do conversor obtidos são um torque de 234~N$\cdot$m e uma velocidade base de 260~rpm, os quais são suficientes para esse sistema. Não foi considerada a programação do retificador para operação com índice de modulação até a unidade.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusão}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste capítulo foram apresentados os principais modelos para análise em regime permanente e em regime transitório dos componentes do WECS. Como o objetivo deste trabalho é o controle de conversores estáticos conectados ao GSIP, pode-se considerar que o detalhamento apresentado sobre a turbina eólica é suficiente, pois com este é possível determinar os pontos de operação, prever o comportamento dinâmico e caracterizar a influência do controle aerodinâmico no sistema. A justificativa de escolha do GSIP é apresentada no contexto da geração eólica; seus aspectos construtivos e suas influências nos parâmetros internos do gerador; o modelo dinâmico e estático; as suas restrições operacionais; e, seu modelo ao conectá-lo com o retificador ativo trifásico. Foi apresentada uma topologia de retificador ativo trifásico para que se possa operar o GSIP com alto desempenho e baixas perdas. Seu modelo dinâmico e as restrições à sua operação foram determinados \cite{Teses-03-06,Artigos-03-14,Artigos-03-15}.
+
+Com base no equacionamento desenvolvido e nas restrições operacionais apresentadas, foi desenvolvida uma metodologia de dimensionamento do WECS. Esta metodologia apresenta de maneira simples a partir de curvas de torque-velocidade as características dos elementos do WECS. A característica fictícia de torque-velocidade do conversor foi determinada a partir de seus parâmetros elétricos e suas relações com os parâmetros eletromecânicos do GSIP. Dessa forma, obteve-se uma representação única das limitações e das regiões de operação dos componentes do WECS.

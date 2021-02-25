@@ -1,0 +1,207 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter[Comparação entre VSR e o VSR Delta]{Comparação entre o VSR$_\Delta$ e o VSR} \label{apendice:vsr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Neste apêndice são comparados os retificadores com base nos esforços de corrente. Essa comparação visa complementar as comparações entre o VSR e o VSR$_\Delta$ e servir de base para determinação precisa das vantagens da topologia empregada.  Para o cálculo dos esforços do VSR será aplicada a mesma metodologia do Apêndice~\ref{apendice:vsr-delta}. São consideradas duas estratégias clássicas de modulação \cite{Livros-07}: a PWM senoidal e a modulação vetorial. Por fim, será apresentada uma análise comparativa dos esforços de corrente em função dos pontos de operação do WECS determinados no Capítulo~\ref{chapter-gsip-controle}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Esforços de Corrente do VSR}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Para o cálculo dos esforços de corrente considera-se que as correntes de entrada são senoidais e foram definidas em (\ref{eq:iabc2}). Os interruptores controlados VSR são implementados com IGBTs, conforme ilustrado na Fig.~\ref{ap05:vsr}. Supõe-se que a tensão do barramento CC é constante e igual a $V_{dc}$. As funções de razão cíclica foram definidas em (\ref{eq:dabc}) e o modulador da Fig.~\ref{ap05:modulador} gera pulsos complementares para os interruptores com $x=\{a,b,c\}$. O sinal da portadora é triangular.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap05/vsr.eps}
+	\caption{Retificador VSR com interruptores do tipo IGBT.}
+	\label{ap05:vsr}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap05/modulador.eps}
+	\caption{Modulador do VSR.}
+	\label{ap05:modulador}
+\end{figure}
+
+A seguir são determinadas as expressões para cálculo dos esforços utilizando a estratégia de modulação PWM senoidal e a modulação vetorial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modulação PWM Senoidal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Na modulação PWM senoidal as funções de razão cíclica definidas em (\ref{eq:dabc}) são aplicadas diretamente no modulador para determinação dos pulsos de comando \cite{Livros-07}. 
+
+Para determinar as expressões dos esforços de corrente deve-se observar a região em destaque da Fig.~\ref{ap05:vsr} e que os esforços só precisam ser calculados para uma fase, pois a operação do circuito é de forma simétrica e equilibrada. Quando a corrente $i_a$ é positiva, se $s_{ap}=1$ a condução se dá pelo diodo de $S_{ap}$. E, se $s_{an}=1$ a condução se dá pelo IGBT de $S_{an}$. Dessa forma, determinam-se os valores médios e eficazes das correntes dos IGBTs a partir de (\ref{eq:isx-avg}) e de (\ref{eq:isx-rms}), respectivamente. 
+
+\begin{equation}
+\label{eq:isx-avg}
+I_{S,avg}\!=\!\dfrac{1}{2\pi}\! \left(\! \int_{y_{i,5_-^B}}^{y_{s,6^B_-}} d_a i_a dy \!+\! \int_{y_{i,6^A_+}}^{y_{s,2^C_-}} d_a i_a dy \! \right) \!= \!I_{pk}\!\left[ \dfrac{1}{2\pi} \!-\! \dfrac{M\cos(\delta_i)}{4\sqrt{3}}  \right]
+\end{equation}
+
+\begin{equation}
+\label{eq:isx-rms}
+I_{S,rms}=I_{pk}\sqrt{ \dfrac{1}{8} - \dfrac{2 M \cos(\delta_i)}{3\pi\sqrt{3}}}
+\end{equation}
+
+E, os valores médios e eficazes das correntes dos diodos a partir de (\ref{eq:idsx-avg}) e de (\ref{eq:idsx-rms}).
+
+\begin{flalign}
+\label{eq:idsx-avg}
+I_{D,avg}&=\dfrac{1}{2\pi} \left[ \int_{y_{i,5^B_-}}^{y_{s,6^B_-}} (1-d_a) i_a dy + \int_{y_{i,6^A_+}}^{y_{s,2^C_-}} (1-d_a) i_a dy \right] \nonumber \\
+& = I_{pk}\left[ \dfrac{1}{2\pi} + \dfrac{M\cos(\delta_i)}{4\sqrt{3}}  \right]
+\end{flalign}
+
+\begin{equation}
+\label{eq:idsx-rms}
+I_{D,rms}=I_{pk}\sqrt{ \dfrac{1}{8} + \dfrac{2 M \cos(\delta_i)}{3\pi\sqrt{3}}}
+\end{equation}
+
+Observa-se que as expressões obtidas são válidas tanto para a operação como retificador quanto como inversor.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modulação Vetorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Esta estratégia de modulação é tratada em detalhes em \cite{Livros-07,Livros-LIPO}. A modulação vetorial empregada pode ser interpretada como a injeção de um sinal composto de componentes harmônicas ímpares e múltiplas de três nas funções de razão cíclica da modulação PWM senoidal. No entanto, a abordagem analítica utilizando essa interpretação pode dificultar os cálculos e requerer o uso de expressões aproximadas para as funções de razão cíclica. Para a determinação das expressões analíticas exatas dessa estratégia de modulação aplica-se o mesmo procedimento do Capítulo~\ref{chapter-modulacao} nos vetores de cada setor, cujo resultado é apresentado na Tabela~\ref{tab:svm} em função das variáveis do plano $\alpha\beta$ e dos setores de tensão. 
+
+\begin{table}[!htb]
+\caption{Funções de razão cíclica em função das variáveis do plano $\alpha\beta$}
+\label{tab:svm}
+
+\centering
+
+\begin{center}
+\begin{tabular}{c  | c  | c  | c  }
+\hline
+Setor de & \multicolumn{3}{|c}{Funções de Razão Cíclica} \\
+\cline{2-4}
+Tensão & $d_{a}$ & $d_{b}$ & $d_{c}$\\
+\hline
+\hline
+&  & & \\
+$S_1$ e $S_3$ & $\!\!\dfrac{1}{2}\!\!\! \left(\!\! 1 \!\!+\!\! \dfrac{3}{2} d^*_{\alpha} \!\!+\!\! \dfrac{\sqrt{3}}{2}d^*_{\beta} \!\!\right)\!\!$ & $\!\!\dfrac{1}{2}\!\!\! \left(\!\! 1 \!\!-\!\! \dfrac{3}{2} d^*_{\alpha} \!\!+\!\! \dfrac{3\sqrt{3}}{2}d^*_{\beta}\!\! \right)\!\!$ & $\!\!\dfrac{1}{2}\!\!\!\left(\!\! 1 \!\!-\!\! \dfrac{3}{2} d^*_{\alpha} \!\!-\!\! \dfrac{\sqrt{3}}{2}d^*_{\beta} \!\!\right)\!\!$  \\
+&  & & \\
+\hline
+
+&  & & \\
+$S_2$ e $S_5$ & $\dfrac{1}{2}\left( 1 + {3}d^*_{\alpha}\right)$ & $\dfrac{1}{2}\left( 1 + \sqrt{3}d^*_{\beta}\right)$ & $\dfrac{1}{2}\left( 1 - \sqrt{3}d^*_{\beta}\right)$  \\
+&  & & \\
+\hline
+
+&  & & \\
+$S_3$ e $S_6$ & $\!\!\dfrac{1}{2}\!\!\! \left(\!\! 1 \!\!+\!\! \dfrac{3}{2} d^*_{\alpha} \!\!-\!\! \dfrac{\sqrt{3}}{2}d^*_{\beta} \!\!\right)\!\!$ & $\!\!\dfrac{1}{2} \!\!\!\left(\!\! 1 \!\!-\!\! \dfrac{3}{2} d^*_{\alpha} \!\!+\!\! \dfrac{\sqrt{3}}{2}d^*_{\beta}\!\! \right)\!\!$ & $\!\!\dfrac{1}{2}\!\!\! \left(\!\! 1 \!\!-\!\! \dfrac{3}{2} d^*_{\alpha} \!\!-\!\! \dfrac{3\sqrt{3}}{2}d^*_{\beta}\!\! \right)\!\!$  \\
+&  & & \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+O cálculo dos esforços é feito da mesma forma que para a modulação PWM senoidal. No entanto, deve-se observar que, como as funções de modulações são contínuas por partes, é necessário dividir o processo de integração entre os setores de tensão. Dessa forma, a integração irá depender do sentido das correntes e da defasagem $\delta_i$ entre as correntes de entrada e as tensões fundamentais sintetizadas pelo VSR. Entretanto,  os resultados podem ser simplificados devido à simetria de quarto de onda das correntes e das funções de razão cíclica. 
+
+Primeiramente, faz-se a análise para a condição em que o VSR opera como retificador e com $|\delta_i|\leq\pi/6$. Os valores médios e eficazes das correntes dos IGBTs podem ser determinados a partir de (\ref{eq:isx-avg-svm1}) e de (\ref{eq:isx-rms-svm1}), respectivamente. E, os valores médios e eficazes das correntes dos diodos a partir de (\ref{eq:idsx-avg-svm1}) e de (\ref{eq:idsx-rms-svm1}). No caso em que a operação se dá como inversor é possível empregar as mesmas expressões, mas aplicam-se os esforços calculados para os IGBTs nos diodos e vice-versa. Nesse caso o ângulo da corrente é redefinido como sendo o ângulo entre a corrente no sentido oposto e a tensão fundamental.
+
+\begin{flalign}
+\label{eq:isx-avg-svm1}
+I_{S,avg}&=\dfrac{1}{2\pi} \left( \int_{y_{i,5^B_-}}^{y_{s,5^B_-}} d_{a,S_5} i_a dy + \int_{y_{i,6^B_-}}^{2\pi+y_{s,6^A_+}} d_{a,S_6} i_a dy + \right. \nonumber \\
+& \left. + \int_{y_{i,1^A_+}}^{y_{s,1^C_-}} d_{a,S_1} i_a dy + \int_{y_{i,2^C_-}}^{y_{s,2^C_-}} d_{a,S_2} i_a dy \right) \nonumber \\
+& = I_{pk}\left[ \dfrac{1}{2\pi} - \dfrac{M\cos(\delta_i)}{4\sqrt{3}}  \right]
+\end{flalign}
+
+\pagebreak
+%\clearpage
+
+\begin{equation}
+\label{eq:isx-rms-svm1}
+I_{S,rms}\!\!=\!\!I_{pk}\sqrt{ \!\dfrac{1}{8} \!-\! \dfrac{2 M \cos(\delta_i)}{3\pi\sqrt{3}} \!-\! \dfrac{M}{24\pi\sqrt{3}}[8\cos(\delta_i)\!-\!3\sqrt{3}\!-\!2\sqrt{3}\cos(2\delta_i)]\!\!}
+\end{equation}
+
+\begin{equation}
+\label{eq:idsx-avg-svm1}
+I_{D,avg} = I_{pk}\left[ \dfrac{1}{2\pi} + \dfrac{M\cos(\delta_i)}{4\sqrt{3}} \right]
+\end{equation}
+
+\begin{equation}
+\label{eq:idsx-rms-svm1}
+I_{D,rms}\!\!=\!\!I_{pk}\sqrt{\! \dfrac{1}{8} \!+\! \dfrac{2 M \cos(\delta_i)}{3\pi\sqrt{3}} \!+ \!\dfrac{M}{24\pi\sqrt{3}}[8\cos(\delta_i)\!-\!3\sqrt{3}\!-\!2\sqrt{3}\cos(2\delta_i)] \!\!}
+\end{equation}
+
+Por fim, faz-se a análise para a condição em que o VSR opera como retificador e com $\pi/6\leq|\delta_i|\leq\pi/2$. Os valores médios e eficazes das correntes dos IGBTs podem ser determinados a partir de (\ref{eq:isx-avg-svm2}) e de (\ref{eq:isx-rms-svm2}), respectivamente. E, os valores médios e eficazes das correntes dos diodos a partir de (\ref{eq:idsx-avg-svm2}) e de (\ref{eq:idsx-rms-svm2}). Observa-se que as mesmas considerações feitas anteriormente são válidas para a operação como inversor, em que o módulo nas expressões (\ref{eq:isx-rms-svm2}) e (\ref{eq:idsx-rms-svm2}) foi adicionado com o intuito de generalizar tais expressões.
+
+\begin{flalign}
+\label{eq:isx-avg-svm2}
+I_{S,avg}&=\dfrac{1}{2\pi} \left( \int_{y_{i,5^B_-}}^{y_{s,4^C_+}} d_{a,S_4} i_a dy + \int_{y_{i,5^C_+}}^{y_{s,5^B_-}} d_{a,S_5} i_a dy +  \right. \nonumber \\
+&  \left. + \int_{y_{i,6^B_-}}^{2\pi+y_{s,6^A_+}} d_{a,S_6} i_a dy + \int_{y_{i,1^A_+}}^{y_{s,2^C_-}} d_{a,S_1} i_a dy \right) \nonumber \\
+& = I_{pk}\left[ \dfrac{1}{2\pi} - \dfrac{M\cos(\delta_i)}{4\sqrt{3}}  \right]
+\end{flalign}
+
+\begin{equation}
+\label{eq:isx-rms-svm2}
+I_{S,rms}\!\!=\!\!I_{pk}\sqrt{\! \dfrac{1}{8}\! -\! \dfrac{M}{24\pi}\!\left[ 3\!+\!8\cos\left(|\delta_i|\!+\!\frac{\pi}{6}\right) \!-\!2\cos\left(2|\delta_i|\!+\!\frac{\pi}{3}\right) \right]\!}
+\end{equation}
+
+\begin{equation}
+\label{eq:idsx-avg-svm2}
+I_{D,avg}= I_{pk}\left[ \dfrac{1}{2\pi} + \dfrac{M\cos(\delta_i)}{4\sqrt{3}}  \right]
+\end{equation}
+
+\begin{equation}
+\label{eq:idsx-rms-svm2}
+I_{D,rms}\!\!=\!\!I_{pk}\sqrt{\! \dfrac{1}{8} \!+ \!\dfrac{M}{24\pi}\!\left[ 3\!+\!8\cos\left(|\delta_i|\!+\!\frac{\pi}{6}\right) \!-\!2\!\cos\left(2|\delta_i|\!+\!\frac{\pi}{3}\right) \right]}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Análise Comparativa entre os Retificadores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparativo Geral}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+É interessante observar que os valores médios das correntes nos IGBTs são iguais em todos os casos, inclusive iguais aos valores médios para os MOSFETs do VSR$_\Delta$ na estratégia SVM~I. Isso acontece devido às etapas de acumulação de energia ou etapas $boost$ permanecerem inalteradas nessas estratégias de modulação. No caso da estratégia SVM~II a etapa é alterada pela inserção de um terceiro interruptor em paralelo. Observa-se que as etapas se dão em momentos diferentes e, portanto, os valores eficazes das correntes são diferentes. 
+
+No caso dos diodos de retificação, o valor médio da corrente não é o mesmo quando comparados os esforços no VSR e no VSR$_\Delta$. Isso se deve à passagem da corrente nos diodos durante a etapa de acumulação de energia no VSR e, portanto, esperam-se maiores valores de correntes nestes componentes. No VSR$_\Delta$ os diodos de retificação estão em condução apenas nas etapas de transferência de energia.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparativo no WECS deste Trabalho}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nas Fig.~\ref{ap05:id-avg}, Fig.~\ref{ap05:id-rms} e Fig.~\ref{ap05:is-rms} estão ilustrados os esforços de corrente no VSR e no VSR$_\Delta$ em função dos pontos de operação do WECS\footnote{O sobrescrito VSR é utilizado para denotar os esforços de corrente quando para as duas estratégias de modulação têm os mesmos valores analíticos. O mesmo se aplica ao VSR$_\Delta$. Os sobrescritos SPWM e SVM denota a modulação PWM senoidal e a vetorial do VSR, respectivamente.}. 
+
+\begin{figure}[!htb]
+	\centering
+	\mbox{
+	
+	\subfigure[]{
+	\label{ap05:id-avg}
+	\includegraphics[scale=\escalafig]{Figuras/ap05/id_avg.eps}}
+	
+	\subfigure[]{
+	\label{ap05:id-rms}
+	\includegraphics[scale=\escalafig]{Figuras/ap05/id_rms.eps}}}
+	\caption[Valores das correntes nos diodos do VSR e do VSR$_\Delta$.]{Valores das correntes nos diodos de retificação do VSR e do VSR$_\Delta$: (a) médios e (b) eficazes.}
+	
+\end{figure}
+
+Observa-se na Fig.~\ref{ap05:id-avg}, como esperado, uma elevação do valor médio da corrente nos diodos de retificação do VSR. Essa elevação se dá também nos valores eficazes das correntes, conforme observado na Fig.~\ref{ap05:id-rms}. Embora seja difícil de se observar, os esforços do VSR são ligeiramente maiores na estratégia de modulação PWM senoidal.
+
+Os esforços nos interruptores controlados estão ilustrados na Fig. \ref{ap05:is-rms}. Nota-se a redução dos esforços com o emprego do VSR$_\Delta$, principalmente se for empregada a estratégia de modulação vetorial proposta neste trabalho. Com relação aos esforços do VSR, observa-se que os esforços da modulação vetorial são ligeiramente maiores. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap05/is_rms.eps}
+	\caption{Valores eficazes das correntes nos interruptores controlados do VSR e do VSR$_\Delta$.}
+	\label{ap05:is-rms}
+\end{figure}
+
+Com o intuito de verificar o aumento dos esforços com a variação da potência de entrada dos retificadores, é a apresentada na Fig.~\ref{ap05:esforcos} o valor percentual de cada corrente tomando como bases os valores das correntes para a estratégia de modulação PWM senoidal do VSR. São comparadas a estratégia SVM~II e a modulação PWM senoidal. Nota-se que há uma redução significativa dos esforços de corrente para a modulação SVM~II, chegando a valores na potência nominal de cerca de 35\% no valor médio da corrente e 20\% no valor eficaz da corrente dos diodos e 15\% no valor eficaz da corrente dos interruptores controlados. 
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=\escalafig]{Figuras/ap05/esforcos.eps}
+	\caption{Variação percentual das correntes.}
+	\label{ap05:esforcos}
+\end{figure}
+ 
+
