@@ -4,7 +4,9 @@
 
 - Modelo focado para o Instituto de Eletrônica de Potência (INEP/UFSC)
 
-- Observação: é possível que mesmo com tudo funcionando como esperando, você encontre 2-3 avisos e/ou erros de compilação
+- Observação: é possível que mesmo com tudo funcionando como esperado, você encontre 2-3 avisos e/ou erros de compilação
+
+- Já serviu de base para o trabalhos de outros colegas, agradeço a confiança e sucesso na sua defesa!
 
 ## Configuração Geral do Documento
 
